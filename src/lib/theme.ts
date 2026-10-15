@@ -22,11 +22,19 @@ export function millisecondsUntilThemeBoundary(date = new Date()) {
   return Math.max(0, next.getTime() - date.getTime());
 }
 
-/**
- * Runs inline in <head> before first paint so the correct theme is applied
- * without a flash. A stored choice wins; otherwise local time controls the theme.
- */
-export const themeBootScript = `(function(){try{var k="${THEME_KEY}",s=null;try{s=localStorage.getItem(k)}catch(e){}
-var h=(new Date()).getHours(),a=(h>=6&&h<18)?"light":"dark",t=(s==="light"||s==="dark")?s:a;
-var d=document.documentElement;d.setAttribute("data-theme",t);d.style.colorScheme=t;
-var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",t==="light"?"#f3f6fc":"#07090f")}catch(e){document.documentElement.setAttribute("data-theme","dark")}})();`;
+/** Applies the stored preference or local-time schedule before React hydration. */
+export function applyInitialTheme() {
+  let stored: string | null = null;
+  try {
+    stored = localStorage.getItem(THEME_KEY);
+  } catch {
+    // The schedule remains available when browser storage is blocked.
+  }
+
+  const theme = stored === "light" || stored === "dark" ? stored : scheduledTheme();
+  const root = document.documentElement;
+  root.setAttribute("data-theme", theme);
+  root.style.colorScheme = theme;
+  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+    ?.setAttribute("content", theme === "light" ? "#f3f6fc" : "#07090f");
+}

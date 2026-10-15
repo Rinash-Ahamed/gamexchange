@@ -52,6 +52,7 @@ This file stores durable context between development sessions. Keep entries conc
 - Added a game-style first-session boot screen with a logo power-up, system statuses, progress sequence, accessible interaction locking, and reduced-motion handling.
 - Combined theme and boot-session pre-paint logic into one bootstrap script to avoid Next.js client-rendered script warnings.
 - Routed all JSON-LD through Next.js Script components so client rendering never encounters raw script elements.
+- Moved executable theme and boot startup code into Next.js client instrumentation so React never renders an executable script element.
 
 ## Next Steps
 
