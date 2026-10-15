@@ -3,7 +3,7 @@ import Script from "next/script";
 import { chakra, inter } from "@/lib/fonts";
 import { themeBootScript } from "@/lib/theme";
 import { bootScreenScript } from "@/lib/boot-screen";
-import { localBusinessJsonLd } from "@/lib/structured-data";
+import { localBusinessJsonLd, serializeJsonLd } from "@/lib/structured-data";
 import { site } from "@/data/site";
 import { Providers } from "@/components/ui/Providers";
 import { SiteChrome } from "@/components/layout/SiteChrome";
@@ -44,7 +44,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div id="main" className="overflow-x-clip">{children}</div>
           </SiteChrome>
         </Providers>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd()) }} />
+        <Script
+          id="gamexchange-local-business-jsonld"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(localBusinessJsonLd()) }}
+        />
       </body>
     </html>
   );

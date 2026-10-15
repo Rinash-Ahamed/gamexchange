@@ -51,6 +51,7 @@ This file stores durable context between development sessions. Keep entries conc
 - Theme changes use a single page-level View Transition instead of transitioning every DOM element, avoiding the previous repaint lag.
 - Added a game-style first-session boot screen with a logo power-up, system statuses, progress sequence, accessible interaction locking, and reduced-motion handling.
 - Combined theme and boot-session pre-paint logic into one bootstrap script to avoid Next.js client-rendered script warnings.
+- Routed all JSON-LD through Next.js Script components so client rendering never encounters raw script elements.
 
 ## Next Steps
 

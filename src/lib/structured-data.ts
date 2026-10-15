@@ -2,6 +2,10 @@ import { branches, site } from "@/data/site";
 
 const openDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Saturday", "Sunday"];
 
+export function serializeJsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}
+
 /** LocalBusiness data built only from facts published on the live site. */
 export function localBusinessJsonLd() {
   return {

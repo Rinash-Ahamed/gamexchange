@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { PageHero } from "@/components/ui/PageHero";
 import { ProductBrowser } from "@/components/shop/ProductBrowser";
 import { site } from "@/data/site";
 import { listPublicProducts } from "@/lib/admin/db";
+import { serializeJsonLd } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
   title: "Shop consoles & gaming gear",
@@ -36,7 +38,11 @@ export default async function ProductsPage() {
         Pre-owned consoles from our shelf. Prices are as listed on our current site. Message the shop to confirm what’s available today.
       </PageHero>
       <div className="mx-auto max-w-7xl px-5 sm:px-8"><ProductBrowser products={products} /></div>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Script
+        id="gamexchange-products-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
     </main>
   );
 }
