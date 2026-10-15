@@ -134,12 +134,9 @@ export async function listPublicInventory() {
 
 export async function listPublicProducts(): Promise<Product[]> {
   const projectId = process.env.FIREBASE_PROJECT_ID?.trim();
-  if (
-    process.env.NODE_ENV !== "production" &&
-    (!projectId || projectId === "your-firebase-project-id")
-  ) {
+  if (!projectId || projectId === "your-firebase-project-id") {
     if (!warnedAboutLocalProductFallback) {
-      console.warn("Firebase is not configured; serving the local demo product catalog.");
+      console.warn("FIREBASE_PROJECT_ID is not configured; serving the local demo product catalog.");
       warnedAboutLocalProductFallback = true;
     }
     return [...products];
