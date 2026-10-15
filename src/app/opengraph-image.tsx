@@ -11,6 +11,7 @@ export default async function OpenGraphImage() {
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: 80, background: "radial-gradient(circle at 80% 20%, #2b3f8f 0%, #07090f 60%)", color: "#f5f7ff" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse renders its own image document. */}
         <img src={logo} alt="" width={330} height={135} />
         <div style={{ fontSize: 132, fontWeight: 800, lineHeight: 0.95, marginTop: 24, textTransform: "uppercase" }}>Your game.</div>
         <div style={{ fontSize: 132, fontWeight: 800, lineHeight: 0.95, textTransform: "uppercase", color: "#865cff" }}>Your rules.</div>

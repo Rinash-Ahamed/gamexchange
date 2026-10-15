@@ -4,12 +4,11 @@ import { useId, useMemo, useState } from "react";
 import { AnimatePresence, m } from "motion/react";
 import { ProductCard } from "./ProductCard";
 import { Glyph, glyphTint, type GlyphName } from "@/components/ui/Glyph";
-import { products, type Product } from "@/data/products";
+import type { Product } from "@/data/products";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { whatsappUrl } from "@/data/site";
 
-const platforms = ["All", "PlayStation 2", "PlayStation 3"] as const;
-type Platform = (typeof platforms)[number];
+type Platform = string;
 
 const sorts = {
   featured: "Featured",
@@ -19,7 +18,7 @@ const sorts = {
 } as const;
 type SortKey = keyof typeof sorts;
 
-const glyphFor: Record<Platform, GlyphName> = { All: "x", "PlayStation 2": "o", "PlayStation 3": "tri" };
+const platformGlyphs: readonly GlyphName[] = ["o", "tri", "sq"];
 
 const sorters: Record<SortKey, (a: Product, b: Product) => number> = {
   featured: (a, b) => Number(b.featured ?? false) - Number(a.featured ?? false),
@@ -28,22 +27,24 @@ const sorters: Record<SortKey, (a: Product, b: Product) => number> = {
   name: (a, b) => a.name.localeCompare(b.name),
 };
 
-export function ProductBrowser() {
+export function ProductBrowser({ products }: { products: readonly Product[] }) {
   const [platform, setPlatform] = useState<Platform>("All");
   const [sort, setSort] = useState<SortKey>("featured");
   const sortId = useId();
+  const platforms = useMemo(() => ["All", ...new Set(products.map((product) => product.platform))], [products]);
 
   const visible = useMemo(
     () => products.filter((p) => platform === "All" || p.platform === platform).toSorted(sorters[sort]),
-    [platform, sort],
+    [platform, products, sort],
   );
 
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div role="radiogroup" aria-label="Filter by platform" className="flex flex-wrap gap-2">
-          {platforms.map((p) => {
+          {platforms.map((p, platformIndex) => {
             const selected = p === platform;
+            const glyph = p === "All" ? "x" : (platformGlyphs[(platformIndex - 1) % platformGlyphs.length] ?? "sq");
             return (
               <button
                 key={p}
@@ -53,7 +54,7 @@ export function ProductBrowser() {
                 onClick={() => setPlatform(p)}
                 className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-display text-xs font-semibold uppercase tracking-[0.16em] transition-all duration-200 touch-manipulation active:scale-95 ${selected ? "border-transparent bg-gradient-to-b from-fill to-fill-2 text-accent-ink" : "glass text-muted hover:text-ink"}`}
               >
-                <span style={{ color: selected ? undefined : glyphTint[glyphFor[p]] }}><Glyph name={glyphFor[p]} className="size-3.5" /></span>
+                <span style={{ color: selected ? undefined : glyphTint[glyph] }}><Glyph name={glyph} className="size-3.5" /></span>
                 {p}
               </button>
             );
@@ -86,6 +87,8 @@ export function ProductBrowser() {
           ))}
         </AnimatePresence>
       </m.ul>
+
+      {!visible.length && <p className="mt-6 rounded-2xl border border-dashed border-line-strong p-10 text-center text-muted">No products are currently available.</p>}
 
       <div className="metal mt-8 flex flex-wrap items-center justify-between gap-4 rounded-3xl p-6">
         <div>

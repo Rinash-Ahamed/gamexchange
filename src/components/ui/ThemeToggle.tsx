@@ -6,6 +6,11 @@ import { Moon, Sun } from "lucide-react";
 import { millisecondsUntilThemeBoundary, scheduledTheme, THEME_KEY, type Theme } from "@/lib/theme";
 
 const root = () => document.documentElement;
+let fallbackTimer: number | undefined;
+
+type ThemeTransitionDocument = Document & {
+  startViewTransition?: (update: () => void) => { finished: Promise<void> };
+};
 
 function readTheme(): Theme {
   return root().getAttribute("data-theme") === "light" ? "light" : "dark";
@@ -69,13 +74,33 @@ function subscribe(onChange: () => void) {
 function applyTheme(next: Theme, animate: boolean) {
   const el = root();
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (animate && !reduce) {
-    el.classList.add("theme-anim");
-    window.setTimeout(() => el.classList.remove("theme-anim"), 360);
+  if (readTheme() === next) return;
+
+  const commit = () => {
+    el.setAttribute("data-theme", next);
+    el.style.colorScheme = next;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "light" ? "#f3f6fc" : "#07090f");
+  };
+
+  if (!animate || reduce) {
+    commit();
+    return;
   }
-  el.setAttribute("data-theme", next);
-  el.style.colorScheme = next;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "light" ? "#f3f6fc" : "#07090f");
+
+  const transitionDocument = document as ThemeTransitionDocument;
+  if (transitionDocument.startViewTransition) {
+    el.classList.add("theme-anim");
+    const transition = transitionDocument.startViewTransition(commit);
+    void transition.finished.finally(() => el.classList.remove("theme-anim"));
+    return;
+  }
+
+  window.clearTimeout(fallbackTimer);
+  el.classList.add("theme-anim-fallback");
+  window.requestAnimationFrame(() => {
+    commit();
+    fallbackTimer = window.setTimeout(() => el.classList.remove("theme-anim-fallback"), 220);
+  });
 }
 
 export function ThemeToggle({ className = "" }: { className?: string }) {

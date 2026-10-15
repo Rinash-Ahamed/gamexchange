@@ -2,13 +2,11 @@
 
 import { useRef, useState } from "react";
 import { AnimatePresence, m, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
-import { products, formatINR } from "@/data/products";
+import { formatINR, type Product } from "@/data/products";
 import { whatsappUrl } from "@/data/site";
 import { ProductStage } from "@/components/shop/ProductStage";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { ControllerButton } from "@/components/ui/ControllerButton";
-
-const n = products.length;
 
 /**
  * Signature moment C: product spotlight. On desktop the section pins and scrolling advances
@@ -16,7 +14,8 @@ const n = products.length;
  * values). The rail buttons give direct keyboard/click access. On touch, small screens and
  * reduced-motion the same products render as a native swipe carousel instead (CSS-only switch).
  */
-export function ShelfShowcase() {
+export function ShelfShowcase({ products }: { products: readonly Product[] }) {
+  const n = products.length;
   const runway = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const reduce = useReducedMotion();

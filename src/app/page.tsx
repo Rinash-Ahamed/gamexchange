@@ -12,8 +12,12 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { Accordion } from "@/components/ui/Accordion";
 import { faqs } from "@/data/faq";
+import { listPublicProducts } from "@/lib/admin/db";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const products = await listPublicProducts();
   return (
     <main>
       <AmbientLight />
@@ -25,7 +29,7 @@ export default function Home() {
         <SectionHeading title={<span id="shelf-h">Pre-owned consoles.<br /><span className="text-gradient">From our shelf.</span></span>}>
           Prices and trade-in figures are as listed on our current site. Message the shop to confirm what’s in stock.
         </SectionHeading>
-        <div className="mt-8"><ShelfShowcase /></div>
+        <div className="mt-8"><ShelfShowcase products={products} /></div>
       </section>
       <SectionGate from="The shelf" to="Trade-in" level={3} />
       <TradeTeaser />

@@ -5,3 +5,6 @@ next-env.d.ts
 playwright-report
 test-results
 .env*.local
+data/*.sqlite
+data/*.sqlite-shm
+data/*.sqlite-wal

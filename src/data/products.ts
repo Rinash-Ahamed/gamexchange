@@ -1,9 +1,9 @@
 export type Product = {
   id: string;
   name: string;
-  platform: "PlayStation 2" | "PlayStation 3";
-  category: "Console";
-  condition: "Pre-Owned";
+  platform: string;
+  category: string;
+  condition: string;
   /** Price in INR as listed on the live site. */
   price: number;
   /** Trade-in figures as listed on the live site. Indicative only; confirmed in store. */

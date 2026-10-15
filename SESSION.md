@@ -22,6 +22,10 @@ This file stores durable context between development sessions. Keep entries conc
 - Added local-time theme scheduling (light from 6:00 AM to 5:59 PM, dark from 6:00 PM to 5:59 AM) with seamless boundary updates and persistent manual overrides.
 - Allowed Next.js image qualities 75, 80, and 85 to match all current image components.
 - Extended the moving gradient animation to every heading that uses gradient text.
+- Replaced the old Game Zone CDN photos with four original local PNG gaming visuals.
+- Added a protected single-admin login and operations dashboard.
+- Added Firestore-backed inventory management and customer service record tracking through the server-only Firebase Admin SDK.
+- Connected active, in-stock inventory to the public home shelf and Products page.
 - Replaced the static “Heard from the lobby” review grid with a themed, accessible 3D vertical testimonial marquee based on the supplied reference.
 
 ## Existing Architecture
@@ -40,10 +44,19 @@ This file stores durable context between development sessions. Keep entries conc
 - Global clarity changes remain token-driven in `globals.css` so all routes inherit them consistently.
 - Inertial scrolling runs only for fine pointers when reduced motion is not requested; touch and reduced-motion users retain native scrolling.
 - Batch upcoming implementation changes without running lint, build, or tests after each change. Run the full validation suite only when the user explicitly asks for final checks.
+- Admin credentials and the session signing secret come from environment variables. Development-only fallback credentials are shown on the login page.
+- Operational data uses Cloud Firestore. Firebase Admin credentials stay server-side and are configured through environment variables.
+- Inventory SKUs use a transactional Firestore index so duplicate SKUs cannot be created during concurrent requests.
+- Destructive admin actions use an accessible themed in-app confirmation dialog instead of the browser confirmation popup.
+- Theme changes use a single page-level View Transition instead of transitioning every DOM element, avoiding the previous repaint lag.
+- Added a game-style first-session boot screen with a logo power-up, system statuses, progress sequence, accessible interaction locking, and reduced-motion handling.
+- Combined theme and boot-session pre-paint logic into one bootstrap script to avoid Next.js client-rendered script warnings.
 
 ## Next Steps
 
-- Define and implement the first requested Gameexchange layout or feature change.
+- Create the Firebase project and Firestore database, then configure the values documented in `FIREBASE_SETUP.md`.
+- Keep the legacy SQLite files until any records that matter have been migrated and verified in Firestore.
+- Run typecheck, lint, build, and Playwright only when explicitly requested.
 
 ## Update Template
 

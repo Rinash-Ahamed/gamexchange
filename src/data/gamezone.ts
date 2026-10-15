@@ -34,11 +34,20 @@ export const zoneStations: readonly ZoneStation[] = [
 ];
 
 export const zoneImages = [
-  "eqAeksSrXuILlI1seJ9fzbPDKIo.jpg",
-  "ovyoJ1prPkw58Ks8RJwnsp88.jpg",
-  "zUMGtDw0yZdAD9KQGHExSzXQ0.jpg",
-  "7d5uRCxohS3Qp6inLsSgi6Abb8.jpg",
-].map((f, i) => ({
-  src: `https://framerusercontent.com/images/${f}`,
-  alt: `GamexChange gaming zone, photo ${i + 1}`,
-}));
+  {
+    src: "/images/game-zone/neon-console-lounge.png",
+    alt: "Futuristic blue and violet console gaming lounge",
+  },
+  {
+    src: "/images/game-zone/multiplayer-station.png",
+    alt: "Four-seat competitive multiplayer gaming station",
+  },
+  {
+    src: "/images/game-zone/arcade-tournament.png",
+    alt: "Neon head-to-head arcade tournament setup",
+  },
+  {
+    src: "/images/game-zone/controller-station.png",
+    alt: "Two controllers on an illuminated gaming desk",
+  },
+] as const;

@@ -10,6 +10,23 @@ npm run typecheck && npm run lint && npm run build
 npx playwright install chromium && npm run test:e2e
 ```
 
+## Admin dashboard
+
+The protected admin area is available at `/admin/login`. It manages live storefront inventory and private customer service records in Cloud Firestore through the server-only Firebase Admin SDK.
+
+Copy `.env.example` to `.env.local` and replace every placeholder before production:
+
+```text
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=replace-with-a-long-unique-password
+ADMIN_SESSION_SECRET=replace-with-at-least-32-random-characters
+FIREBASE_PROJECT_ID=your-firebase-project-id
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-firebase-project-id.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nreplace-with-your-private-key\n-----END PRIVATE KEY-----\n"
+```
+
+Local development falls back to the temporary login credentials shown on the login page when admin environment variables are absent. Production has no login fallback. Firebase credentials are always required before pages that use inventory or service data can load. See `FIREBASE_SETUP.md` for the complete setup, named database, and Application Default Credentials options.
+
 ## Where to connect things later
 | What | Where |
 |---|---|
@@ -31,6 +48,7 @@ The default theme follows the visitor's local time: light from 6:00 AM through 5
 
 ## Environment & security notes
 
+- Admin sessions are signed, HTTP-only, same-site cookies with an eight-hour lifetime. Change the development login before sharing the application.
 - Set `ENQUIRY_SECRET` (long random string) in production; it signs the single-use enquiry tokens. Without it a per-process fallback is used, so tokens won't survive restarts or multiple instances.
 - Rate limits are in-memory per server process. For multiple instances, back them with a shared store (e.g. Redis).
 - The CSP still allows `script-src 'unsafe-inline'` (theme boot script, JSON-LD, Next inline scripts). Development also allows `unsafe-eval` for React and Turbopack debugging; production does not. Moving inline scripts to nonces is a known follow-up.
