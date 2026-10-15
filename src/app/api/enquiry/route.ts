@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   const { _t: token, ...body } = json as Record<string, unknown>;
   const tokenState = verifyToken(token);
   if (tokenState !== "ok") {
-    const msg = tokenState === "too-fast" ? "That was quick — please review your details and send again." : "Your session expired. Please reload the page and try again.";
+    const msg = tokenState === "too-fast" ? "That was quick. Please review your details and send again." : "Your session expired. Please reload the page and try again.";
     return fail(msg, tokenState === "too-fast" ? 429 : 400, { retry: true });
   }
 

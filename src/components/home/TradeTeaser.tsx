@@ -6,18 +6,18 @@ import { site } from "@/data/site";
 
 const steps: { glyph: GlyphName; title: string; body: string }[] = [
   { glyph: "x", title: "Choose your console", body: "Tell us what you’re trading in." },
-  { glyph: "o", title: "Select its condition", body: "Be honest — the shop checks it in person." },
+  { glyph: "o", title: "Select its condition", body: "Be honest. The shop checks it in person." },
   { glyph: "tri", title: "Add the extras", body: "Controllers, cables, box, games." },
   { glyph: "sq", title: "Pick your upgrade", body: "PS5, PS4, PS3 or an accessory." },
 ];
 
 export function TradeTeaser() {
   return (
-    <section data-tone="violet" aria-labelledby="trade-h" className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
-      <div className="grid items-center gap-12 lg:grid-cols-2">
+    <section data-tone="violet" aria-labelledby="trade-h" className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
+      <div className="grid items-center gap-8 lg:grid-cols-2">
         <div>
-          <SectionHeading eyebrow="Trade-in & exchange" title={<span id="trade-h">Level up<br /><span className="text-gradient">your setup.</span></span>}>
-            Swap your old console toward your next one. Send an enquiry in a minute — the shop confirms the offer after checking your device.
+          <SectionHeading title={<span id="trade-h">Level up<br /><span className="text-gradient">your setup.</span></span>}>
+            Swap your old console toward your next one. Send an enquiry in a minute. The shop confirms the offer after checking your device.
           </SectionHeading>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <ControllerButton href="/exchange" glyph="x" size="lg">Start trade-in</ControllerButton>

@@ -55,8 +55,8 @@ export function ControllerButton(props: AsLink | AsButton) {
     "group relative inline-flex select-none items-center justify-center overflow-hidden rounded-full font-display font-semibold uppercase tracking-[0.14em] outline-offset-4 transition-[filter,background-color] duration-200 disabled:pointer-events-none disabled:opacity-50 touch-manipulation";
   const look =
     variant === "primary"
-      ? "bg-gradient-to-b from-fill to-[color-mix(in_srgb,var(--fill)_78%,black)] text-accent-ink [box-shadow:var(--shadow-button)] hover:brightness-110"
-      : "glass text-ink [box-shadow:var(--shadow-card)] hover:bg-surface-2";
+      ? "bg-gradient-to-b from-fill to-[color-mix(in_srgb,var(--fill)_78%,black)] text-accent-ink hover:brightness-110"
+      : "glass text-ink hover:bg-surface-2";
 
   const content = (
     <>
@@ -65,7 +65,7 @@ export function ControllerButton(props: AsLink | AsButton) {
       <span
         aria-hidden
         style={{ color: glyphTint[glyph] }}
-        className={`relative grid shrink-0 place-items-center rounded-full bg-surface text-[color:var(--key)] shadow-[inset_0_2px_0_rgb(255_255_255/0.16),inset_0_-3px_0_rgb(0_0_0/0.25),0_2px_6px_rgb(0_0_0/0.3)] ${keySizes[size]}`}
+        className={`relative grid shrink-0 place-items-center rounded-full bg-surface text-[color:var(--key)] shadow-[inset_0_2px_0_rgb(255_255_255/0.16),inset_0_-3px_0_rgb(0_0_0/0.25)] ${keySizes[size]}`}
       >
         <Glyph name={glyph} className="size-4" />
       </span>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef } from "react";
-import { m, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, m, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { ControllerBack, ControllerBody, ControllerCallouts, ControllerControls } from "@/components/hero/ControllerArt";
 import { useFinePointer, useMedia } from "@/lib/use-media";
@@ -9,22 +9,40 @@ import { site } from "@/data/site";
 
 const d = (s: string) => ({ ["--d" as string]: s });
 
+const headlines = [
+  { top: "Your game.", bottom: "Your rules." },
+  { top: "Play more.", bottom: "Pay less." },
+  { top: "Trade smart.", bottom: "Level up." },
+  { top: "Game over?", bottom: "Not yet." },
+] as const;
+
 /**
  * Cinematic hero. Entry sequence is pure CSS (plays before hydration, never blocks LCP):
  * light rises → controller emerges → blue light travels across the shell → headline → buttons.
  * Afterwards: pointer parallax (desktop, CSS variables only) and a scroll-linked "exploded view"
- * (transform/opacity only, motion values — no React re-renders).
+ * (transform/opacity only and motion values, with no React re-renders).
  */
 export function Hero() {
   const section = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const frame = useRef(0);
+  const [headline, setHeadline] = useState(0);
 
   const live = useInView(section, { margin: "120px" });
   const fine = useFinePointer();
   const wide = useMedia("(min-width: 1024px)");
   const reduce = useReducedMotion();
   const explode = wide && fine && !reduce;
+
+  useEffect(() => {
+    if (reduce) return;
+
+    const interval = window.setInterval(() => {
+      setHeadline((current) => (current + 1) % headlines.length);
+    }, 3200);
+
+    return () => window.clearInterval(interval);
+  }, [reduce]);
 
   const { scrollYProgress } = useScroll({ target: section, offset: ["start start", "end start"] });
   const rotX = useTransform(scrollYProgress, [0, 1], [0, explode ? 24 : 0]);
@@ -62,20 +80,29 @@ export function Hero() {
       <div aria-hidden className="anim-illuminate absolute inset-0 -z-10">
         <div className="absolute -left-1/4 -top-1/4 size-[70vmax] rounded-full bg-[radial-gradient(closest-side,var(--hero-wash-a),transparent)]" />
         <div className="absolute -bottom-1/4 -right-1/4 size-[65vmax] rounded-full bg-[radial-gradient(closest-side,var(--hero-wash-b),transparent)]" />
-        <div className="hud-grid absolute inset-0" />
         <div className="absolute inset-0" style={{ background: "var(--hero-vignette)" }} />
       </div>
 
       <div className="mx-auto grid w-full max-w-7xl items-center gap-2 px-5 sm:px-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6.6fr)] lg:gap-4">
         {/* copy */}
         <div className="relative z-10 order-2 lg:order-1">
-          <p className="anim-rise flex items-center gap-3 font-display text-[11px] font-semibold uppercase tracking-[0.35em] text-accent-text sm:text-xs" style={d("0.5s")}>
-            <span aria-hidden className="h-px w-8 bg-current opacity-60" />
-            Coimbatore · Gaming hub
-          </p>
-          <h1 className="mt-5 font-display text-[clamp(2.7rem,12.4vw,4.4rem)] font-bold uppercase leading-[0.9] tracking-tight sm:text-[clamp(3.4rem,9vw,5.6rem)] lg:text-[clamp(3.2rem,5.6vw,6.2rem)]">
-            <span className="anim-rise block" style={d("0.62s")}>Your game.</span>
-            <span className="anim-rise text-gradient block pb-[0.08em]" style={d("0.78s")}>Your rules.</span>
+          <h1 className="anim-rise font-display text-[clamp(2.7rem,12.4vw,4.4rem)] font-bold uppercase leading-[0.9] tracking-tight sm:text-[clamp(3.4rem,9vw,5.6rem)] lg:text-[clamp(3.2rem,5.6vw,6.2rem)]" style={d("0.62s")}>
+            <span className="sr-only">Your game. Your rules.</span>
+            <span aria-hidden className="block min-h-[1.88em]">
+              <AnimatePresence mode="wait" initial={false}>
+                <m.span
+                  key={headline}
+                  className="block"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <span className="block">{headlines[headline]?.top}</span>
+                  <span className="text-gradient-motion block pb-[0.08em]">{headlines[headline]?.bottom}</span>
+                </m.span>
+              </AnimatePresence>
+            </span>
           </h1>
           <p className="anim-rise mt-5 font-display text-[13px] font-medium uppercase tracking-[0.14em] text-muted min-[400px]:text-[15px] sm:text-lg sm:tracking-[0.2em]" style={d("0.98s")}>
             {site.tagline}
@@ -119,10 +146,6 @@ export function Hero() {
         </div>
       </div>
 
-      <div aria-hidden className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.35em] text-muted lg:flex">
-        Scroll
-        <span className="h-10 w-px overflow-hidden bg-line"><span className="block size-full animate-[scan_2.4s_ease-in-out_infinite] bg-blue" /></span>
-      </div>
     </section>
   );
 }

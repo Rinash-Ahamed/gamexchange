@@ -6,18 +6,18 @@ import { branches, mapsUrl, site, whatsappUrl } from "@/data/site";
 
 export const metadata: Metadata = {
   title: "Contact & branches",
-  description: "Two GamexChange branches in Coimbatore — Sungam and Selvapuram South. Open 11:00 AM – 8:30 PM, closed Fridays.",
+  description: "Two GamexChange branches in Coimbatore: Sungam and Selvapuram South. Open 11:00 AM – 8:30 PM, closed Fridays.",
   alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {
   return (
     <main>
-      <PageHero eyebrow="Contact" title={<>Find us.<br /><span className="text-gradient">Say hello.</span></>}>
+      <PageHero title={<>Find us.<br /><span className="text-gradient">Say hello.</span></>}>
         Two branches in Coimbatore. Message on WhatsApp, call, or drop in.
       </PageHero>
 
-      <div className="mx-auto grid max-w-7xl gap-8 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr]">
+      <div className="mx-auto grid max-w-7xl gap-6 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr]">
         <div className="space-y-5">
           {branches.map((b) => (
             <section key={b.id} aria-labelledby={`${b.id}-h`} className="metal rounded-3xl p-7">

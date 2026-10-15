@@ -3,21 +3,34 @@ import { stubImages } from "./helpers";
 
 const theme = (page: import("@playwright/test").Page) => page.locator("html").getAttribute("data-theme");
 
+test.use({ timezoneId: "Asia/Kolkata" });
 test.beforeEach(async ({ page }) => { await stubImages(page); });
 
-test.describe("first visit follows the system theme", () => {
-  test.use({ colorScheme: "light" });
-  test("light system → light theme, applied before hydration", async ({ page }) => {
+test.describe("automatic local-time schedule", () => {
+  test("daytime uses light theme before hydration", async ({ page }) => {
+    await page.clock.setFixedTime("2026-10-15T12:00:00+05:30");
     await page.goto("/", { waitUntil: "commit" });
     await expect.poll(() => theme(page)).toBe("light");
   });
-});
 
-test.describe("dark system", () => {
-  test.use({ colorScheme: "dark" });
-  test("dark system → dark theme", async ({ page }) => {
+  test("nighttime uses dark theme", async ({ page }) => {
+    await page.clock.setFixedTime("2026-10-15T22:00:00+05:30");
     await page.goto("/");
     expect(await theme(page)).toBe("dark");
+  });
+
+  test("switches at 6 PM without a refresh", async ({ page }) => {
+    await page.clock.install({ time: "2026-10-15T17:59:59.500+05:30" });
+    await page.goto("/");
+    expect(await theme(page)).toBe("light");
+    await page.clock.fastForward(1000);
+    await expect.poll(() => theme(page)).toBe("dark");
+  });
+});
+
+test.describe("manual preference", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.clock.setFixedTime("2026-10-15T22:00:00+05:30");
   });
 
   test("toggle switches instantly, persists across reloads, and keeps scroll position", async ({ page }) => {
@@ -36,7 +49,7 @@ test.describe("dark system", () => {
     await expect(page.getByRole("button", { name: "Switch to dark theme" })).toBeVisible();
   });
 
-  test("stored preference beats the system setting on every page", async ({ page }) => {
+  test("stored preference beats the time schedule on every page", async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem("gx-theme", "light"));
     for (const r of ["/", "/products", "/contact"]) {
       await page.goto(r);
@@ -57,6 +70,7 @@ test.describe("dark system", () => {
 test.describe("reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
   test("theme still switches with no transition class applied", async ({ page }) => {
+    await page.clock.setFixedTime("2026-10-15T22:00:00+05:30");
     await page.goto("/");
     await page.getByRole("button", { name: /Switch to/ }).click();
     await expect(page.locator("html")).not.toHaveClass(/theme-anim/);

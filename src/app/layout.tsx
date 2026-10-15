@@ -13,9 +13,9 @@ const description =
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: "GamexChange — Buy, Sell, Exchange & Repair Gaming Consoles", template: "%s · GamexChange" },
+  title: { default: "GamexChange | Buy, Sell, Exchange & Repair Gaming Consoles", template: "%s · GamexChange" },
   description,
-  openGraph: { type: "website", siteName: site.name, title: "GamexChange — Your Game. Your Rules.", description, locale: "en_IN" },
+  openGraph: { type: "website", siteName: site.name, title: "GamexChange | Your Game. Your Rules.", description, locale: "en_IN" },
   twitter: { card: "summary_large_image" },
   appleWebApp: { capable: true, title: "GamexChange", statusBarStyle: "black-translucent" },
 };

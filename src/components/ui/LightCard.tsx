@@ -2,7 +2,7 @@
 
 import type { ElementType, ReactNode, PointerEvent } from "react";
 
-/** Surface with a soft pointer-following light. One handler, CSS variables only — no re-renders. */
+/** Surface with a soft pointer-following light. One handler and CSS variables only; no re-renders. */
 export function LightCard({ children, className = "", as: Tag = "div" }: { children: ReactNode; className?: string; as?: ElementType }) {
   const onMove = (e: PointerEvent<HTMLElement>) => {
     if (e.pointerType !== "mouse") return;

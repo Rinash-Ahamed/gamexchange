@@ -29,8 +29,8 @@ const jsonLd = {
 export default function ProductsPage() {
   return (
     <main>
-      <PageHero eyebrow="Shop" title={<>Choose<br /><span className="text-gradient">your gear.</span></>}>
-        Pre-owned consoles from our shelf. Prices are as listed on our current site — message the shop to confirm what’s available today.
+      <PageHero title={<>Choose<br /><span className="text-gradient">your gear.</span></>}>
+        Pre-owned consoles from our shelf. Prices are as listed on our current site. Message the shop to confirm what’s available today.
       </PageHero>
       <div className="mx-auto max-w-7xl px-5 sm:px-8"><ProductBrowser /></div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />

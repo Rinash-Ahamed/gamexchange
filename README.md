@@ -22,16 +22,18 @@ npx playwright install chromium && npm run test:e2e
 | Rate limiting (in-memory; swap for Redis/Upstash when multi-instance) | `src/lib/rate-limit.ts` |
 | Theme tokens (dark + light) | `src/app/globals.css` |
 
+The default theme follows the visitor's local time: light from 6:00 AM through 5:59 PM and dark from 6:00 PM through 5:59 AM. The navigation toggle stores an explicit light or dark preference that overrides the schedule.
+
 ## Notes
 - Forms never claim a booking. Success means "ready to send on WhatsApp".
 - Product images load from the existing site's CDN (`framerusercontent.com`); self-host them before decommissioning the old site.
-- FAQ answers and warranty terms were not published on the old site — review `src/data/faq.ts`.
+- FAQ answers and warranty terms were not published on the old site. Review `src/data/faq.ts`.
 
 ## Environment & security notes
 
 - Set `ENQUIRY_SECRET` (long random string) in production; it signs the single-use enquiry tokens. Without it a per-process fallback is used, so tokens won't survive restarts or multiple instances.
 - Rate limits are in-memory per server process. For multiple instances, back them with a shared store (e.g. Redis).
-- The CSP still allows `script-src 'unsafe-inline'` (theme boot script, JSON-LD, Next inline scripts). Moving to nonces is a known follow-up.
+- The CSP still allows `script-src 'unsafe-inline'` (theme boot script, JSON-LD, Next inline scripts). Development also allows `unsafe-eval` for React and Turbopack debugging; production does not. Moving inline scripts to nonces is a known follow-up.
 - Enquiries are not stored: they end as a pre-filled WhatsApp message the customer sends.
 
 ## Brand assets

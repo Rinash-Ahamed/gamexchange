@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { m, useReducedMotion, useScroll, useTransform } from "motion/react";
 
 /**
- * Signature moment B — "level transition". A gate between sections: the finished level
+ * Signature moment B: "level transition". A gate between sections: the finished level
  * fades out, a beam draws across, a flare passes, and the next level's title arrives.
  * Transform + opacity only. On touch/small screens the flare is dropped.
  */
@@ -23,7 +23,7 @@ export function SectionGate({ from, to, level }: { from: string; to: string; lev
   const num = String(level).padStart(2, "0");
 
   return (
-    <div ref={ref} aria-hidden className="relative mx-auto h-[20vh] min-h-36 max-w-7xl px-5 sm:px-8">
+    <div ref={ref} aria-hidden className="relative mx-auto h-28 max-w-7xl px-5 sm:h-32 sm:px-8">
       <div className="absolute inset-x-5 top-1/2 h-px -translate-y-1/2 bg-line sm:inset-x-8" />
       <m.div style={{ scaleX: beam }} className="absolute inset-x-5 top-1/2 h-px origin-left -translate-y-1/2 bg-gradient-to-r from-fill via-fill-2 to-transparent sm:inset-x-8" />
       <m.div style={{ x: flareX, opacity: flareO }} className="absolute inset-x-5 top-1/2 hidden h-24 -translate-y-1/2 sm:inset-x-8 pinned:block">

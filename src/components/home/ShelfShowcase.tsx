@@ -11,7 +11,7 @@ import { ControllerButton } from "@/components/ui/ControllerButton";
 const n = products.length;
 
 /**
- * Signature moment C — product spotlight. On desktop the section pins and scrolling advances
+ * Signature moment C: product spotlight. On desktop the section pins and scrolling advances
  * through the shelf (state changes only when the active product changes; the rest is CSS/motion
  * values). The rail buttons give direct keyboard/click access. On touch, small screens and
  * reduced-motion the same products render as a native swipe carousel instead (CSS-only switch).
@@ -53,14 +53,14 @@ export function ShelfShowcase() {
       {/* pinned showcase: desktop with fine pointer */}
       <div ref={runway} className="relative hidden pinned:block" style={{ height: `${n * 85 + 40}vh` }}>
         <div className="sticky top-0 flex h-dvh items-center">
-          <div className="grid w-full items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
+          <div className="grid w-full items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
             <div>
               <p className="font-display text-sm font-semibold tabular-nums tracking-[0.3em] text-muted">
                 <span className="text-ink">{String(active + 1).padStart(2, "0")}</span> / {String(n).padStart(2, "0")}
               </p>
               <AnimatePresence mode="wait">
                 <m.div key={p.id} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}>
-                  <p className="eyebrow mt-6">{p.platform} · {p.condition}</p>
+                  <p className="mt-6 text-sm font-medium text-muted">{p.platform} · {p.condition}</p>
                   <h3 className="mt-4 font-display text-5xl font-bold uppercase leading-[0.95] xl:text-6xl">{p.name}</h3>
                   <p className="mt-6 font-display text-6xl font-bold tabular-nums tracking-tight">{formatINR(p.price)}</p>
                   <dl className="mt-6 flex gap-8 text-sm">
@@ -92,7 +92,7 @@ export function ShelfShowcase() {
                       onClick={() => goTo(i)}
                       aria-label={`Show ${x.name}`}
                       aria-current={i === active ? "true" : undefined}
-                      className={`grid size-11 place-items-center rounded-full border font-display text-xs font-semibold tabular-nums transition-all duration-300 ${i === active ? "scale-110 border-transparent bg-gradient-to-b from-fill to-fill-2 text-accent-ink [box-shadow:var(--shadow-button)]" : "glass text-muted hover:text-ink"}`}
+                      className={`grid size-11 place-items-center rounded-full border font-display text-xs font-semibold tabular-nums transition-all duration-300 ${i === active ? "scale-110 border-transparent bg-gradient-to-b from-fill to-fill-2 text-accent-ink" : "glass text-muted hover:text-ink"}`}
                     >
                       {String(i + 1).padStart(2, "0")}
                     </button>

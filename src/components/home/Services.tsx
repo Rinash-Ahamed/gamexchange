@@ -11,12 +11,12 @@ const icons: Record<(typeof services)[number]["icon"], LucideIcon> = {
 
 export function Services() {
   return (
-    <section data-tone="blue" aria-labelledby="services-h" className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
-      <SectionHeading eyebrow="Everything gaming" title={<span id="services-h">Gear. Service.<br /><span className="text-gradient">Zero downtime.</span></span>}>
+    <section data-tone="blue" aria-labelledby="services-h" className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
+      <SectionHeading title={<span id="services-h">Gear. Service.<br /><span className="text-gradient">Zero downtime.</span></span>}>
         One shop for buying, selling, exchanging and repairing the hardware you play on.
       </SectionHeading>
 
-      <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {services.map((s, i) => {
           const Icon = icons[s.icon];
           return (
@@ -30,7 +30,7 @@ export function Services() {
         })}
       </ul>
 
-      <div className="mt-10 flex flex-wrap gap-4">
+      <div className="mt-8 flex flex-wrap gap-4">
         <ControllerButton href="/repair-service" glyph="sq">Book a service</ControllerButton>
         <ControllerButton href="/exchange" glyph="tri" variant="ghost">Trade in</ControllerButton>
       </div>

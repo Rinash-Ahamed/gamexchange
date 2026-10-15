@@ -29,7 +29,7 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
     }
   }, []);
 
-  // Fetch lazily, when the person first touches the form — page views alone never hit the endpoint.
+  // Fetch lazily when the person first touches the form. Page views alone never hit the endpoint.
   useEffect(() => {
     const form = formRef.current;
     if (!form) return;
@@ -65,7 +65,7 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
           if (attempt > 0) await new Promise((r) => setTimeout(r, 2100)); // a fresh token must age past the human-speed floor
         }
         const res = await fetch("/api/enquiry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, _t: token.current }) });
-        token.current = null; // single use — a fresh one is fetched before any retry
+        token.current = null; // Single use; a fresh one is fetched before any retry.
         const data: { ok: boolean; error?: string; fieldErrors?: Errors; whatsappUrl?: string; retry?: boolean } = await res.json();
 
         if (res.ok && data.ok && data.whatsappUrl) {

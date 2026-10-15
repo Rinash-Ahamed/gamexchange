@@ -5,7 +5,7 @@ import { useEffect } from "react";
 /**
  * Context-reactive illumination. Sections declare data-tone="blue|violet|teal"; whichever
  * crosses the middle of the viewport sets <html data-tone>, and CSS cross-fades three fixed
- * light layers (opacity only). State changes only when the section changes — never per frame.
+ * light layers (opacity only). State changes only when the section changes, never per frame.
  */
 export function AmbientLight() {
   useEffect(() => {

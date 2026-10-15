@@ -28,11 +28,11 @@ export function RepairTeaser() {
   }, [inView, manual, reduce]);
 
   return (
-    <section ref={ref} data-tone="teal" aria-labelledby="repair-h" className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
-      <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+    <section ref={ref} data-tone="teal" aria-labelledby="repair-h" className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
+      <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_1fr]">
         <RepairDiagnostic value={fault} onChange={(f) => { setManual(true); setFault(f); }} />
         <div>
-          <SectionHeading eyebrow="Repairs" title={<span id="repair-h">Game over?<br /><span className="text-gradient">Not yet.</span></span>}>
+          <SectionHeading title={<span id="repair-h">Game over?<br /><span className="text-gradient">Not yet.</span></span>}>
             Consoles and controllers, from power faults to analogue drift. Repairs are listed as typically completed in {site.repairTurnaround}.
           </SectionHeading>
           <div className="mt-8"><ControllerButton href="/repair-service" glyph="sq" size="lg">Request a repair</ControllerButton></div>

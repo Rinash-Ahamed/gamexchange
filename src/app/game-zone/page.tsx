@@ -17,18 +17,18 @@ export default function GameZonePage() {
   return (
     <main>
       <AmbientLight />
-      <PageHero eyebrow="Game zone" title={<>Enter<br /><span className="text-gradient">the arena.</span></>}>
-        Step into a space built for gamers — consoles, big screens and a complimentary beverage with every PlayStation session.
+      <PageHero title={<>Enter<br /><span className="text-gradient">the arena.</span></>}>
+        Step into a space built for gamers, with consoles, big screens and a complimentary beverage with every PlayStation session.
       </PageHero>
 
       <section data-tone="violet" aria-label="Gallery" className="mx-auto max-w-7xl px-5 sm:px-8"><GameZoneRail pinned /></section>
 
       <SectionGate from="Gallery" to="Session pricing" level={1} />
-      <section data-tone="blue" aria-labelledby="price-h" className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
-        <SectionHeading eyebrow="Pricing" title={<span id="price-h">Pick your <span className="text-gradient">station.</span></span>}>
+      <section data-tone="blue" aria-labelledby="price-h" className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-16">
+        <SectionHeading title={<span id="price-h">Pick your <span className="text-gradient">station.</span></span>}>
           Rates are per head, as listed on our current site. Please reconfirm with the shop before you visit.
         </SectionHeading>
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
           {zoneStations.map((s) => (
             <div key={s.id} className="metal lit rounded-3xl p-7" style={{ ["--glow" as string]: s.id === "ps5" ? "var(--accent-2)" : "var(--accent)" }}>
               <h3 className="font-display text-2xl font-bold uppercase">{s.name}</h3>
@@ -48,9 +48,9 @@ export default function GameZonePage() {
       </section>
 
       <SectionGate from="Pricing" to="Enquire" level={2} />
-      <section data-tone="violet" aria-labelledby="enq-h" className="mx-auto max-w-3xl px-5 py-20 sm:px-8">
-        <SectionHeading eyebrow="Plan a session" title={<span id="enq-h">Bring <span className="text-gradient">the squad.</span></span>} align="center" />
-        <div className="mt-10"><ZoneEnquiryForm /></div>
+      <section data-tone="violet" aria-labelledby="enq-h" className="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-16">
+        <SectionHeading title={<span id="enq-h">Bring <span className="text-gradient">the squad.</span></span>} align="center" />
+        <div className="mt-8"><ZoneEnquiryForm /></div>
       </section>
     </main>
   );

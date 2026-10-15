@@ -3,11 +3,19 @@ import type { NextConfig } from "next";
 /**
  * Content-Security-Policy. `script-src 'unsafe-inline'` is required today because pages are
  * statically rendered and Next/the theme boot script emit inline scripts; moving to nonces needs
- * dynamic rendering (see README). Everything else is locked to same-origin.
+ * dynamic rendering (see README). React and Turbopack also require `unsafe-eval` for development
+ * debugging, but it is deliberately excluded from production.
  */
+const scriptSrc = [
+  "script-src 'self' 'unsafe-inline'",
+  process.env.NODE_ENV === "development" ? "'unsafe-eval'" : "",
+]
+  .filter(Boolean)
+  .join(" ");
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  scriptSrc,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://framerusercontent.com",
   "font-src 'self' data:",
@@ -34,6 +42,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
+    qualities: [75, 80, 85],
     remotePatterns: [{ protocol: "https", hostname: "framerusercontent.com", pathname: "/images/**" }],
   },
   async headers() {

@@ -51,7 +51,7 @@ export function ProductBrowser() {
                 role="radio"
                 aria-checked={selected}
                 onClick={() => setPlatform(p)}
-                className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-display text-xs font-semibold uppercase tracking-[0.16em] transition-all duration-200 touch-manipulation active:scale-95 ${selected ? "border-transparent bg-gradient-to-b from-fill to-fill-2 text-accent-ink [box-shadow:var(--shadow-button)]" : "glass text-muted hover:text-ink"}`}
+                className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-display text-xs font-semibold uppercase tracking-[0.16em] transition-all duration-200 touch-manipulation active:scale-95 ${selected ? "border-transparent bg-gradient-to-b from-fill to-fill-2 text-accent-ink" : "glass text-muted hover:text-ink"}`}
               >
                 <span style={{ color: selected ? undefined : glyphTint[glyphFor[p]] }}><Glyph name={glyphFor[p]} className="size-3.5" /></span>
                 {p}
@@ -77,7 +77,7 @@ export function ProductBrowser() {
         Showing {visible.length} {visible.length === 1 ? "product" : "products"}
       </p>
 
-      <m.ul layout className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <m.ul layout className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
           {visible.map((p, i) => (
             <m.li key={p.id} layout initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.3 }}>
@@ -87,7 +87,7 @@ export function ProductBrowser() {
         </AnimatePresence>
       </m.ul>
 
-      <div className="metal mt-12 flex flex-wrap items-center justify-between gap-5 rounded-3xl p-6 sm:p-8">
+      <div className="metal mt-8 flex flex-wrap items-center justify-between gap-4 rounded-3xl p-6">
         <div>
           <h2 className="font-display text-2xl font-bold uppercase">Looking for games, controllers or accessories?</h2>
           <p className="mt-1 max-w-xl text-muted">Stock changes often. Ask the shop and we’ll tell you what’s on the shelf today.</p>

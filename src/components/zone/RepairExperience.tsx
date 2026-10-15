@@ -30,7 +30,7 @@ export function RepairExperience() {
 
         <form ref={formRef} onSubmit={onSubmit} noValidate hidden={state.status === "success"} className="metal relative rounded-3xl p-6 sm:p-8" aria-label="Repair enquiry">
           <h2 className="font-display text-2xl font-bold uppercase">Request a repair</h2>
-          <p className="mt-1 text-sm text-muted">Tell us what’s wrong. The shop will review it and reply — nothing is booked until they confirm.</p>
+          <p className="mt-1 text-sm text-muted">Tell us what’s wrong. The shop will review it and reply. Nothing is booked until they confirm.</p>
 
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <SelectField label="Device category" name="category" errors={errors} options={repairCategories} value={category} onChange={(v) => { setCategory(v); setDevice(""); }} />

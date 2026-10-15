@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 
 /* ------------------------------------------------------------------
    DESIGN TOKENS
@@ -14,9 +15,10 @@
   --surface: #111521;
   --surface-2: #181d2d;
   --ink: #f5f7ff;
-  --muted: #939bac;
-  --line: rgb(245 247 255 / 0.1);
-  --line-strong: rgb(245 247 255 / 0.22);
+  --muted: #aab2c3;
+  --line: rgb(245 247 255 / 0.14);
+  --line-strong: rgb(245 247 255 / 0.28);
+  --focus-ring: #a8bdff;
 
   --accent: #497bff;
   --accent-2: #865cff;
@@ -37,11 +39,9 @@
   --glow-opacity: 0.55;
   --glow-opacity-hover: 0.9;
   --shadow-card: 0 24px 60px -24px rgb(0 0 0 / 0.8), 0 0 0 1px var(--line);
-  --shadow-button: 0 10px 0 -2px #05070c, 0 18px 30px -10px rgb(73 123 255 / 0.45);
   --hero-wash-a: rgb(73 123 255 / 0.28);
   --hero-wash-b: rgb(134 92 255 / 0.22);
   --hero-vignette: radial-gradient(ellipse at 50% 40%, transparent 0%, #07090f 78%);
-  --grid-opacity: 1;
   --img-filter: saturate(1.05) brightness(0.96);
   --stage: radial-gradient(closest-side, rgb(73 123 255 / 0.22), transparent 72%);
   --theme-color: #07090f;
@@ -54,9 +54,10 @@
   --surface: #ffffff;
   --surface-2: #e8edf7;
   --ink: #0b1020;
-  --muted: #53607a;
-  --line: rgb(11 16 32 / 0.1);
-  --line-strong: rgb(11 16 32 / 0.24);
+  --muted: #46536c;
+  --line: rgb(11 16 32 / 0.13);
+  --line-strong: rgb(11 16 32 / 0.28);
+  --focus-ring: #244dcc;
 
   --accent: #2f5be8;
   --accent-2: #6a3fe0;
@@ -77,11 +78,9 @@
   --glow-opacity: 0.16;
   --glow-opacity-hover: 0.3;
   --shadow-card: 0 28px 50px -28px rgb(36 60 130 / 0.35), 0 2px 6px rgb(36 60 130 / 0.06), 0 0 0 1px var(--line);
-  --shadow-button: 0 8px 0 -2px #b9c4dc, 0 16px 24px -10px rgb(47 91 232 / 0.35);
   --hero-wash-a: rgb(47 91 232 / 0.16);
   --hero-wash-b: rgb(106 63 224 / 0.12);
   --hero-vignette: radial-gradient(ellipse at 50% 40%, transparent 0%, #f3f6fc 80%);
-  --grid-opacity: 0.55;
   --img-filter: saturate(1) contrast(1.02);
   --stage: radial-gradient(closest-side, rgb(47 91 232 / 0.14), transparent 72%);
   --theme-color: #f3f6fc;
@@ -117,6 +116,7 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 6rem;
+  scrollbar-gutter: stable;
   -webkit-text-size-adjust: 100%;
   background: var(--bg);
 }
@@ -125,16 +125,54 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans);
+  font-synthesis: none;
+  line-height: 1.6;
   overflow-x: clip;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
 
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 0.08em;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+strong,
+b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
 ::selection { background: var(--accent); color: var(--accent-ink); }
 
 :focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 4px;
   border-radius: 6px;
 }
 
@@ -188,24 +226,18 @@ html.theme-anim *::after {
   background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%);
 }
 
-.hud-grid {
-  opacity: var(--grid-opacity);
-  background-image:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse at center, #000 20%, transparent 72%);
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 72%);
-}
-
 .product-stage { background: var(--stage); }
 .themed-img { filter: var(--img-filter); }
 
-.text-gradient {
-  background: linear-gradient(100deg, var(--ink) 30%, var(--accent) 70%, var(--accent-2));
+.text-gradient,
+.text-gradient-motion {
+  background: linear-gradient(100deg, var(--ink) 0%, var(--accent) 32%, var(--accent-2) 58%, var(--ink) 100%);
+  background-size: 240% 100%;
+  background-position: 0% 50%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  animation: gradient-flow 4.5s linear infinite;
 }
 
 .hide-scrollbar { scrollbar-width: none; }
@@ -222,6 +254,9 @@ html.theme-anim *::after {
 @keyframes pulse-ring {
   0% { transform: scale(0.9); opacity: 0.6; }
   100% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes gradient-flow {
+  to { background-position: 200% 50%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -258,7 +293,7 @@ html.theme-anim *::after {
 .anim-rise { animation: rise 0.9s var(--ease-out-expo) both; animation-delay: var(--d, 0s); }
 
 /* ------------------------------------------------------------------
-   HERO CONTROLLER MATERIALS — separately lit per theme
+   HERO CONTROLLER MATERIALS: separately lit per theme
    dark: obsidian shell, blue/violet rim light, volumetric spot
    light: pearl ceramic shell, soft studio light, long soft shadow
    ------------------------------------------------------------------ */
@@ -393,7 +428,7 @@ html.theme-anim *::after {
 }
 
 /* ------------------------------------------------------------------
-   SECTION SYSTEM — ambient tone, gates, pinned/unpinned variants
+   SECTION SYSTEM: ambient tone, gates, pinned/unpinned variants
    ------------------------------------------------------------------ */
 @custom-variant pinned (@media (min-width: 1024px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference));
 @custom-variant unpinned (@media not all and (min-width: 1024px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference));
@@ -408,13 +443,6 @@ html:not([data-tone]) .amb-blue, html[data-tone="blue"] .amb-blue,
 html[data-tone="violet"] .amb-violet, html[data-tone="teal"] .amb-teal { opacity: 1; }
 :root, :root[data-theme="dark"] { --amb-blue: rgb(73 123 255 / 0.16); --amb-violet: rgb(134 92 255 / 0.17); --amb-teal: rgb(79 209 165 / 0.11); }
 :root[data-theme="light"] { --amb-blue: rgb(47 91 232 / 0.11); --amb-violet: rgb(106 63 224 / 0.11); --amb-teal: rgb(14 122 88 / 0.08); }
-
-.eyebrow {
-  display: inline-flex; align-items: center; gap: 0.75rem;
-  font-family: var(--font-display); font-size: 0.72rem; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.32em; color: var(--accent-text);
-}
-.eyebrow::before { content: ""; width: 2rem; height: 1px; background: currentColor; opacity: 0.6; }
 
 /* Interactive card edge: a rim of light that follows the pointer (set --mx/--my). */
 .edge-light { position: relative; }

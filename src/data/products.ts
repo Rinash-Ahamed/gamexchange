@@ -6,7 +6,7 @@ export type Product = {
   condition: "Pre-Owned";
   /** Price in INR as listed on the live site. */
   price: number;
-  /** Trade-in figures as listed on the live site. Indicative only — confirmed in store. */
+  /** Trade-in figures as listed on the live site. Indicative only; confirmed in store. */
   tradeInVoucher: number;
   tradeInCash: number;
   image: { src: string; width: number; height: number };

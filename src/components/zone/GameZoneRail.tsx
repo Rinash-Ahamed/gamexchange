@@ -27,7 +27,6 @@ function Slide({ it, idx }: { it: (typeof items)[number]; idx: number }) {
   if (!s) return null;
   return (
     <div key={idx} className={cls + " flex snap-start flex-col justify-between p-7"}>
-      <p className="eyebrow">Station</p>
       <div>
         <h3 className="font-display text-3xl font-bold uppercase leading-none">{s.name}</h3>
         <ul className="mt-6 space-y-3">
@@ -57,7 +56,7 @@ function NativeRail() {
         ref={rail}
         tabIndex={0}
         role="region"
-        aria-label="Game zone gallery — scroll horizontally"
+        aria-label="Game zone gallery, scroll horizontally"
         onKeyDown={(e) => {
           if (e.key === "ArrowRight") { e.preventDefault(); slide(1); }
           if (e.key === "ArrowLeft") { e.preventDefault(); slide(-1); }
@@ -80,7 +79,7 @@ function NativeRail() {
   );
 }
 
-/** Signature moment D — desktop: vertical scroll drives the gallery sideways while the section is pinned. */
+/** Signature moment D. On desktop, vertical scroll drives the gallery sideways while the section is pinned. */
 function PinnedRail() {
   const runway = useRef<HTMLDivElement>(null);
   const viewport = useRef<HTMLDivElement>(null);

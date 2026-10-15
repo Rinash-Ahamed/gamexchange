@@ -79,7 +79,7 @@ export function ExchangeWizard() {
             const current = i === step;
             return (
               <li key={s.title} aria-current={current ? "step" : undefined} className="relative flex flex-col items-center gap-2">
-                <span className={`grid size-10 place-items-center rounded-full border transition-all duration-300 ${current ? "scale-110 border-transparent bg-gradient-to-b from-fill to-fill-2 text-accent-ink [box-shadow:var(--shadow-button)]" : done ? "border-blue bg-surface text-accent-text" : "border-line-strong bg-surface text-muted"}`} style={!current && !done ? { color: glyphTint[s.glyph] } : undefined}>
+                <span className={`grid size-10 place-items-center rounded-full border transition-all duration-300 ${current ? "scale-110 border-transparent bg-gradient-to-b from-fill to-fill-2 text-accent-ink" : done ? "border-blue bg-surface text-accent-text" : "border-line-strong bg-surface text-muted"}`} style={!current && !done ? { color: glyphTint[s.glyph] } : undefined}>
                   <Glyph name={s.glyph} className="size-4" />
                 </span>
                 <span className={`hidden text-[11px] font-semibold uppercase tracking-[0.14em] sm:block ${current ? "text-ink" : "text-muted"}`}>{s.title}</span>
@@ -97,7 +97,7 @@ export function ExchangeWizard() {
               {i === 1 && "What condition is it in?"}
               {i === 2 && "What’s included?"}
               {i === 3 && "What would you like to upgrade to?"}
-              {i === 4 && "Almost there — how do we reach you?"}
+              {i === 4 && "Almost there. How do we reach you?"}
             </h2>
             <div className="mt-6 space-y-6">
               {i === 0 && <PillRadio legend="Current console" name="console" options={exchangeConsoles} errors={errors} />}
@@ -115,7 +115,7 @@ export function ExchangeWizard() {
         ))}
 
         <p className="mt-8 rounded-2xl border border-line p-4 text-sm text-muted">
-          <strong className="text-ink">No instant valuation.</strong> We don’t estimate trade-in value online — the shop checks your device and confirms an offer in person.
+          <strong className="text-ink">No instant valuation.</strong> We don’t estimate trade-in value online. The shop checks your device and confirms an offer in person.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4">

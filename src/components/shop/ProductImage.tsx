@@ -11,7 +11,7 @@ export function ProductImage({ product, priority = false, sizes }: { product: Pr
 
   if (failed) {
     return (
-      <div role="img" aria-label={`${product.name} — photo unavailable`} className="grid size-full place-items-center text-muted">
+      <div role="img" aria-label={`${product.name}, photo unavailable`} className="grid size-full place-items-center text-muted">
         <span className="grid place-items-center gap-2 text-center">
           <Gamepad2 className="size-10" aria-hidden />
           <span className="font-display text-xs font-semibold uppercase tracking-[0.2em]">{product.platform}</span>

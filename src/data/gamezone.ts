@@ -29,7 +29,7 @@ export const zoneStations: readonly ZoneStation[] = [
   {
     id: "tekken",
     name: "Arcade Tekken Tournament",
-    entry: "Minimum 5 coins — ₹20",
+    entry: "Minimum 5 coins: ₹20",
   },
 ];
 

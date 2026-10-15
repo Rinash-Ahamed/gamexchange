@@ -47,7 +47,7 @@ export function verifyToken(token: unknown, now = Date.now()): TokenResult {
 /**
  * Same-origin check for state-changing requests. Browsers always send Origin on cross-site
  * POSTs; we accept only an exact host match, or Sec-Fetch-Site: same-origin when Origin is absent.
- * This stops cross-site form posts (CSRF); it is not bot protection — that is the token,
+ * This stops cross-site form posts (CSRF); it is not bot protection. That is the token,
  * honeypot and rate limits.
  */
 export function isSameOrigin(req: NextRequest) {

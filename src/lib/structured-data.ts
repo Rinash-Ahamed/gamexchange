@@ -9,7 +9,7 @@ export function localBusinessJsonLd() {
     "@graph": branches.map((b) => ({
       "@type": "Store",
       "@id": `${site.url}/#${b.id}`,
-      name: `${site.name} — ${b.area.split(",")[0]}`,
+      name: `${site.name}: ${b.area.split(",")[0]}`,
       url: site.url,
       telephone: b.phone,
       description: "Buy, sell and exchange gaming consoles and accessories. Console and controller repairs. Gaming zone.",
