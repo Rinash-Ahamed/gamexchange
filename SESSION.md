@@ -22,6 +22,7 @@ This file stores durable context between development sessions. Keep entries conc
 - Added local-time theme scheduling (light from 6:00 AM to 5:59 PM, dark from 6:00 PM to 5:59 AM) with seamless boundary updates and persistent manual overrides.
 - Allowed Next.js image qualities 75, 80, and 85 to match all current image components.
 - Extended the moving gradient animation to every heading that uses gradient text.
+- Replaced the static “Heard from the lobby” review grid with a themed, accessible 3D vertical testimonial marquee based on the supplied reference.
 
 ## Existing Architecture
 
