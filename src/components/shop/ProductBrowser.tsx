@@ -82,7 +82,7 @@ export function ProductBrowser({ products }: { products: readonly Product[] }) {
         <AnimatePresence mode="popLayout">
           {visible.map((p, i) => (
             <m.li key={p.id} layout initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.3 }}>
-              <ProductCard product={p} index={i} total={visible.length} priority={i < 2} />
+              <ProductCard product={p} index={i} total={visible.length} priority={i === 0} />
             </m.li>
           ))}
         </AnimatePresence>

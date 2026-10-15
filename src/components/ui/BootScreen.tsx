@@ -38,8 +38,8 @@ export function BootScreen() {
     };
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const leaveAfter = reducedMotion ? 350 : 2100;
-    const hideAfter = reducedMotion ? 450 : 2500;
+    const leaveAfter = reducedMotion ? 350 : 1400;
+    const hideAfter = reducedMotion ? 450 : 1800;
 
     const leaveTimer = window.setTimeout(() => setPhase("leaving"), leaveAfter);
     const hideTimer = window.setTimeout(() => {

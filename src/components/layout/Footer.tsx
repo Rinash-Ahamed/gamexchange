@@ -1,22 +1,12 @@
 import Link from "next/link";
 import { branches, mapsUrl, navItems, site, whatsappUrl } from "@/data/site";
 import { Wordmark } from "./Wordmark";
+import { FooterVideo } from "./FooterVideo";
 
 export function Footer() {
   return (
     <footer className="relative isolate mt-20 overflow-hidden border-t border-white/15 bg-[#050711] pb-24 pt-12 text-white lg:pb-10">
-      <video
-        aria-hidden="true"
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="metadata"
-        tabIndex={-1}
-        className="absolute inset-0 -z-20 size-full object-cover object-center motion-reduce:hidden"
-      >
-        <source src="/video/footervideo.mp4" type="video/mp4" />
-      </video>
+      <FooterVideo />
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,5,14,0.92)_0%,rgba(3,5,14,0.78)_48%,rgba(3,5,14,0.9)_100%)]" />
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(3,5,14,0.34)_0%,rgba(3,5,14,0.72)_100%)]" />
 

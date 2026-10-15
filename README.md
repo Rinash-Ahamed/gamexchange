@@ -25,7 +25,7 @@ FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-firebase-project-id.iam.gserv
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nreplace-with-your-private-key\n-----END PRIVATE KEY-----\n"
 ```
 
-Local development falls back to the temporary login credentials shown on the login page when admin environment variables are absent. Production has no login fallback. Firebase credentials are always required before pages that use inventory or service data can load. See `FIREBASE_SETUP.md` for the complete setup, named database, and Application Default Credentials options.
+Local development falls back to the temporary login credentials shown on the login page when admin environment variables are absent. Production has no login fallback. Until Firebase is configured, public product pages use the local demo catalog in `src/data/products.ts`; admin inventory and service-record pages require a working Firestore connection. See `FIREBASE_SETUP.md` for the complete setup, named database, and Application Default Credentials options.
 
 ## Where to connect things later
 | What | Where |

@@ -2,7 +2,13 @@ import "server-only";
 
 import { createHash, randomUUID } from "node:crypto";
 import { applicationDefault, cert, getApps, initializeApp, type App } from "firebase-admin/app";
-import { getFirestore, type Firestore, type Query, type QueryDocumentSnapshot } from "firebase-admin/firestore";
+import {
+  AggregateField,
+  getFirestore,
+  type Firestore,
+  type Query,
+  type QueryDocumentSnapshot,
+} from "firebase-admin/firestore";
 import { products, type Product } from "@/data/products";
 import type { DashboardStats, InventoryItem, ServiceRecord, ServiceStatus } from "./types";
 
@@ -15,6 +21,7 @@ type StoredInventoryItem = Omit<InventoryItem, "id">;
 type StoredServiceRecord = Omit<ServiceRecord, "id">;
 
 let firestore: Firestore | undefined;
+let warnedAboutLocalProductFallback = false;
 
 function firebaseApp(): App {
   const existing = getApps()[0];
@@ -114,13 +121,30 @@ export async function listInventory() {
 }
 
 export async function listPublicInventory() {
-  const inventory = await listInventory();
-  return inventory
+  await ensureInventorySeeded();
+  const snapshot = await database()
+    .collection(INVENTORY_COLLECTION)
+    .where("status", "==", "active")
+    .get();
+  return snapshot.docs
+    .map(inventoryFromDocument)
     .filter((item) => item.status === "active" && item.stock > 0)
     .toSorted((a, b) => Number(b.featured) - Number(a.featured) || b.updatedAt.localeCompare(a.updatedAt));
 }
 
 export async function listPublicProducts(): Promise<Product[]> {
+  const projectId = process.env.FIREBASE_PROJECT_ID?.trim();
+  if (
+    process.env.NODE_ENV !== "production" &&
+    (!projectId || projectId === "your-firebase-project-id")
+  ) {
+    if (!warnedAboutLocalProductFallback) {
+      console.warn("Firebase is not configured; serving the local demo product catalog.");
+      warnedAboutLocalProductFallback = true;
+    }
+    return [...products];
+  }
+
   return (await listPublicInventory()).map((item) => ({
     id: item.id,
     name: item.name,
@@ -216,12 +240,24 @@ export async function updateServiceRecord(
 }
 
 export async function dashboardStats(): Promise<DashboardStats> {
-  const [inventory, services] = await Promise.all([listInventory(), listServiceRecords()]);
+  await ensureInventorySeeded();
+  const inventory = database().collection(INVENTORY_COLLECTION);
+  const services = database().collection(SERVICES_COLLECTION);
+  const [inventoryStats, lowStock, openServices, readyServices] = await Promise.all([
+    inventory.aggregate({
+      inventoryItems: AggregateField.count(),
+      unitsInStock: AggregateField.sum("stock"),
+    }).get(),
+    inventory.where("stock", "<=", 2).count().get(),
+    services.where("status", "not-in", ["completed", "cancelled"]).count().get(),
+    services.where("status", "==", "ready").count().get(),
+  ]);
+
   return {
-    inventoryItems: inventory.length,
-    unitsInStock: inventory.reduce((total, item) => total + item.stock, 0),
-    lowStockItems: inventory.filter((item) => item.stock <= 2).length,
-    openServices: services.filter((record) => !["completed", "cancelled"].includes(record.status)).length,
-    readyServices: services.filter((record) => record.status === "ready").length,
+    inventoryItems: inventoryStats.data().inventoryItems,
+    unitsInStock: inventoryStats.data().unitsInStock,
+    lowStockItems: lowStock.data().count,
+    openServices: openServices.data().count,
+    readyServices: readyServices.data().count,
   };
 }
