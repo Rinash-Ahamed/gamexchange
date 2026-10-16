@@ -648,6 +648,7 @@ html.theme-anim-fallback .metal {
 .pl-back { transform: translate3d(calc(var(--px) * -14px), calc(var(--py) * -8px), 0); }
 .pl-body { transform: translate3d(calc(var(--px) * 4px), calc(var(--py) * 3px), 0); }
 .pl-ctl { transform: translate3d(calc(var(--px) * 16px), calc(var(--py) * 10px), 0); }
+.pl-console { transform: translate3d(calc(var(--px) * -7px), calc(var(--py) * -5px), -42px); }
 
 .spot {
   clip-path: polygon(36% 0, 64% 0, 100% 100%, 0 100%);
@@ -688,6 +689,8 @@ html.theme-anim-fallback .metal {
 .ctl-callout { opacity: 0; animation: illuminate 0.9s ease-out both; }
 
 .hero-float { animation: float-y 7s ease-in-out 1.6s infinite; }
+.console-float { transform-origin: center; animation: console-float 7.8s ease-in-out 1.2s infinite; }
+@keyframes console-float { 0%, 100% { transform: translate(560px, 82px) rotate(6deg); } 50% { transform: translate(560px, 72px) rotate(4deg); } }
 
 /* Pause every looping animation while the hero is off-screen. */
 [data-live="false"] *, [data-live="false"] *::before { animation-play-state: paused !important; }
@@ -719,16 +722,14 @@ html[data-tone="violet"] .amb-violet, html[data-tone="teal"] .amb-teal { opacity
   height: 36rem;
   overflow: hidden;
   perspective: 900px;
-  -webkit-mask-image: radial-gradient(ellipse 88% 86% at 52% 50%, #000 48%, rgb(0 0 0 / 0.92) 64%, transparent 100%);
-  mask-image: radial-gradient(ellipse 88% 86% at 52% 50%, #000 48%, rgb(0 0 0 / 0.92) 64%, transparent 100%);
 }
 
 .review-marquee-stage {
   position: absolute;
-  inset: -22% -10%;
+  inset: -22% 1rem;
   display: flex;
   gap: 0.85rem;
-  transform: rotateX(9deg) rotateY(-11deg) rotateZ(7deg) translate3d(2%, 1%, -55px);
+  transform: rotateX(7deg) rotateY(-4deg) rotateZ(2deg) translate3d(0, 1%, -30px);
   transform-style: preserve-3d;
 }
 
@@ -749,11 +750,6 @@ html[data-tone="violet"] .amb-violet, html[data-tone="teal"] .amb-teal { opacity
 
 .review-marquee-reverse {
   animation-name: review-marquee-down;
-}
-
-.review-marquee-scene:hover .review-marquee-track,
-.review-marquee-scene:focus-within .review-marquee-track {
-  animation-play-state: paused;
 }
 
 .review-float-card {
@@ -792,18 +788,19 @@ html[data-tone="violet"] .amb-violet, html[data-tone="teal"] .amb-teal { opacity
 
 @media (max-width: 1023px) {
   .review-marquee-scene { height: 32rem; }
-  .review-marquee-stage { inset: -24% -6%; }
+  .review-marquee-stage { inset: -24% 0.75rem; }
 }
 
 @media (max-width: 639px) {
   .review-marquee-scene { height: 28rem; }
   .review-marquee-stage {
-    inset: -22% -20%;
+    inset: -22% 0.5rem;
     gap: 0.65rem;
-    transform: rotateX(7deg) rotateY(-8deg) rotateZ(5deg) translate3d(2%, 1%, -40px);
+    /* A flat compositor layer keeps the continuous marquee reliable on mobile Safari. */
+    transform: rotate(-2deg) translateZ(0);
   }
   .review-float-card { min-height: 11.5rem; }
-  .review-float-card > a { padding: 1rem; }
+  .review-float-card > div { padding: 1rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

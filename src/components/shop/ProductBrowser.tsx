@@ -8,7 +8,7 @@ import type { Product } from "@/data/products";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { whatsappUrl } from "@/data/site";
 
-type Platform = string;
+type Category = string;
 
 const sorts = {
   featured: "Featured",
@@ -18,7 +18,7 @@ const sorts = {
 } as const;
 type SortKey = keyof typeof sorts;
 
-const platformGlyphs: readonly GlyphName[] = ["o", "tri", "sq"];
+const categoryGlyphs: readonly GlyphName[] = ["o", "tri", "sq", "x"];
 
 const sorters: Record<SortKey, (a: Product, b: Product) => number> = {
   featured: (a, b) => Number(b.featured ?? false) - Number(a.featured ?? false),
@@ -28,34 +28,34 @@ const sorters: Record<SortKey, (a: Product, b: Product) => number> = {
 };
 
 export function ProductBrowser({ products }: { products: readonly Product[] }) {
-  const [platform, setPlatform] = useState<Platform>("All");
+  const [category, setCategory] = useState<Category>("All");
   const [sort, setSort] = useState<SortKey>("featured");
   const sortId = useId();
-  const platforms = useMemo(() => ["All", ...new Set(products.map((product) => product.platform))], [products]);
+  const categories = useMemo(() => ["All", ...new Set(products.map((product) => product.category))], [products]);
 
   const visible = useMemo(
-    () => products.filter((p) => platform === "All" || p.platform === platform).toSorted(sorters[sort]),
-    [platform, products, sort],
+    () => products.filter((p) => category === "All" || p.category === category).toSorted(sorters[sort]),
+    [category, products, sort],
   );
 
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div role="radiogroup" aria-label="Filter by platform" className="flex flex-wrap gap-2">
-          {platforms.map((p, platformIndex) => {
-            const selected = p === platform;
-            const glyph = p === "All" ? "x" : (platformGlyphs[(platformIndex - 1) % platformGlyphs.length] ?? "sq");
+        <div role="radiogroup" aria-label="Filter by category" className="flex flex-wrap gap-2">
+          {categories.map((item, categoryIndex) => {
+            const selected = item === category;
+            const glyph = item === "All" ? "x" : (categoryGlyphs[(categoryIndex - 1) % categoryGlyphs.length] ?? "sq");
             return (
               <button
-                key={p}
+                key={item}
                 type="button"
                 role="radio"
                 aria-checked={selected}
-                onClick={() => setPlatform(p)}
+                onClick={() => setCategory(item)}
                 className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-display text-xs font-semibold uppercase tracking-[0.16em] transition-all duration-200 touch-manipulation active:scale-95 ${selected ? "border-transparent bg-gradient-to-b from-fill to-fill-2 text-accent-ink" : "glass text-muted hover:text-ink"}`}
               >
                 <span style={{ color: selected ? undefined : glyphTint[glyph] }}><Glyph name={glyph} className="size-3.5" /></span>
-                {p}
+                {item}
               </button>
             );
           })}
@@ -88,7 +88,7 @@ export function ProductBrowser({ products }: { products: readonly Product[] }) {
         </AnimatePresence>
       </m.ul>
 
-      {!visible.length && <p className="mt-6 rounded-2xl border border-dashed border-line-strong p-10 text-center text-muted">No products are currently available.</p>}
+      {!visible.length && <p className="mt-6 rounded-2xl border border-dashed border-line-strong p-10 text-center text-muted">No products are currently available in this category.</p>}
 
       <div className="metal mt-8 flex flex-wrap items-center justify-between gap-4 rounded-3xl p-6">
         <div>

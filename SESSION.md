@@ -48,6 +48,13 @@ This file stores durable context between development sessions. Keep entries conc
 - Operational data uses Cloud Firestore. Firebase Admin credentials stay server-side and are configured through environment variables.
 - Inventory SKUs use a transactional Firestore index so duplicate SKUs cannot be created during concurrent requests.
 - Destructive admin actions use an accessible themed in-app confirmation dialog instead of the browser confirmation popup.
+- The testimonial marquee no longer pauses on hover or focus, and uses a simpler mobile compositor layer to avoid touch-device animation stalls.
+- Testimonial cards are display-only, preventing mobile taps from opening Google Maps through short review links.
+- The testimonial stage keeps both columns fully visible by removing the edge mask and reducing perspective skew.
+- Added Franchise Opportunities to the home service list with a WhatsApp franchise enquiry call to action.
+- Added a contact-form enquiry type so franchise messages are clearly labelled for the team.
+- Added a console layer behind the controller in the hero, and changed shop browsing to live inventory categories managed from the admin inventory form.
+- Made every home service card a full-card link to its appropriate repair, exchange, or contact route.
 - Theme changes use a single page-level View Transition instead of transitioning every DOM element, avoiding the previous repaint lag.
 - Added a game-style first-session boot screen with a logo power-up, system statuses, progress sequence, accessible interaction locking, and reduced-motion handling.
 - Combined theme and boot-session pre-paint logic into one bootstrap script to avoid Next.js client-rendered script warnings.

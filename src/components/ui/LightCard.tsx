@@ -13,7 +13,7 @@ export function LightCard({ children, className = "", as: Tag = "div" }: { child
   return (
     <Tag onPointerMove={onMove} className={`cursor-light-host group relative overflow-hidden ${className}`}>
       <span aria-hidden className="cursor-light pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      <div className="relative">{children}</div>
+      <div className="relative h-full">{children}</div>
     </Tag>
   );
 }

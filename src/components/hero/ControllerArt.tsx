@@ -41,6 +41,38 @@ export function ControllerBack() {
   );
 }
 
+/** A brand-neutral premium console silhouette that gives the hero a full gaming-rig composition. */
+export function ControllerConsole() {
+  const id = useId().replace(/:/g, "");
+  return (
+    <Layer
+      defs={
+        <>
+          <linearGradient id={`${id}-console-shell`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" style={stop("--ctl-body-a")} />
+            <stop offset="1" style={stop("--ctl-trigger-b")} />
+          </linearGradient>
+          <linearGradient id={`${id}-console-face`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" style={stop("--ctl-plate-a")} />
+            <stop offset="1" style={stop("--ctl-plate-b")} />
+          </linearGradient>
+        </>
+      }
+    >
+      <g className="console-float" transform="translate(560 82) rotate(6 84 190)">
+        <ellipse cx="84" cy="410" rx="92" ry="14" style={{ fill: "var(--ctl-shadow)", filter: "blur(12px)" }} />
+        <path d="M12 24Q12 0 36 0H145Q168 0 168 24V368Q168 392 145 392H36Q12 392 12 368Z" fill={`url(#${id}-console-shell)`} stroke="var(--ctl-rim-a)" strokeOpacity=".55" strokeWidth="2" />
+        <path d="M42 17H137Q148 17 148 29V362Q148 374 137 374H42Q31 374 31 362V29Q31 17 42 17Z" fill={`url(#${id}-console-face)`} />
+        <path d="M43 52H137" stroke="var(--ctl-rim-a)" strokeOpacity=".36" strokeWidth="2" />
+        <path d="M43 76H137" stroke="var(--ctl-rim-a)" strokeOpacity=".18" strokeWidth="2" />
+        <rect x="53" y="108" width="74" height="6" rx="3" fill="var(--ctl-lightbar)" opacity=".82" />
+        <rect x="53" y="124" width="74" height="2" rx="1" fill="var(--ctl-rim-a)" opacity=".32" />
+        <circle cx="126" cy="344" r="5" fill="var(--ctl-lightbar)" />
+      </g>
+    </Layer>
+  );
+}
+
 /** Middle layer: shell, face plate, rim light, and the travelling blue sheen. */
 export function ControllerBody() {
   const id = useId().replace(/:/g, "");

@@ -5,7 +5,7 @@ import { adminButtonClass, adminGhostButtonClass, adminInputClass, adminLabelCla
 import { formatINR } from "@/data/products";
 import { listInventory } from "@/lib/admin/db";
 import { formatAdminDate, titleCaseStatus } from "@/lib/admin/format";
-import { inventoryStatuses } from "@/lib/admin/types";
+import { inventoryCategories, inventoryStatuses } from "@/lib/admin/types";
 import { createInventoryAction, deleteInventoryAction, updateInventoryAction } from "../../actions";
 
 export const metadata: Metadata = { title: "Inventory management", robots: { index: false, follow: false } };
@@ -28,8 +28,11 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
     <div className="mx-auto max-w-7xl">
       <div>
         <h1 className="font-display text-3xl font-bold uppercase sm:text-4xl">Inventory</h1>
-        <p className="mt-2 text-muted">Products marked active and in stock appear automatically on the public catalogue.</p>
+        <p className="mt-2 text-muted">Products marked active and in stock appear automatically in their public shop category.</p>
       </div>
+      <datalist id="inventory-category-options">
+        {inventoryCategories.map((category) => <option key={category} value={category} />)}
+      </datalist>
 
       {query.notice && notices[query.notice] && <p role="status" className="mt-6 rounded-xl border border-ok/30 bg-ok/10 px-4 py-3 text-sm text-ok">{notices[query.notice]}</p>}
       {query.error && errors[query.error] && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">{errors[query.error]}</p>}
@@ -43,7 +46,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
           <label><span className={adminLabelClass}>SKU</span><input name="sku" required maxLength={160} placeholder="PS5-SLIM-001" className={adminInputClass} /></label>
           <label className="sm:col-span-1 lg:col-span-2"><span className={adminLabelClass}>Product name</span><input name="name" required maxLength={160} className={adminInputClass} /></label>
           <label><span className={adminLabelClass}>Platform</span><input name="platform" required placeholder="PlayStation 5" className={adminInputClass} /></label>
-          <label><span className={adminLabelClass}>Category</span><input name="category" required defaultValue="Console" className={adminInputClass} /></label>
+          <label><span className={adminLabelClass}>Shop category</span><input name="category" list="inventory-category-options" required defaultValue="Console" placeholder="Console" className={adminInputClass} /></label>
           <label><span className={adminLabelClass}>Condition</span><input name="condition" required defaultValue="Pre-Owned" className={adminInputClass} /></label>
           <label><span className={adminLabelClass}>Stock</span><input name="stock" type="number" min="0" required defaultValue="1" className={adminInputClass} /></label>
           <label><span className={adminLabelClass}>Selling price</span><input name="price" type="number" min="0" required className={adminInputClass} /></label>
@@ -82,7 +85,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
                   <label className="col-span-2"><span className={adminLabelClass}>Product name</span><input name="name" required maxLength={160} defaultValue={item.name} className={adminInputClass} /></label>
                   <label><span className={adminLabelClass}>SKU</span><input name="sku" required maxLength={160} defaultValue={item.sku} className={adminInputClass} /></label>
                   <label><span className={adminLabelClass}>Platform</span><input name="platform" required defaultValue={item.platform} className={adminInputClass} /></label>
-                  <label><span className={adminLabelClass}>Category</span><input name="category" required defaultValue={item.category} className={adminInputClass} /></label>
+                  <label><span className={adminLabelClass}>Shop category</span><input name="category" list="inventory-category-options" required defaultValue={item.category} className={adminInputClass} /></label>
                   <label><span className={adminLabelClass}>Condition</span><input name="condition" required defaultValue={item.condition} className={adminInputClass} /></label>
                   <label><span className={adminLabelClass}>Stock</span><input name="stock" type="number" min="0" required defaultValue={item.stock} className={adminInputClass} /></label>
                   <label><span className={adminLabelClass}>Price</span><input name="price" type="number" min="0" required defaultValue={item.price} className={adminInputClass} /></label>

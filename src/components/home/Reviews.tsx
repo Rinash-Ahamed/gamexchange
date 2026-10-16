@@ -14,15 +14,8 @@ const timings = [
 
 function ReviewCard({ review, hidden = false }: { review: (typeof reviews)[number]; hidden?: boolean }) {
   return (
-    <li className="review-float-card">
-      <a
-        href={review.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        tabIndex={hidden ? -1 : undefined}
-        aria-hidden={hidden || undefined}
-        className="block h-full p-5"
-      >
+    <li className="review-float-card" aria-hidden={hidden || undefined}>
+      <div className="block h-full p-5">
         <div className="flex items-center gap-3">
           <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full border border-line-strong bg-gradient-to-br from-fill to-fill-2 font-display text-sm font-bold text-accent-ink">
             {review.name.charAt(0)}
@@ -42,7 +35,7 @@ function ReviewCard({ review, hidden = false }: { review: (typeof reviews)[numbe
           <span>Verified player</span>
           <span aria-label="5 out of 5 stars" className="tracking-wider text-accent-text">★★★★★</span>
         </span>
-      </a>
+      </div>
     </li>
   );
 }
@@ -55,7 +48,7 @@ export function Reviews() {
       <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 sm:px-8 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)]">
         <div className="relative z-10">
           <SectionHeading title={<span id="reviews-h">Heard from<br /><span className="text-gradient">the lobby.</span></span>}>
-            Real player feedback from our public reviews. Select a card to visit its original source.
+            Real player feedback from our public reviews.
           </SectionHeading>
           <p className="mt-6 font-display text-sm font-semibold uppercase tracking-[0.18em] text-accent-text">Player-tested. Lobby-approved.</p>
         </div>

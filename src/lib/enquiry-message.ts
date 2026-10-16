@@ -9,7 +9,7 @@ export function buildEnquiryMessage(e: Enquiry): string {
     repair: "Repair enquiry",
     exchange: "Trade-in / exchange enquiry",
     gamezone: "Game Zone enquiry",
-    contact: "General enquiry",
+    contact: "Website contact enquiry",
   }[e.kind];
 
   const rows: string[] = [`Hi ${site.name}, ${head} from the website.`, ""];
@@ -32,6 +32,7 @@ export function buildEnquiryMessage(e: Enquiry): string {
       if (e.message) rows.push(line("Note", e.message));
       break;
     case "contact":
+      rows.push(line("Enquiry type", e.contactTopic));
       rows.push(line("Message", e.message));
       break;
   }

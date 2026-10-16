@@ -1,6 +1,17 @@
 export const inventoryStatuses = ["active", "draft", "out-of-stock"] as const;
 export type InventoryStatus = (typeof inventoryStatuses)[number];
 
+/** Suggested labels keep storefront browsing tidy while allowing real stock to use a custom category. */
+export const inventoryCategories = [
+  "Console",
+  "Controller",
+  "Game",
+  "Accessory",
+  "Gaming PC",
+  "VR & Sim",
+  "Collectible",
+] as const;
+
 export const serviceStatuses = [
   "received",
   "diagnosing",

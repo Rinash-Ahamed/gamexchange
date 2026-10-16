@@ -7,6 +7,7 @@ const oneLine = (v: string) => v.replace(/[\u0000-\u001f\u007f\u2028\u2029]/g, "
 const multiLine = (v: string) => v.replace(/\r\n?/g, "\n").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f\u2028\u2029]/g, "").replace(/\n{3,}/g, "\n\n").trim();
 
 const contactMethods = ["WhatsApp", "Phone call"] as const;
+const contactTopics = ["General enquiry", "Franchise opportunity"] as const;
 const branchChoices = ["No preference", "Branch 1 – Sungam", "Branch 2 – Selvapuram South"] as const;
 
 const name = z.string({ error: "Enter your name" }).transform(oneLine).pipe(z.string().min(2, "Enter your name").max(80, "Name is too long"));
@@ -56,6 +57,7 @@ export const zoneSchema = z.object({
 export const contactSchema = z.object({
   kind: z.literal("contact"),
   ...common,
+  contactTopic: z.enum(contactTopics, { error: "Choose an enquiry type" }),
   message: z.string({ error: "Tell us a little more" }).transform(multiLine).pipe(z.string().min(10, "Tell us a little more (10+ characters)").max(1000, "Keep it under 1000 characters")),
   branch,
 });
@@ -65,4 +67,4 @@ export const enquirySchema = z.discriminatedUnion("kind", [repairSchema, exchang
 export type EnquiryInput = z.input<typeof enquirySchema>;
 export type Enquiry = z.output<typeof enquirySchema>;
 export type EnquiryKind = Enquiry["kind"];
-export { contactMethods, branchChoices };
+export { contactMethods, branchChoices, contactTopics };

@@ -72,12 +72,13 @@ export const exchangeUpgrades = [
 ] as const;
 
 export const services = [
-  { title: "Console Repair & Maintenance", icon: "wrench" },
-  { title: "Controller Diagnostics & Fixes", icon: "gamepad" },
-  { title: "Gaming PC Optimization & Upgrades", icon: "cpu" },
-  { title: "Accessory Replacement", icon: "plug" },
-  { title: "Trade-In & Exchange Programs", icon: "repeat" },
-  { title: "Custom Gaming Setups", icon: "monitor" },
-  { title: "Performance Tuning for VR Devices", icon: "glasses" },
-  { title: "Gaming Consultation & Support", icon: "message" },
+  { title: "Console Repair & Maintenance", icon: "wrench", href: "/repair-service" },
+  { title: "Controller Diagnostics & Fixes", icon: "gamepad", href: "/repair-service" },
+  { title: "Gaming PC Optimization & Upgrades", icon: "cpu", href: "/contact" },
+  { title: "Accessory Replacement", icon: "plug", href: "/repair-service" },
+  { title: "Trade-In & Exchange Programs", icon: "repeat", href: "/exchange" },
+  { title: "Custom Gaming Setups", icon: "monitor", href: "/contact" },
+  { title: "Performance Tuning for VR Devices", icon: "glasses", href: "/contact" },
+  { title: "Gaming Consultation & Support", icon: "message", href: "/contact" },
+  { title: "Franchise Opportunities", icon: "store", href: "/contact" },
 ] as const;

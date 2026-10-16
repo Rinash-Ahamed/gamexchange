@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef } from "react";
-import { ContactBlock, TextAreaField } from "@/components/forms/fields";
+import { ContactBlock, SelectField, TextAreaField } from "@/components/forms/fields";
 import { SubmitArea, SuccessPanel } from "@/components/forms/SubmitArea";
 import { formToPayload, useEnquiry } from "@/components/forms/use-enquiry";
+import { contactTopics } from "@/lib/validation";
 
 export function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -22,6 +23,13 @@ export function ContactForm() {
       >
         <h2 className="font-display text-2xl font-bold uppercase">Send us a message</h2>
         <div className="mt-6 space-y-5">
+          <SelectField
+            label="What is this about?"
+            name="contactTopic"
+            errors={errors}
+            options={contactTopics}
+            placeholder="Choose an enquiry type"
+          />
           <TextAreaField label="How can we help?" name="message" errors={errors} rows={5} />
           <ContactBlock errors={errors} />
         </div>
