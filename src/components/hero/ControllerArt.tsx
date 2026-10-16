@@ -10,7 +10,14 @@ function Layer({ children, defs }: { children: React.ReactNode; defs?: React.Rea
 }
 
 export function ControllerBack() {
-  return <Layer><ellipse cx="400" cy="512" rx="300" ry="20" style={{ fill: "var(--ctl-shadow)", filter: "blur(16px)" }} /><path d="M188 172C205 128 262 110 322 118L326 152C270 150 224 162 206 194Z" fill="var(--ctl-trigger-a)" stroke="var(--ctl-rim-a)" strokeOpacity=".45" /><path d="M612 172C595 128 538 110 478 118L474 152C530 150 576 162 594 194Z" fill="var(--ctl-trigger-a)" stroke="var(--ctl-rim-a)" strokeOpacity=".45" /></Layer>;
+  return <Layer>
+    <ellipse cx="400" cy="512" rx="300" ry="20" style={{ fill: "var(--ctl-shadow)", filter: "blur(16px)" }} />
+    <path className="ctl-depth-edge" d="M82 330C62 395 48 450 78 480C108 505 150 495 178 450L178 463C150 508 108 518 78 493C48 463 62 408 82 344Z" />
+    <path className="ctl-depth-edge" d="M718 330C738 395 752 450 722 480C692 505 650 495 622 450L622 463C650 508 692 518 722 493C752 463 738 408 718 344Z" />
+    <path className="ctl-depth-edge" d="M178 450C205 405 240 372 290 366C330 362 365 372 400 372C435 372 470 362 510 366C560 372 595 405 622 450L622 463C594 420 558 387 509 381C469 377 435 387 400 387C365 387 331 377 291 381C242 387 206 420 178 463Z" />
+    <path d="M188 172C205 128 262 110 322 118L326 152C270 150 224 162 206 194Z" fill="var(--ctl-trigger-a)" stroke="var(--ctl-rim-a)" strokeOpacity=".45" />
+    <path d="M612 172C595 128 538 110 478 118L474 152C530 150 576 162 594 194Z" fill="var(--ctl-trigger-a)" stroke="var(--ctl-rim-a)" strokeOpacity=".45" />
+  </Layer>;
 }
 
 /** Brand-neutral console silhouette that supports the hero without competing with the controller. */
@@ -43,6 +50,8 @@ export function ControllerControls() {
   const id = useId().replace(/:/g, "");
   return <Layer defs={<radialGradient id={`${id}-cap`} cx=".35" cy=".3" r=".85"><stop offset="0" style={stop("--ctl-cap-a")} /><stop offset="1" style={stop("--ctl-cap-b")} /></radialGradient>}>
     <rect x="336" y="188" width="128" height="68" rx="18" fill="var(--ctl-glass-a)" stroke="var(--ctl-rim-a)" strokeOpacity=".5" />
+    <circle className="ctl-brand-halo" cx="400" cy="222" r="26" fill="var(--ctl-mark-bg)" opacity=".58" />
+    <image className="ctl-brand-mark" href="/brand/gamexchange-mark.png" x="378" y="200" width="44" height="44" preserveAspectRatio="xMidYMid meet" />
     <path className="ctl-bar" d="M348 176H452" stroke="var(--ctl-lightbar)" strokeWidth="4" strokeLinecap="round" />
     <g transform="translate(228 250)"><circle r="56" fill="var(--ctl-recess)" opacity=".55" /><path d="M-14-42H14V-14H42V14H14V42H-14V14H-42V-14H-14Z" fill={`url(#${id}-cap)`} stroke="var(--ctl-rim-a)" /></g>
     <g transform="translate(572 250)"><circle r="64" fill="var(--ctl-recess)" opacity=".55" />{[[-39, 0], [39, 0], [0, -39], [0, 39]].map(([x, y]) => <circle key={`${x}-${y}`} cx={x} cy={y} r="20" fill={`url(#${id}-cap)`} stroke="var(--ctl-rim-a)" />)}</g>

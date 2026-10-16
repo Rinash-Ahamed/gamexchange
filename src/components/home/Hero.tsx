@@ -72,9 +72,7 @@ export function Hero() {
     <section
       ref={section}
       data-live={live ? "true" : "false"}
-      onPointerMove={onPointerMove}
-      onPointerLeave={onPointerLeave}
-      className="relative isolate flex min-h-dvh items-center overflow-clip pb-24 pt-24 sm:pt-28 lg:pb-12"
+      className="hero-section relative isolate flex min-h-dvh items-center overflow-clip pb-24 pt-24 sm:pt-28 lg:pb-12"
     >
       {/* ambient lighting */}
       <div aria-hidden className="anim-illuminate absolute inset-0 -z-10">
@@ -88,6 +86,14 @@ export function Hero() {
         <div className="hero-energy-trail hero-energy-trail-a" />
         <div className="hero-energy-trail hero-energy-trail-b" />
       </div>
+      <svg aria-hidden className="hero-fibers absolute inset-0 z-0 size-full" viewBox="0 0 1600 900" preserveAspectRatio="none">
+        <path className="hero-fiber hero-fiber-cyan" pathLength="1" d="M120-20C145 118 500 74 432 250S1040 468 1420 530" />
+        <path className="hero-fiber hero-fiber-magenta" pathLength="1" d="M314-20C276 146 620 137 538 320S1110 580 1420 530" />
+        <path className="hero-fiber hero-fiber-violet" pathLength="1" d="M530-20C484 198 754 170 684 305S1170 408 1420 530" />
+        <path className="hero-fiber-pulse hero-fiber-pulse-cyan" pathLength="1" d="M120-20C145 118 500 74 432 250S1040 468 1420 530" />
+        <path className="hero-fiber-pulse hero-fiber-pulse-magenta" pathLength="1" d="M314-20C276 146 620 137 538 320S1110 580 1420 530" />
+        <path className="hero-fiber-pulse hero-fiber-pulse-violet" pathLength="1" d="M530-20C484 198 754 170 684 305S1170 408 1420 530" />
+      </svg>
 
       <div className="mx-auto grid w-full max-w-7xl items-center gap-2 px-5 sm:px-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6.6fr)] lg:gap-4">
         {/* copy */}
@@ -113,9 +119,9 @@ export function Hero() {
           <p className="anim-rise mt-5 font-display text-[13px] font-medium uppercase tracking-[0.14em] text-muted min-[400px]:text-[15px] sm:text-lg sm:tracking-[0.2em]" style={d("0.98s")}>
             {site.tagline}
           </p>
-          <div className="anim-rise mt-8 flex flex-wrap gap-3 sm:gap-4" style={d("1.15s")}>
-            <ControllerButton href="/products" glyph="x" size="lg" magnetic>Explore gear</ControllerButton>
-            <ControllerButton href="/game-zone" glyph="o" size="lg" variant="ghost" magnetic>Enter game zone</ControllerButton>
+          <div className="hero-cta-actions anim-rise mt-8 flex flex-wrap gap-3 sm:gap-4" style={d("1.15s")}>
+            <ControllerButton href="/products" glyph="x" size="lg" className="hero-cta" magnetic>Explore gear</ControllerButton>
+            <ControllerButton href="/game-zone" glyph="o" size="lg" variant="ghost" className="hero-cta" magnetic>Enter game zone</ControllerButton>
           </div>
           <ul className="anim-rise mt-9 hidden flex-wrap gap-x-7 gap-y-2 text-sm text-muted sm:flex" style={d("1.35s")}>
             <li><span className="font-display font-semibold text-ink">2</span> branches</li>
@@ -156,15 +162,21 @@ export function Hero() {
                 <div className="hero-float absolute inset-0">
                   <m.div style={{ rotateX: rotX }} className="absolute inset-0 [transform-style:preserve-3d]">
                     <div className="ctl-tilt absolute inset-0">
-                      <m.div style={{ y: yBack }} className="absolute inset-0"><div className="pl pl-back absolute inset-0"><ControllerBack /></div></m.div>
+                      <m.div style={{ y: yBack }} className="absolute inset-0 [transform-style:preserve-3d]"><div className="pl pl-back absolute inset-0"><ControllerBack /></div></m.div>
                       <div className="pl pl-body absolute inset-0"><ControllerBody /></div>
-                      <m.div style={{ y: yCtl, scale: sCtl }} className="absolute inset-0"><div className="pl pl-ctl absolute inset-0"><ControllerControls /></div></m.div>
+                      <m.div style={{ y: yCtl, scale: sCtl }} className="absolute inset-0 [transform-style:preserve-3d]"><div className="pl pl-ctl absolute inset-0"><ControllerControls /></div></m.div>
                       <ControllerCallouts />
                     </div>
                   </m.div>
                 </div>
               </div>
             </m.div>
+            <div aria-hidden className="hero-controller-hitbox" onPointerMove={onPointerMove} onPointerLeave={onPointerLeave} />
+            <div aria-hidden className="hero-neon-port absolute right-[5.5%] top-[56%] z-20">
+              <span className="hero-neon-port-core" />
+              <span className="hero-neon-port-spark hero-neon-port-spark-a" />
+              <span className="hero-neon-port-spark hero-neon-port-spark-b" />
+            </div>
           </div>
         </div>
       </div>
