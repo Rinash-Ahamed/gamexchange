@@ -82,6 +82,12 @@ export function Hero() {
         <div className="absolute -bottom-1/4 -right-1/4 size-[65vmax] rounded-full bg-[radial-gradient(closest-side,var(--hero-wash-b),transparent)]" />
         <div className="absolute inset-0" style={{ background: "var(--hero-vignette)" }} />
       </div>
+      <div aria-hidden className="hero-environment absolute inset-0 -z-10">
+        <div className="hero-architecture hero-architecture-left" />
+        <div className="hero-architecture hero-architecture-right" />
+        <div className="hero-energy-trail hero-energy-trail-a" />
+        <div className="hero-energy-trail hero-energy-trail-b" />
+      </div>
 
       <div className="mx-auto grid w-full max-w-7xl items-center gap-2 px-5 sm:px-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6.6fr)] lg:gap-4">
         {/* copy */}
@@ -121,6 +127,23 @@ export function Hero() {
         {/* stage */}
         <div className="order-1 lg:order-2">
           <div ref={stage} className="hero-stage relative mx-auto aspect-[840/500] w-full max-w-[60rem] [perspective:1400px] lg:-mr-8 lg:w-[calc(100%+2rem)] lg:max-w-none min-[1536px]:-mr-24 min-[1536px]:w-[calc(100%+6rem)]">
+            <div aria-hidden className="hero-controller-aura absolute inset-[8%_-4%_0]" />
+            <div aria-hidden className="hero-holo-rings absolute inset-0">
+              <span className="hero-holo-ring hero-holo-ring-a" />
+              <span className="hero-holo-ring hero-holo-ring-b" />
+              <span className="hero-holo-ring hero-holo-ring-c" />
+            </div>
+            <div aria-hidden className="hero-arena-floor absolute inset-x-[4%] bottom-[-8%] top-[55%]" />
+            <div aria-hidden className="hero-particles absolute inset-0">
+              <span className="hero-particle hero-particle-a" />
+              <span className="hero-particle hero-particle-b" />
+              <span className="hero-particle hero-particle-c" />
+              <span className="hero-particle hero-particle-d" />
+              <span className="hero-particle hero-particle-e" />
+              <span className="hero-particle hero-particle-f" />
+              <span className="hero-particle hero-particle-g" />
+              <span className="hero-particle hero-particle-h" />
+            </div>
             <div aria-hidden className="stage-pool anim-illuminate absolute inset-x-[2%] bottom-[-6%] top-[30%]" style={d("0.2s")} />
             <div aria-hidden className="spot anim-illuminate absolute inset-x-[10%] -top-[14%] bottom-[8%]" style={d("0.1s")} />
             <div aria-hidden className="absolute inset-x-[2%] bottom-[0%] top-[58%] [perspective:900px]">

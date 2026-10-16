@@ -43,6 +43,14 @@
   --hero-wash-a: rgb(73 123 255 / 0.28);
   --hero-wash-b: rgb(134 92 255 / 0.22);
   --hero-vignette: radial-gradient(ellipse at 50% 40%, transparent 0%, #07090f 78%);
+  --hero-environment: radial-gradient(76% 110% at 88% 48%, rgb(38 67 155 / 0.23), transparent 62%), radial-gradient(48% 65% at 76% 52%, rgb(134 92 255 / 0.16), transparent 68%);
+  --hero-architecture: rgb(103 138 255 / 0.13);
+  --hero-energy: rgb(110 145 255 / 0.42);
+  --hero-grid: rgb(106 140 255 / 0.18);
+  --hero-ring: rgb(137 169 255 / 0.38);
+  --hero-particle-cyan: rgb(79 234 255 / 0.78);
+  --hero-particle-magenta: rgb(239 104 255 / 0.72);
+  --hero-aura: rgb(89 127 255 / 0.38);
   --img-filter: saturate(1.05) brightness(0.96);
   --stage: radial-gradient(closest-side, rgb(73 123 255 / 0.22), transparent 72%);
   --theme-color: #07090f;
@@ -83,6 +91,14 @@
   --hero-wash-a: rgb(47 91 232 / 0.16);
   --hero-wash-b: rgb(106 63 224 / 0.12);
   --hero-vignette: radial-gradient(ellipse at 50% 40%, transparent 0%, #f3f6fc 80%);
+  --hero-environment: radial-gradient(76% 110% at 88% 48%, rgb(47 91 232 / 0.14), transparent 62%), radial-gradient(48% 65% at 76% 52%, rgb(106 63 224 / 0.1), transparent 68%);
+  --hero-architecture: rgb(47 91 232 / 0.11);
+  --hero-energy: rgb(47 91 232 / 0.28);
+  --hero-grid: rgb(47 91 232 / 0.16);
+  --hero-ring: rgb(47 91 232 / 0.28);
+  --hero-particle-cyan: rgb(18 151 181 / 0.48);
+  --hero-particle-magenta: rgb(155 76 185 / 0.42);
+  --hero-aura: rgb(83 113 218 / 0.22);
   --img-filter: saturate(1) contrast(1.02);
   --stage: radial-gradient(closest-side, rgb(47 91 232 / 0.14), transparent 72%);
   --theme-color: #f3f6fc;
@@ -638,6 +654,77 @@ html.theme-anim-fallback .metal {
 
 /* ---------- hero staging ---------- */
 .hero-stage { --px: 0; --py: 0; }
+.hero-environment {
+  overflow: hidden;
+  background: var(--hero-environment);
+  pointer-events: none;
+}
+.hero-environment::before {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(70% 100% at 12% 50%, var(--bg) 20%, transparent 68%);
+  content: "";
+}
+.hero-architecture {
+  position: absolute;
+  width: clamp(18rem, 35vw, 42rem);
+  height: 125%;
+  border: 1px solid var(--hero-architecture);
+  background: linear-gradient(135deg, transparent 20%, var(--hero-architecture) 20.2%, transparent 20.5%), linear-gradient(90deg, transparent 49%, var(--hero-architecture) 49.2%, transparent 49.5%);
+  opacity: 0.5;
+  transform: skewY(-12deg);
+}
+.hero-architecture-left { left: -22%; top: -26%; }
+.hero-architecture-right { right: -13%; top: -17%; transform: skewY(12deg); }
+.hero-energy-trail {
+  position: absolute;
+  width: 48vw;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--hero-energy), transparent);
+  box-shadow: 0 0 18px var(--hero-energy);
+  opacity: 0.42;
+  will-change: transform, opacity;
+}
+.hero-energy-trail-a { right: -8%; top: 28%; transform: rotate(-17deg); animation: hero-energy-a 13s ease-in-out infinite; }
+.hero-energy-trail-b { right: 6%; bottom: 18%; transform: rotate(9deg); animation: hero-energy-b 16s ease-in-out -5s infinite; }
+@keyframes hero-energy-a { 0%, 100% { opacity: 0.12; transform: translateX(0) rotate(-17deg); } 50% { opacity: 0.5; transform: translateX(-6vw) rotate(-17deg); } }
+@keyframes hero-energy-b { 0%, 100% { opacity: 0.08; transform: translateX(0) rotate(9deg); } 50% { opacity: 0.4; transform: translateX(5vw) rotate(9deg); } }
+.hero-controller-aura {
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--hero-aura), transparent 70%);
+  filter: blur(12px);
+  opacity: 0.78;
+  transform: translate3d(calc(var(--px) * 10px), calc(var(--py) * 8px), 0);
+  will-change: opacity, transform;
+  animation: hero-aura-breathe 8s ease-in-out infinite;
+}
+@keyframes hero-aura-breathe { 0%, 100% { opacity: 0.48; scale: 0.94; } 50% { opacity: 0.88; scale: 1.05; } }
+.hero-holo-ring { position: absolute; display: block; border: 1px solid var(--hero-ring); border-radius: 50%; box-shadow: inset 0 0 22px rgb(118 150 255 / 0.08), 0 0 22px rgb(94 128 255 / 0.09); will-change: transform; }
+.hero-holo-ring-a { inset: 14% 10% 16%; transform: rotateX(66deg) rotateZ(8deg); animation: hero-ring-a 38s linear infinite; }
+.hero-holo-ring-b { inset: 24% 20% 25%; border-style: dashed; opacity: 0.7; transform: rotateX(70deg) rotateZ(-12deg); animation: hero-ring-b 54s linear infinite; }
+.hero-holo-ring-c { inset: 5% 2% 7%; opacity: 0.42; transform: rotateX(74deg) rotateZ(18deg); animation: hero-ring-c 72s linear infinite; }
+@keyframes hero-ring-a { to { transform: rotateX(66deg) rotateZ(368deg); } }
+@keyframes hero-ring-b { to { transform: rotateX(70deg) rotateZ(-372deg); } }
+@keyframes hero-ring-c { to { transform: rotateX(74deg) rotateZ(378deg); } }
+.hero-arena-floor {
+  transform: translate3d(calc(var(--px) * 16px), calc(var(--py) * 10px), 0) perspective(900px) rotateX(66deg);
+  transform-origin: center bottom;
+  background-image: linear-gradient(var(--hero-grid) 1px, transparent 1px), linear-gradient(90deg, var(--hero-grid) 1px, transparent 1px), radial-gradient(ellipse at center, var(--hero-aura), transparent 68%);
+  background-size: 100% 18px, 30px 100%, 100% 100%;
+  mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 78%, transparent);
+  opacity: 0.15;
+  will-change: transform;
+}
+.hero-particle { position: absolute; width: 3px; height: 3px; border-radius: 999px; background: var(--particle-color); box-shadow: 0 0 12px var(--particle-color); opacity: 0; will-change: transform, opacity; animation: hero-particle 10s ease-in-out infinite; }
+.hero-particle-a { --particle-color: var(--hero-particle-cyan); left: 16%; top: 26%; animation-delay: -2s; }
+.hero-particle-b { --particle-color: var(--hero-particle-magenta); left: 35%; top: 12%; animation-delay: -7s; }
+.hero-particle-c { --particle-color: var(--hero-particle-cyan); right: 22%; top: 17%; animation-delay: -4s; }
+.hero-particle-d { --particle-color: var(--hero-particle-magenta); right: 10%; top: 53%; animation-delay: -8s; }
+.hero-particle-e { --particle-color: var(--hero-particle-cyan); left: 28%; bottom: 15%; animation-delay: -5s; }
+.hero-particle-f { --particle-color: var(--hero-particle-magenta); left: 53%; top: 34%; animation-delay: -1s; }
+.hero-particle-g { --particle-color: var(--hero-particle-cyan); right: 35%; bottom: 18%; animation-delay: -6s; }
+.hero-particle-h { --particle-color: var(--hero-particle-magenta); right: 4%; top: 34%; animation-delay: -9s; }
+@keyframes hero-particle { 0%, 100% { opacity: 0; transform: translate3d(calc(var(--px) * -6px), calc(var(--py) * -4px + 14px), 0) scale(0.7); } 35%, 70% { opacity: 0.72; } 50% { transform: translate3d(calc(var(--px) * 8px + 12px), calc(var(--py) * 6px - 20px), 0) scale(1); } }
 .ctl-tilt {
   transform-style: preserve-3d;
   transform: rotateX(calc(var(--py) * -5deg)) rotateY(calc(var(--px) * 8deg));
@@ -693,6 +780,10 @@ html.theme-anim-fallback .metal {
 
 @media (max-width: 1023px) {
   .ctl-tilt, .pl { transition: none; }
+  .hero-architecture-left { left: -40%; }
+  .hero-architecture-right { right: -42%; }
+  .hero-energy-trail { width: 65vw; }
+  .hero-holo-ring-c, .hero-particle-d, .hero-particle-e, .hero-particle-g, .hero-particle-h { display: none; }
 }
 
 /* ------------------------------------------------------------------
