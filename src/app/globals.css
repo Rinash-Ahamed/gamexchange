@@ -313,7 +313,6 @@ html.theme-anim-fallback .metal {
   transition: opacity 380ms ease, visibility 380ms ease;
 }
 
-.boot-seen .boot-screen { display: none; }
 .boot-screen-leaving { visibility: hidden; opacity: 0; }
 
 .boot-grid {
@@ -648,7 +647,6 @@ html.theme-anim-fallback .metal {
 .pl-back { transform: translate3d(calc(var(--px) * -14px), calc(var(--py) * -8px), 0); }
 .pl-body { transform: translate3d(calc(var(--px) * 4px), calc(var(--py) * 3px), 0); }
 .pl-ctl { transform: translate3d(calc(var(--px) * 16px), calc(var(--py) * 10px), 0); }
-.pl-console { transform: translate3d(calc(var(--px) * -7px), calc(var(--py) * -5px), -42px); }
 
 .spot {
   clip-path: polygon(36% 0, 64% 0, 100% 100%, 0 100%);
@@ -689,8 +687,6 @@ html.theme-anim-fallback .metal {
 .ctl-callout { opacity: 0; animation: illuminate 0.9s ease-out both; }
 
 .hero-float { animation: float-y 7s ease-in-out 1.6s infinite; }
-.console-float { transform-origin: center; animation: console-float 7.8s ease-in-out 1.2s infinite; }
-@keyframes console-float { 0%, 100% { transform: translate(560px, 82px) rotate(6deg); } 50% { transform: translate(560px, 72px) rotate(4deg); } }
 
 /* Pause every looping animation while the hero is off-screen. */
 [data-live="false"] *, [data-live="false"] *::before { animation-play-state: paused !important; }

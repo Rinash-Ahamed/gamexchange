@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, m, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { ControllerButton } from "@/components/ui/ControllerButton";
-import { ControllerBack, ControllerBody, ControllerCallouts, ControllerConsole, ControllerControls } from "@/components/hero/ControllerArt";
+import { ControllerBack, ControllerBody, ControllerCallouts, ControllerControls } from "@/components/hero/ControllerArt";
 import { useFinePointer, useMedia } from "@/lib/use-media";
 import { site } from "@/data/site";
 
@@ -133,7 +133,6 @@ export function Hero() {
                 <div className="hero-float absolute inset-0">
                   <m.div style={{ rotateX: rotX }} className="absolute inset-0 [transform-style:preserve-3d]">
                     <div className="ctl-tilt absolute inset-0">
-                      <div className="pl pl-console absolute inset-0"><ControllerConsole /></div>
                       <m.div style={{ y: yBack }} className="absolute inset-0"><div className="pl pl-back absolute inset-0"><ControllerBack /></div></m.div>
                       <div className="pl pl-body absolute inset-0"><ControllerBody /></div>
                       <m.div style={{ y: yCtl, scale: sCtl }} className="absolute inset-0"><div className="pl pl-ctl absolute inset-0"><ControllerControls /></div></m.div>

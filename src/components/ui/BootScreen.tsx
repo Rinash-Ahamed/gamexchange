@@ -7,19 +7,25 @@ import { BOOT_SCREEN_KEY } from "@/lib/boot-screen";
 type Phase = "booting" | "leaving" | "hidden";
 
 export function BootScreen() {
-  const [phase, setPhase] = useState<Phase>("booting");
+  const [phase, setPhase] = useState<Phase>("hidden");
   const screen = useRef<HTMLDivElement>(null);
+  const ownsBootSession = useRef(false);
 
   useEffect(() => {
+    let hasSeenBoot = false;
     try {
-      if (sessionStorage.getItem(BOOT_SCREEN_KEY) === "1") {
-        const hideFrame = window.requestAnimationFrame(() => setPhase("hidden"));
-        return () => window.cancelAnimationFrame(hideFrame);
+      hasSeenBoot = sessionStorage.getItem(BOOT_SCREEN_KEY) === "1";
+      if (!hasSeenBoot) {
+        sessionStorage.setItem(BOOT_SCREEN_KEY, "1");
+        ownsBootSession.current = true;
       }
-      sessionStorage.setItem(BOOT_SCREEN_KEY, "1");
     } catch {
       // The intro still works when browser storage is unavailable.
     }
+
+    // Avoid outputting loader markup on refreshes. The ref preserves the true
+    // first visit through React Strict Mode's development-only effect replay.
+    if (hasSeenBoot && !ownsBootSession.current) return;
 
     const shell = document.querySelector<HTMLElement>("[data-site-shell]");
     const skipLink = document.getElementById("skip-to-content");
@@ -27,7 +33,11 @@ export function BootScreen() {
     shell?.setAttribute("inert", "");
     skipLink?.setAttribute("inert", "");
     document.body.style.overflow = "hidden";
-    screen.current?.focus({ preventScroll: true });
+    let focusFrame = 0;
+    const showFrame = window.requestAnimationFrame(() => {
+      setPhase("booting");
+      focusFrame = window.requestAnimationFrame(() => screen.current?.focus({ preventScroll: true }));
+    });
     let unlocked = false;
     const unlockSite = () => {
       if (unlocked) return;
@@ -45,7 +55,6 @@ export function BootScreen() {
     const hideTimer = window.setTimeout(() => {
       unlockSite();
       setPhase("hidden");
-      document.documentElement.classList.add("boot-seen");
     }, hideAfter);
 
     const skip = (event: KeyboardEvent) => {
@@ -54,11 +63,12 @@ export function BootScreen() {
       window.clearTimeout(hideTimer);
       unlockSite();
       setPhase("hidden");
-      document.documentElement.classList.add("boot-seen");
     };
     window.addEventListener("keydown", skip);
 
     return () => {
+      window.cancelAnimationFrame(showFrame);
+      window.cancelAnimationFrame(focusFrame);
       window.clearTimeout(leaveTimer);
       window.clearTimeout(hideTimer);
       window.removeEventListener("keydown", skip);

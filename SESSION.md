@@ -55,6 +55,7 @@ This file stores durable context between development sessions. Keep entries conc
 - Added a contact-form enquiry type so franchise messages are clearly labelled for the team.
 - Added a console layer behind the controller in the hero, and changed shop browsing to live inventory categories managed from the admin inventory form.
 - Made every home service card a full-card link to its appropriate repair, exchange, or contact route.
+- Retained the cleaner console-and-controller hero composition after removing the experimental PS5 exploded-module variation.
 - Theme changes use a single page-level View Transition instead of transitioning every DOM element, avoiding the previous repaint lag.
 - Added a game-style first-session boot screen with a logo power-up, system statuses, progress sequence, accessible interaction locking, and reduced-motion handling.
 - Combined theme and boot-session pre-paint logic into one bootstrap script to avoid Next.js client-rendered script warnings.
