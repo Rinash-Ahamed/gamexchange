@@ -659,6 +659,10 @@ html.theme-anim-fallback .metal {
 }
 
 /* ---------- hero staging ---------- */
+.service-offering-image { transition: transform 600ms cubic-bezier(0.2, 0.75, 0.2, 1); }
+@media (prefers-reduced-motion: no-preference) {
+  .service-offering:is(:hover, :focus-visible) .service-offering-image { transform: scale(1.045); }
+}
 .hero-stage { --px: 0; --py: 0; perspective-origin: 62% 46%; }
 .hero-product-float {
   --hero-product-scale: 1.14;
