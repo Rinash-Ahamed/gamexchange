@@ -32,10 +32,11 @@ const R = 128;
 const pos = (deg: number) => ({ x: 200 + R * Math.cos((deg * Math.PI) / 180), y: 200 + R * Math.sin((deg * Math.PI) / 180) });
 
 /** Abstract diagnostic-scan visual. Deliberately generic: it is not a model of any specific device. */
-export function RepairDiagnostic({ value, onChange }: { value?: string | null; onChange?: (fault: string) => void }) {
+export function RepairDiagnostic({ value, values, onChange }: { value?: string | null; values?: readonly string[]; onChange?: (fault: string) => void }) {
   const [internal, setInternal] = useState<string>("Power issues");
   const active = value !== undefined ? value : internal;
-  const lit = new Set(active ? (faultToNodes[active] ?? []) : []);
+  const selected = values ?? (active ? [active] : []);
+  const lit = new Set(selected.flatMap((fault) => faultToNodes[fault] ?? []));
 
   const select = (f: string) => {
     setInternal(f);
@@ -45,7 +46,7 @@ export function RepairDiagnostic({ value, onChange }: { value?: string | null; o
   return (
     <div className="metal rounded-3xl p-5 sm:p-8">
       <div className="relative mx-auto aspect-square w-full max-w-md">
-        <svg viewBox="0 0 400 400" className="size-full" role="img" aria-label={`Diagnostic map. ${active ? `Highlighting areas related to: ${active}.` : "Choose an issue to highlight related areas."}`}>
+        <svg viewBox="0 0 400 400" className="size-full" role="img" aria-label={`Diagnostic map. ${selected.length ? `Highlighting areas related to: ${selected.join(", ")}.` : "Choose an issue to highlight related areas."}`}>
           <defs>
             <clipPath id="scan-clip"><circle cx="200" cy="200" r="170" /></clipPath>
           </defs>
@@ -71,15 +72,15 @@ export function RepairDiagnostic({ value, onChange }: { value?: string | null; o
         </svg>
       </div>
 
-      <p className="mt-4 text-center font-display text-xs font-semibold uppercase tracking-[0.3em] text-accent-text">Select the issue</p>
+      <p className="mt-4 text-center font-display text-xs font-semibold uppercase tracking-[0.3em] text-accent-text">{values ? "Select all issues that apply" : "Select the issue"}</p>
       <div className="mt-3 flex flex-wrap justify-center gap-2">
         {repairFaults.map((f) => (
           <button
             key={f}
             type="button"
-            aria-pressed={active === f}
+            aria-pressed={selected.includes(f)}
             onClick={() => select(f)}
-            className={`min-h-11 rounded-full border px-4 text-sm font-medium transition-all duration-200 touch-manipulation active:scale-95 ${active === f ? "border-transparent bg-gradient-to-b from-fill to-fill-2 text-accent-ink" : "border-line-strong bg-surface hover:border-blue"}`}
+            className={`min-h-11 rounded-full border px-4 text-sm font-medium transition-all duration-200 touch-manipulation active:scale-95 ${selected.includes(f) ? "border-transparent bg-gradient-to-b from-fill to-fill-2 text-accent-ink" : "border-line-strong bg-surface hover:border-blue"}`}
           >
             {f}
           </button>

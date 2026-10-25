@@ -12,18 +12,21 @@ export function RepairExperience() {
   const { state, errors, submit, reset } = useEnquiry(formRef);
   const [category, setCategory] = useState("");
   const [device, setDevice] = useState("");
-  const [fault, setFault] = useState("");
+  const [faults, setFaults] = useState<string[]>([]);
+  const toggleFault = (fault: string) => {
+    setFaults((current) => current.includes(fault) ? current.filter((item) => item !== fault) : [...current, fault]);
+  };
 
   const devices = category === "Console" || category === "Accessories" ? repairDevices[category] : [];
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    void submit(formToPayload(e.currentTarget, "repair"));
+    void submit(formToPayload(e.currentTarget, "repair", ["fault"]));
   };
 
   return (
     <div className="grid items-start gap-8 lg:grid-cols-[1fr_1.1fr]">
-      <RepairDiagnostic value={fault || null} onChange={setFault} />
+      <RepairDiagnostic values={faults} onChange={toggleFault} />
 
       <div>
         {state.status === "success" && <SuccessPanel whatsappUrl={state.whatsappUrl} onEdit={reset} title="Repair enquiry ready" />}
@@ -35,7 +38,19 @@ export function RepairExperience() {
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <SelectField label="Device category" name="category" errors={errors} options={repairCategories} value={category} onChange={(v) => { setCategory(v); setDevice(""); }} />
             <SelectField label="Device model" name="device" errors={errors} options={devices} value={device} onChange={setDevice} placeholder={category ? "Select…" : "Choose a category first"} />
-            <SelectField label="Issue" name="fault" errors={errors} options={repairFaults} value={fault} onChange={setFault} className="sm:col-span-2" />
+            <fieldset className="min-w-0 sm:col-span-2" aria-describedby={errors.fault ? "repair-issues-hint repair-issues-error" : "repair-issues-hint"}>
+              <legend className="text-sm font-semibold">Issues with your device</legend>
+              <p id="repair-issues-hint" className="mb-3 mt-1 text-xs text-muted">Select all that apply. You can choose more than one issue.</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {repairFaults.map((fault) => (
+                  <label key={fault} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-line-strong bg-surface px-3 py-2 text-sm has-checked:border-blue has-checked:bg-blue/10">
+                    <input type="checkbox" name="fault" value={fault} checked={faults.includes(fault)} onChange={() => toggleFault(fault)} aria-invalid={Boolean(errors.fault)} aria-describedby={errors.fault ? "repair-issues-error" : undefined} className="size-4 shrink-0 accent-blue" />
+                    {fault}
+                  </label>
+                ))}
+              </div>
+              {errors.fault && <p id="repair-issues-error" className="mt-2 text-sm font-medium text-danger">{errors.fault[0]}</p>}
+            </fieldset>
             <div className="sm:col-span-2">
               <TextAreaField label="Describe the issue" name="details" errors={errors} placeholder="What happens, when it started, anything you’ve already tried…" />
             </div>

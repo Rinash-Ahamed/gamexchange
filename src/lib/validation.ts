@@ -27,7 +27,7 @@ export const repairSchema = z
     ...common,
     category: z.enum(repairCategories, { error: "Choose a device category" }),
     device: z.string({ error: "Choose your device" }).transform(oneLine).pipe(z.string().min(1, "Choose your device")),
-    fault: z.enum(repairFaults, { error: "Choose the closest issue" }),
+    fault: z.array(z.enum(repairFaults), { error: "Select at least one issue" }).min(1, "Select at least one issue").max(repairFaults.length).transform((faults) => [...new Set(faults)]),
     details: z.string({ error: "Tell us a little more" }).transform(multiLine).pipe(z.string().min(10, "Tell us a little more (10+ characters)").max(1000, "Keep it under 1000 characters")),
     branch,
   })

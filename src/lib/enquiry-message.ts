@@ -16,7 +16,7 @@ export function buildEnquiryMessage(e: Enquiry): string {
 
   switch (e.kind) {
     case "repair":
-      rows.push(line("Category", e.category), line("Device", e.device), line("Issue", e.fault), line("Details", e.details));
+      rows.push(line("Category", e.category), line("Device", e.device), line("Issues", e.fault.join(", ")), line("Details", e.details));
       break;
     case "exchange":
       rows.push(
