@@ -57,7 +57,7 @@ export const whatsappUrl = (message?: string) =>
 export const navItems = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/products", label: "Shop", icon: "shop" },
-  { href: "/exchange", label: "Sell / Exchange", short: "Trade", icon: "exchange" },
+  { href: "/exchange", label: "Trade", short: "Trade", icon: "exchange" },
   { href: "/repair-service", label: "Repairs", short: "Repair", icon: "repair" },
   { href: "/game-zone", label: "Game Zone", short: "Zone", icon: "zone" },
   { href: "/contact", label: "Contact", icon: "contact" },

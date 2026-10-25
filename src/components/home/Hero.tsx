@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { AnimatePresence, m, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { ControllerButton } from "@/components/ui/ControllerButton";
-import { ControllerBack, ControllerBody, ControllerCallouts, ControllerControls } from "@/components/hero/ControllerArt";
-import { useFinePointer, useMedia } from "@/lib/use-media";
+import { useMedia } from "@/lib/use-media";
 import { site } from "@/data/site";
 
 const d = (s: string) => ({ ["--d" as string]: s });
@@ -24,15 +24,11 @@ const headlines = [
  */
 export function Hero() {
   const section = useRef<HTMLElement>(null);
-  const stage = useRef<HTMLDivElement>(null);
-  const frame = useRef(0);
   const [headline, setHeadline] = useState(0);
 
   const live = useInView(section, { margin: "120px" });
-  const fine = useFinePointer();
   const wide = useMedia("(min-width: 1024px)");
   const reduce = useReducedMotion();
-  const explode = wide && fine && !reduce;
 
   useEffect(() => {
     if (reduce) return;
@@ -45,28 +41,8 @@ export function Hero() {
   }, [reduce]);
 
   const { scrollYProgress } = useScroll({ target: section, offset: ["start start", "end start"] });
-  const rotX = useTransform(scrollYProgress, [0, 1], [0, explode ? 24 : 0]);
-  const yBack = useTransform(scrollYProgress, [0, 1], [0, explode ? 90 : 0]);
-  const yCtl = useTransform(scrollYProgress, [0, 1], [0, explode ? -110 : 0]);
-  const sCtl = useTransform(scrollYProgress, [0, 1], [1, explode ? 1.1 : 1]);
   const fade = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, reduce ? 1 : 0.1]);
   const lift = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : wide ? -40 : -18]);
-
-  const onPointerMove = (e: React.PointerEvent<HTMLElement>) => {
-    if (!fine || reduce || e.pointerType !== "mouse") return;
-    const { clientX, clientY, currentTarget } = e;
-    cancelAnimationFrame(frame.current);
-    frame.current = requestAnimationFrame(() => {
-      const r = currentTarget.getBoundingClientRect();
-      stage.current?.style.setProperty("--px", String(((clientX - r.left) / r.width) * 2 - 1));
-      stage.current?.style.setProperty("--py", String(((clientY - r.top) / r.height) * 2 - 1));
-    });
-  };
-  const onPointerLeave = () => {
-    cancelAnimationFrame(frame.current);
-    stage.current?.style.setProperty("--px", "0");
-    stage.current?.style.setProperty("--py", "0");
-  };
 
   return (
     <section
@@ -132,7 +108,9 @@ export function Hero() {
 
         {/* stage */}
         <div className="order-1 lg:order-2">
-          <div ref={stage} className="hero-stage relative mx-auto aspect-[840/500] w-full max-w-[60rem] [perspective:1400px] lg:-mr-8 lg:w-[calc(100%+2rem)] lg:max-w-none min-[1536px]:-mr-24 min-[1536px]:w-[calc(100%+6rem)]">
+          <div
+            className="hero-stage hero-product-stage relative mx-auto aspect-[3/2] w-full max-w-[60rem] [perspective:1400px] lg:-mr-8 lg:w-[calc(100%+2rem)] lg:max-w-none min-[1536px]:-mr-24 min-[1536px]:w-[calc(100%+6rem)]"
+          >
             <div aria-hidden className="hero-controller-aura absolute inset-[8%_-4%_0]" />
             <div aria-hidden className="hero-holo-rings absolute inset-0">
               <span className="hero-holo-ring hero-holo-ring-a" />
@@ -159,24 +137,18 @@ export function Hero() {
 
             <m.div style={{ opacity: fade, y: lift }} className="absolute inset-0">
               <div className="anim-emerge absolute inset-0" style={d("0.3s")}>
-                <div className="hero-float absolute inset-0">
-                  <m.div style={{ rotateX: rotX }} className="absolute inset-0 [transform-style:preserve-3d]">
-                    <div className="ctl-tilt absolute inset-0">
-                      <m.div style={{ y: yBack }} className="absolute inset-0 [transform-style:preserve-3d]"><div className="pl pl-back absolute inset-0"><ControllerBack /></div></m.div>
-                      <div className="pl pl-body absolute inset-0"><ControllerBody /></div>
-                      <m.div style={{ y: yCtl, scale: sCtl }} className="absolute inset-0 [transform-style:preserve-3d]"><div className="pl pl-ctl absolute inset-0"><ControllerControls /></div></m.div>
-                      <ControllerCallouts />
-                    </div>
-                  </m.div>
+                <div className="hero-product-float absolute inset-0">
+                  <Image
+                    src="/hero/gamexchange-hardware-stage.png"
+                    alt="Gaming console, controller, VR headset and handheld system on an illuminated display platform"
+                    fill
+                    priority
+                    sizes="(min-width: 1536px) 880px, (min-width: 1024px) 58vw, 96vw"
+                    className="hero-product-art object-contain"
+                  />
                 </div>
               </div>
             </m.div>
-            <div aria-hidden className="hero-controller-hitbox" onPointerMove={onPointerMove} onPointerLeave={onPointerLeave} />
-            <div aria-hidden className="hero-neon-port absolute right-[5.5%] top-[56%] z-20">
-              <span className="hero-neon-port-core" />
-              <span className="hero-neon-port-spark hero-neon-port-spark-a" />
-              <span className="hero-neon-port-spark hero-neon-port-spark-b" />
-            </div>
           </div>
         </div>
       </div>

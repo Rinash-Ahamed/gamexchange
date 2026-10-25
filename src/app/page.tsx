@@ -1,4 +1,5 @@
 import { Hero } from "@/components/home/Hero";
+import { PromoSwitch } from "@/components/home/PromoSwitch";
 import { Services } from "@/components/home/Services";
 import { ShelfShowcase } from "@/components/home/ShelfShowcase";
 import { TradeTeaser } from "@/components/home/TradeTeaser";
@@ -22,6 +23,7 @@ export default async function Home() {
     <main>
       <AmbientLight />
       <Hero />
+      <PromoSwitch />
       <SectionGate from="Intro" to="Services" level={1} />
       <Services />
       <SectionGate from="Services" to="The shelf" level={2} />
