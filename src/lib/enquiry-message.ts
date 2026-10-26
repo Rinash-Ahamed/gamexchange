@@ -20,11 +20,12 @@ export function buildEnquiryMessage(e: Enquiry): string {
       break;
     case "exchange":
       rows.push(
+        line("Request", e.intent === "sell" ? "Sell for cash" : "Exchange / upgrade"),
         line("Current console", e.console),
         line("Condition", e.condition),
         line("Accessories", e.accessories.length ? e.accessories.join(", ") : "None"),
-        line("Wants to upgrade to", e.upgrade),
       );
+      if (e.intent === "exchange" && e.upgrade) rows.push(line("Wants to upgrade to", e.upgrade));
       if (e.details) rows.push(line("Details", e.details));
       break;
     case "gamezone":

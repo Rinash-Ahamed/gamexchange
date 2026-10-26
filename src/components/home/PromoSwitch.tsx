@@ -61,7 +61,10 @@ export function PromoSwitch() {
   }, [reduceMotion]);
 
   return (
-    <section className="promo-switch-section" aria-label="GameXChange highlights">
+    <section className="promo-switch-section" aria-labelledby="promo-switch-heading">
+      <h2 id="promo-switch-heading" className="mb-6 text-center font-display text-[clamp(1.8rem,4.5vw,3.5rem)] font-bold uppercase leading-tight tracking-tight sm:mb-8">
+        The <span className="text-gradient-motion">Next Level.</span>
+      </h2>
       <div className="promo-switch-console">
         <button className="promo-joycon promo-joycon-left" type="button" onClick={() => move(-1)} aria-label="Previous promotion">
           <span aria-hidden="true" className="promo-joycon-minus" />
@@ -93,7 +96,7 @@ export function PromoSwitch() {
                 />
                 <div className="promo-switch-shade" />
                 <div className="promo-switch-copy">
-                  <h2>{slide.title}</h2>
+                  <h3>{slide.title}</h3>
                   <p>{slide.copy}</p>
                   <Link href={slide.href} tabIndex={index === active ? 0 : -1}>
                     {slide.action}<span aria-hidden="true"> ↗</span>

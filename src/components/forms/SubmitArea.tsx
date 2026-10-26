@@ -2,9 +2,10 @@
 
 import { CircleCheck, LoaderCircle, TriangleAlert } from "lucide-react";
 import { ControllerButton } from "@/components/ui/ControllerButton";
+import type { GlyphName } from "@/components/ui/Glyph";
 import type { EnquiryState } from "./use-enquiry";
 
-export function SubmitArea({ state, label }: { state: EnquiryState; label: string }) {
+export function SubmitArea({ state, label, glyph = "x" }: { state: EnquiryState; label: string; glyph?: GlyphName }) {
   return (
     <div className="mt-8 space-y-4">
       {state.status === "error" && (
@@ -13,7 +14,7 @@ export function SubmitArea({ state, label }: { state: EnquiryState; label: strin
           {state.message}
         </p>
       )}
-      <ControllerButton type="submit" glyph="x" size="lg" disabled={state.status === "submitting"}>
+      <ControllerButton type="submit" glyph={glyph} size="lg" disabled={state.status === "submitting"}>
         {state.status === "submitting" ? (
           <span className="inline-flex items-center gap-2"><LoaderCircle className="size-4 animate-spin" aria-hidden />Preparing…</span>
         ) : label}
@@ -35,7 +36,7 @@ export function SuccessPanel({ whatsappUrl, onEdit, title = "Your enquiry is rea
         One last step: send it on WhatsApp so the shop receives it. <strong className="text-ink">Nothing is booked or confirmed until the shop replies.</strong>
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-4">
-        <ControllerButton href={whatsappUrl} external glyph="x" size="lg">Send on WhatsApp</ControllerButton>
+        <ControllerButton href={whatsappUrl} external glyph="play" size="lg">Send on WhatsApp</ControllerButton>
         <ControllerButton onClick={onEdit} glyph="o" size="lg" variant="ghost">Edit enquiry</ControllerButton>
       </div>
     </div>

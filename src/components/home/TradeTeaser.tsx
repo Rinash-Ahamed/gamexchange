@@ -2,13 +2,12 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Glyph, glyphTint, type GlyphName } from "@/components/ui/Glyph";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { Reveal } from "@/components/ui/Reveal";
-import { site } from "@/data/site";
 
 const steps: { glyph: GlyphName; title: string; body: string }[] = [
   { glyph: "x", title: "Choose your console", body: "Tell us what you’re trading in." },
   { glyph: "o", title: "Select its condition", body: "Be honest. The shop checks it in person." },
   { glyph: "tri", title: "Add the extras", body: "Controllers, cables, box, games." },
-  { glyph: "sq", title: "Pick your upgrade", body: "PS5, PS4, PS3 or an accessory." },
+  { glyph: "play", title: "Sell or upgrade", body: "Sell for cash, or choose a console or accessory to upgrade to." },
 ];
 
 export function TradeTeaser() {
@@ -17,11 +16,10 @@ export function TradeTeaser() {
       <div className="grid items-center gap-8 lg:grid-cols-2">
         <div>
           <SectionHeading title={<span id="trade-h">Level up<br /><span className="text-gradient">your setup.</span></span>}>
-            Swap your old console toward your next one. Send an enquiry in a minute. The shop confirms the offer after checking your device.
+            Sell your console for cash or trade it toward your next one. The shop confirms the offer after checking your device.
           </SectionHeading>
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <ControllerButton href="/exchange" glyph="x" size="lg">Start trade-in</ControllerButton>
-            <a href={site.sellFormUrl} target="_blank" rel="noopener noreferrer" className="py-3 text-sm text-muted underline-offset-4 hover:text-ink hover:underline">Prefer selling outright? Use the sell form</a>
+            <ControllerButton href="/exchange" glyph="play" size="lg">Sell or exchange</ControllerButton>
           </div>
         </div>
 

@@ -107,9 +107,9 @@ export function Hero() {
         </div>
 
         {/* stage */}
-        <div className="order-1 lg:order-2">
+        <div className="order-1 min-w-0 lg:order-2">
           <div
-            className="hero-stage hero-product-stage relative mx-auto aspect-[3/2] w-full max-w-[60rem] [perspective:1400px] lg:-mr-8 lg:w-[calc(100%+2rem)] lg:max-w-none min-[1536px]:-mr-24 min-[1536px]:w-[calc(100%+6rem)]"
+            className="hero-stage hero-product-stage relative mx-auto aspect-[3/2] w-full max-w-[60rem] [perspective:1400px]"
           >
             <div aria-hidden className="hero-controller-aura absolute inset-[8%_-4%_0]" />
             <div aria-hidden className="hero-holo-rings absolute inset-0">
@@ -137,13 +137,13 @@ export function Hero() {
 
             <m.div style={{ opacity: fade, y: lift }} className="absolute inset-0">
               <div className="anim-emerge absolute inset-0" style={d("0.3s")}>
-                <div className="hero-product-float absolute inset-0">
+                <div className="hero-product-float absolute">
                   <Image
                     src="/hero/gamexchange-hardware-stage.png"
                     alt="Gaming console, controller, VR headset and handheld system on an illuminated display platform"
                     fill
                     priority
-                    sizes="(min-width: 1536px) 880px, (min-width: 1024px) 58vw, 96vw"
+                    sizes="(min-width: 1280px) 680px, (min-width: 1024px) 54vw, (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)"
                     className="hero-product-art object-contain"
                   />
                 </div>
