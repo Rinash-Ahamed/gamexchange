@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { reviews } from "@/data/reviews";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { AnimationBoundary } from "@/components/ui/AnimationBoundary";
 
 const columns = [
   reviews.filter((_, index) => index % 2 === 0),
@@ -53,7 +54,7 @@ export function Reviews() {
           <p className="mt-6 font-display text-sm font-semibold uppercase tracking-[0.18em] text-accent-text">Player-tested. Lobby-approved.</p>
         </div>
 
-        <div className="review-marquee-scene" aria-label="Customer reviews">
+        <AnimationBoundary className="review-marquee-scene" label="Customer reviews">
           <div className="review-marquee-stage">
             {columns.map((column, columnIndex) => {
               const timing = timings[columnIndex];
@@ -81,7 +82,7 @@ export function Reviews() {
               );
             })}
           </div>
-        </div>
+        </AnimationBoundary>
       </div>
     </section>
   );

@@ -1,73 +1,53 @@
 import "server-only";
 
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import type { DecodedIdToken } from "firebase-admin/auth";
+import { firebaseAdminAuth } from "@/lib/firebase/admin";
 
-const COOKIE_NAME = "gamexchange_admin";
+// A new name deliberately invalidates all legacy password-only cookies.
+const COOKIE_NAME = "gamexchange_admin_mfa";
 const SESSION_SECONDS = 60 * 60 * 8;
-const DEV_EMAIL = "admin@gamexchange.local";
-const DEV_PASSWORD = "change-me-now";
-const DEV_SECRET = "gamexchange-development-session-secret-only";
 
-type AdminSession = {
-  email: string;
-  expiresAt: number;
-};
-
-function credentials() {
-  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-  const password = process.env.ADMIN_PASSWORD;
-
-  if (email && password) return { email, password };
-  if (process.env.NODE_ENV !== "production") return { email: DEV_EMAIL, password: DEV_PASSWORD };
-  return null;
-}
-
-function sessionSecret() {
-  const configured = process.env.ADMIN_SESSION_SECRET;
-  if (configured && configured.length >= 32) return configured;
-  if (process.env.NODE_ENV !== "production") return DEV_SECRET;
-  return null;
-}
-
-function equalSecret(left: string, right: string) {
-  const leftHash = createHash("sha256").update(left).digest();
-  const rightHash = createHash("sha256").update(right).digest();
-  return timingSafeEqual(leftHash, rightHash);
-}
-
-function sign(payload: string, secret: string) {
-  return createHmac("sha256", secret).update(payload).digest("base64url");
-}
+export class AdminAccessError extends Error {}
 
 export function adminAuthConfigured() {
-  return Boolean(credentials() && sessionSecret());
+  return Boolean(process.env.FIREBASE_PROJECT_ID?.trim() && process.env.FIREBASE_ADMIN_UIDS?.trim());
 }
 
-export function developmentLoginHint() {
-  if (process.env.NODE_ENV === "production" || process.env.ADMIN_EMAIL || process.env.ADMIN_PASSWORD) return null;
-  return { email: DEV_EMAIL, password: DEV_PASSWORD };
+function approvedUid(uid: string) {
+  return (process.env.FIREBASE_ADMIN_UIDS ?? "").split(",").map((entry) => entry.trim()).filter(Boolean).includes(uid);
 }
 
-export function verifyAdminCredentials(email: string, password: string) {
-  const expected = credentials();
-  if (!expected) return false;
-  return equalSecret(email.trim().toLowerCase(), expected.email) && equalSecret(password, expected.password);
+async function approvedUser(token: DecodedIdToken, requireTotp: boolean) {
+  if (!approvedUid(token.uid)) throw new AdminAccessError("This account is not approved for admin access.");
+  const user = await firebaseAdminAuth().getUser(token.uid);
+  if (user.disabled || !user.email || user.email !== token.email) throw new AdminAccessError("Admin account is unavailable.");
+  if (requireTotp && (!user.emailVerified || !token.email_verified || token.firebase.sign_in_second_factor !== "totp"
+    || !user.multiFactor?.enrolledFactors.some((factor) => factor.factorId === "totp"))) {
+    throw new AdminAccessError("Sign in with your password and authenticator code to continue.");
+  }
+  return user;
 }
 
-export async function createAdminSession(email: string) {
-  const secret = sessionSecret();
-  if (!secret) throw new Error("Admin session secret is not configured.");
+/** Enrollment checks never create an admin session or grant access to records. */
+export async function checkAdminIdentity(idToken: string) {
+  const token = await firebaseAdminAuth().verifyIdToken(idToken, true);
+  const age = Date.now() / 1000 - token.auth_time;
+  if (age < -60 || age > 300) throw new AdminAccessError("Please sign in again to continue.");
+  const user = await approvedUser(token, false);
+  return { emailVerified: user.emailVerified && Boolean(token.email_verified) };
+}
 
-  const session: AdminSession = {
-    email: email.trim().toLowerCase(),
-    expiresAt: Date.now() + SESSION_SECONDS * 1000,
-  };
-  const payload = Buffer.from(JSON.stringify(session)).toString("base64url");
-  const token = `${payload}.${sign(payload, secret)}`;
-  const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, token, {
+export async function createAdminSession(idToken: string) {
+  const auth = firebaseAdminAuth();
+  const token = await auth.verifyIdToken(idToken, true);
+  const age = Date.now() / 1000 - token.auth_time;
+  if (age < -60 || age > 300) throw new AdminAccessError("Please sign in again to continue.");
+  await approvedUser(token, true);
+  const session = await auth.createSessionCookie(idToken, { expiresIn: SESSION_SECONDS * 1000 });
+  (await cookies()).set(COOKIE_NAME, session, {
     httpOnly: true,
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
@@ -76,27 +56,22 @@ export async function createAdminSession(email: string) {
   });
 }
 
-export async function clearAdminSession() {
-  const cookieStore = await cookies();
-  cookieStore.delete(COOKIE_NAME);
-}
-
-export async function getAdminSession(): Promise<AdminSession | null> {
-  const secret = sessionSecret();
+export const getAdminSession = cache(async () => {
   const token = (await cookies()).get(COOKIE_NAME)?.value;
-  if (!secret || !token) return null;
-
-  const [payload, signature] = token.split(".");
-  if (!payload || !signature || !equalSecret(signature, sign(payload, secret))) return null;
-
+  if (!token || !adminAuthConfigured()) return null;
   try {
-    const session = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as AdminSession;
-    const expected = credentials();
-    if (!expected || session.email !== expected.email || session.expiresAt <= Date.now()) return null;
-    return session;
+    const decoded = await firebaseAdminAuth().verifySessionCookie(token, true);
+    const user = await approvedUser(decoded, true);
+    return { uid: user.uid, email: user.email!, expiresAt: decoded.exp * 1000 };
   } catch {
     return null;
   }
+});
+
+export async function clearAdminSession() {
+  const store = await cookies();
+  store.delete(COOKIE_NAME);
+  store.delete("gamexchange_admin");
 }
 
 export async function requireAdmin() {

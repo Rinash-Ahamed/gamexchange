@@ -1,7 +1,7 @@
 import { Hero } from "@/components/home/Hero";
-import { PromoSwitch } from "@/components/home/PromoSwitch";
+import { Suspense } from "react";
+import { BannerPlaceholder, HomeBanners, HomeShelf } from "@/components/home/HomeData";
 import { Services } from "@/components/home/Services";
-import { ShelfShowcase } from "@/components/home/ShelfShowcase";
 import { TradeTeaser } from "@/components/home/TradeTeaser";
 import { RepairTeaser } from "@/components/home/RepairTeaser";
 import { Reviews } from "@/components/home/Reviews";
@@ -14,16 +14,18 @@ import { ControllerButton } from "@/components/ui/ControllerButton";
 import { Accordion } from "@/components/ui/Accordion";
 import { faqs } from "@/data/faq";
 import { listPublicProducts } from "@/lib/admin/db";
+import { listPublicBanners } from "@/lib/admin/banners";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
-  const products = await listPublicProducts();
+export default function Home() {
+  const products = listPublicProducts();
+  const banners = listPublicBanners();
   return (
     <main>
       <AmbientLight />
       <Hero />
-      <PromoSwitch />
+      <Suspense fallback={<BannerPlaceholder />}><HomeBanners data={banners} /></Suspense>
       <SectionGate from="Intro" to="Services" level={1} />
       <Services />
       <SectionGate from="Services" to="The shelf" level={2} />
@@ -31,7 +33,7 @@ export default async function Home() {
         <SectionHeading title={<span id="shelf-h">Pre-owned consoles.<br /><span className="text-gradient">From our shelf.</span></span>}>
           Prices and trade-in figures are as listed on our current site. Message the shop to confirm what’s in stock.
         </SectionHeading>
-        <div className="mt-8"><ShelfShowcase products={products} /></div>
+        <div className="mt-8"><Suspense fallback={<div aria-label="Loading available consoles" className="min-h-[30rem] rounded-3xl bg-surface/40" />}><HomeShelf data={products} /></Suspense></div>
       </section>
       <SectionGate from="The shelf" to="Trade-in" level={3} />
       <TradeTeaser />

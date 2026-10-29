@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, m, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { useMedia } from "@/lib/use-media";
+import { usePageVisible } from "@/lib/use-page-visible";
 import { site } from "@/data/site";
 
 const d = (s: string) => ({ ["--d" as string]: s });
@@ -29,16 +30,17 @@ export function Hero() {
   const live = useInView(section, { margin: "120px" });
   const wide = useMedia("(min-width: 1024px)");
   const reduce = useReducedMotion();
+  const pageVisible = usePageVisible();
 
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || !live || !pageVisible) return;
 
     const interval = window.setInterval(() => {
       setHeadline((current) => (current + 1) % headlines.length);
     }, 3200);
 
     return () => window.clearInterval(interval);
-  }, [reduce]);
+  }, [reduce, live, pageVisible]);
 
   const { scrollYProgress } = useScroll({ target: section, offset: ["start start", "end start"] });
   const fade = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, reduce ? 1 : 0.1]);
@@ -47,7 +49,7 @@ export function Hero() {
   return (
     <section
       ref={section}
-      data-live={live ? "true" : "false"}
+      data-live={live && pageVisible ? "true" : "false"}
       className="hero-section relative isolate flex min-h-dvh items-center overflow-clip pb-24 pt-24 sm:pt-28 lg:pb-12"
     >
       {/* ambient lighting */}
@@ -63,15 +65,15 @@ export function Hero() {
         <div className="hero-energy-trail hero-energy-trail-b" />
       </div>
       <svg aria-hidden className="hero-fibers absolute inset-0 z-0 size-full" viewBox="0 0 1600 900" preserveAspectRatio="none">
-        <path className="hero-fiber hero-fiber-cyan" pathLength="1" d="M120-20C145 118 500 74 432 250S1040 468 1420 530" />
-        <path className="hero-fiber hero-fiber-magenta" pathLength="1" d="M314-20C276 146 620 137 538 320S1110 580 1420 530" />
-        <path className="hero-fiber hero-fiber-violet" pathLength="1" d="M530-20C484 198 754 170 684 305S1170 408 1420 530" />
-        <path className="hero-fiber-pulse hero-fiber-pulse-cyan" pathLength="1" d="M120-20C145 118 500 74 432 250S1040 468 1420 530" />
-        <path className="hero-fiber-pulse hero-fiber-pulse-magenta" pathLength="1" d="M314-20C276 146 620 137 538 320S1110 580 1420 530" />
-        <path className="hero-fiber-pulse hero-fiber-pulse-violet" pathLength="1" d="M530-20C484 198 754 170 684 305S1170 408 1420 530" />
+        <path className="hero-fiber hero-fiber-cyan" pathLength="1" d="M120-20C145 118 500 74 432 250S1040 468 1420 530S1660 580 1760 430" />
+        <path className="hero-fiber hero-fiber-magenta" pathLength="1" d="M314-20C276 146 620 137 538 320S1110 580 1420 530S1660 420 1760 500" />
+        <path className="hero-fiber hero-fiber-violet" pathLength="1" d="M530-20C484 198 754 170 684 305S1170 408 1420 530S1660 680 1760 610" />
+        <path className="hero-fiber-pulse hero-fiber-pulse-cyan" pathLength="1" d="M120-20C145 118 500 74 432 250S1040 468 1420 530S1660 580 1760 430" />
+        <path className="hero-fiber-pulse hero-fiber-pulse-magenta" pathLength="1" d="M314-20C276 146 620 137 538 320S1110 580 1420 530S1660 420 1760 500" />
+        <path className="hero-fiber-pulse hero-fiber-pulse-violet" pathLength="1" d="M530-20C484 198 754 170 684 305S1170 408 1420 530S1660 680 1760 610" />
       </svg>
 
-      <div className="mx-auto grid w-full max-w-7xl items-center gap-2 px-5 sm:px-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6.6fr)] lg:gap-4">
+      <div className="mx-auto grid w-full max-w-7xl items-center gap-2 px-5 sm:px-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7.2fr)] lg:gap-4">
         {/* copy */}
         <div className="relative z-10 order-2 lg:order-1">
           <h1 className="anim-rise font-display text-[clamp(2.7rem,12.4vw,4.4rem)] font-bold uppercase leading-[0.9] tracking-tight sm:text-[clamp(3.4rem,9vw,5.6rem)] lg:text-[clamp(3.2rem,5.6vw,6.2rem)]" style={d("0.62s")}>
@@ -109,7 +111,7 @@ export function Hero() {
         {/* stage */}
         <div className="order-1 min-w-0 lg:order-2">
           <div
-            className="hero-stage hero-product-stage relative mx-auto aspect-[3/2] w-full max-w-[60rem] [perspective:1400px]"
+            className="hero-stage hero-product-stage relative mx-auto aspect-[7/5] w-full max-w-[60rem] [perspective:1400px]"
           >
             <div aria-hidden className="hero-controller-aura absolute inset-[8%_-4%_0]" />
             <div aria-hidden className="hero-holo-rings absolute inset-0">

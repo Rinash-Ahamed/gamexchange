@@ -1,6 +1,6 @@
 # Firebase setup
 
-GamexChange stores inventory and customer service records in Cloud Firestore through the Firebase Admin SDK. Firebase credentials are used only by server code and must never be exposed to the browser.
+GamexChange stores inventory and customer service records in Cloud Firestore through the Firebase Admin SDK. Firebase Admin credentials are used only by server code and must never be exposed to the browser. Admin sign-in uses Firebase Authentication with mandatory TOTP MFA.
 
 ## 1. Create the database
 
@@ -52,8 +52,65 @@ FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS=true
 
 The client email and private key are not required in that mode.
 
-## 4. Start the app
+## 4. Enable admin authentication and TOTP
+
+Blaze is the billing plan. TOTP additionally requires upgrading **Firebase Authentication with Identity Platform**. Enable it in the Firebase Authentication settings or Google Cloud Identity Platform console. Enable the **Email/Password** sign-in provider. Configure a suitable password policy and email enumeration protection.
+
+Register a Web app under **Project settings > General > Your apps**. Add its configuration to `.env.local`:
+
+```dotenv
+NEXT_PUBLIC_FIREBASE_API_KEY=your-web-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_APP_ID=your-web-app-id
+FIREBASE_ADMIN_UIDS=your-admin-user-uid
+```
+
+The public and server project IDs must refer to the same Firebase project. The public values identify the Firebase web app; the private server credentials above must never use a `NEXT_PUBLIC_` prefix.
+
+1. Under **Authentication > Users**, create the admin account with an email and a strong password. There is no public sign-up screen.
+2. Copy its **User UID** into `FIREBASE_ADMIN_UIDS`. For additional admins, separate UIDs with commas. An empty allowlist denies all admin access.
+3. Add `localhost` and your production hostname to Authentication's authorized domains as needed. Use HTTPS in production.
+4. Enable TOTP for the project by explicitly running:
+
+   ```text
+   node --env-file=.env.local scripts/enable-admin-totp.mjs
+   ```
+
+   This changes the selected Firebase project's MFA configuration. It requires project configuration update permissions and preserves existing non-TOTP factor providers. The app does not change project settings automatically.
+
+5. Restart the development server, open `/admin/login`, and sign in. If the email is unverified, the app sends a verification email. Open that link and sign in again.
+6. Scan the setup QR code with an authenticator app, or enter the displayed setup key manually. Enter its six-digit code to enroll.
+7. Sign in again with your password and authenticator code. A dashboard session is created only after successful TOTP sign-in.
+
+The server verifies Firebase tokens, checks the UID allowlist, verified email, current account status, TOTP enrollment, and the token's `sign_in_second_factor=totp` claim. A recent sign-in is required to create an eight-hour HTTP-only session cookie. Protected pages and every admin mutation check authorization on the server, including revoked sessions. Browser auth uses memory only and is signed out after the cookie is issued. Legacy `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `ADMIN_SESSION_SECRET` variables no longer grant access; remove them from local and hosting configuration.
+
+If an authenticator is lost, the Firebase project owner must verify the administrator's identity, revoke their refresh tokens, and remove the lost TOTP factor using trusted Firebase Admin tooling. The user can then repeat enrollment. There is no password-only recovery bypass in the website. Removing a UID from the allowlist, disabling/deleting the account, revoking its tokens, or removing its TOTP factor blocks dashboard access.
+
+Reference: [Firebase TOTP MFA](https://firebase.google.com/docs/auth/web/totp-mfa) and [Firebase session cookies](https://firebase.google.com/docs/auth/admin/manage-cookies).
+
+## 5. Start the app
 
 Restart the development server after changing environment variables. On the first inventory request, the existing catalogue products are seeded into Firestore if the `inventory` collection is empty.
 
 The legacy files under `data/` are no longer read or written by the application. Keep them until any records you need have been migrated and verified in Firestore.
+
+## 6. Homepage banner uploads
+
+Open **Firebase Console > Storage**, create a Cloud Storage bucket if needed, and copy its exact bucket name. Add it to `.env.local` and your hosting environment:
+
+```dotenv
+FIREBASE_STORAGE_BUCKET=your-project-id.firebasestorage.app
+```
+
+Use only the name, without `gs://` or a URL. Older buckets may end in `.appspot.com`; use the actual name shown in your console. The server service account needs permission to read, create and delete objects in this bucket. Keep client Storage and Firestore rules restricted: uploads, changes and draft image previews go through the server and require the approved admin's MFA session. No public upload rule is needed.
+
+Visit `/admin/banners` to upload, replace, reorder, publish, unpublish and delete carousel artwork. The existing five slides are copied into `homepageBanners` when an admin first opens that page. `settings/homepageBanners` records that initialization is complete, so unpublished or deleted slides do not reappear as demo content. There is a limit of five published slides and 20 saved slides. Deleting or replacing an uploaded image removes the old object when possible; failed cleanup is logged for manual removal in Storage. Original bundled images under `public/promos` are never deleted.
+
+Recommended artwork is **1920 × 840 px, 16:7**. Accepted inputs are static JPG, PNG and WebP up to **5 MB**, between **1280 × 560** and **4096 × 1792 px**, with a 2% aspect-ratio tolerance. Image dimensions and contents are checked on the server; files are resized to a maximum of 1920 × 840 and converted to WebP with metadata removed. Keep essential content in the central 50%, leaving 10% space above and below for mobile crops. Desktop and mobile crop previews are available in the editor.
+
+The banner name is internal. A descriptive image alt text is required. The optional headline and supporting text appear over the artwork; leave both empty for a finished poster. There are no public links or CTA buttons. Published images are served through a same-origin image endpoint; draft images require an admin session. Uploaded images receive a new versioned path on replacement to avoid stale artwork. Normal image/browser caches can briefly retain an already viewed published image after unpublishing; banners must not contain private customer information.
+
+Saving a published banner updates subsequent homepage visits or refreshes. Already open pages are not automatically refreshed. The carousel retains its 2.5-second interval, Joy-Con controls and reduced-motion behavior; zero published slides hide the section, and a single published slide stays still.
+
+Public catalogue and banner data use a 60-second server cache. Admin saves immediately invalidate the relevant cache and public routes. Changes made directly in Firebase Console may take roughly one cache window to appear. Admin records and authorization are not cached. Uploaded image bytes have a bounded per-process cache, while the image endpoint still checks current visibility and draft access. See `PERFORMANCE_AUDIT.md` for the current optimization scope and measurement limits.

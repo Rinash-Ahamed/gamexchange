@@ -1,6 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { PUBLIC_PRODUCTS_TAG } from "@/lib/public-cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin, clearAdminSession } from "@/lib/admin/auth";
@@ -99,8 +100,10 @@ export async function createInventoryAction(formData: FormData) {
   }
   revalidatePath("/admin");
   revalidatePath("/admin/inventory");
+  updateTag(PUBLIC_PRODUCTS_TAG);
   revalidatePath("/products");
-  redirect("/admin/inventory?notice=created");
+  revalidatePath("/");
+  redirect(`/admin/inventory?notice=created&saved=${Date.now()}#inventory-list`);
 }
 
 export async function updateInventoryAction(formData: FormData) {
@@ -131,8 +134,10 @@ export async function updateInventoryAction(formData: FormData) {
   }
   revalidatePath("/admin");
   revalidatePath("/admin/inventory");
+  updateTag(PUBLIC_PRODUCTS_TAG);
   revalidatePath("/products");
-  redirect("/admin/inventory?notice=updated");
+  revalidatePath("/");
+  redirect(`/admin/inventory?notice=updated&saved=${Date.now()}#inventory-list`);
 }
 
 export async function deleteInventoryAction(formData: FormData) {
@@ -142,7 +147,9 @@ export async function deleteInventoryAction(formData: FormData) {
   await deleteInventoryItem(id);
   revalidatePath("/admin");
   revalidatePath("/admin/inventory");
+  updateTag(PUBLIC_PRODUCTS_TAG);
   revalidatePath("/products");
+  revalidatePath("/");
   redirect("/admin/inventory?notice=deleted");
 }
 

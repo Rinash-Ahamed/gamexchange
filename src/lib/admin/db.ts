@@ -1,7 +1,9 @@
 import "server-only";
 
 import { createHash, randomUUID } from "node:crypto";
-import { applicationDefault, cert, getApps, initializeApp, type App } from "firebase-admin/app";
+import { unstable_cache } from "next/cache";
+import { PUBLIC_PRODUCTS_TAG } from "@/lib/public-cache";
+import { firebaseAdminApp as firebaseApp } from "@/lib/firebase/admin";
 import {
   AggregateField,
   getFirestore,
@@ -22,34 +24,7 @@ type StoredServiceRecord = Omit<ServiceRecord, "id">;
 
 let firestore: Firestore | undefined;
 let warnedAboutLocalProductFallback = false;
-
-function firebaseApp(): App {
-  const existing = getApps()[0];
-  if (existing) return existing;
-
-  const projectId = process.env.FIREBASE_PROJECT_ID?.trim();
-  if (!projectId) {
-    throw new Error("FIREBASE_PROJECT_ID is required to connect to Firestore.");
-  }
-
-  const useApplicationDefault = process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS === "true";
-  if (useApplicationDefault) {
-    return initializeApp({ credential: applicationDefault(), projectId });
-  }
-
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n").trim();
-  if (!clientEmail || !privateKey) {
-    throw new Error(
-      "FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY are required unless FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS=true.",
-    );
-  }
-
-  return initializeApp({
-    credential: cert({ projectId, clientEmail, privateKey }),
-    projectId,
-  });
-}
+let seedCheck: Promise<void> | undefined;
 
 function database() {
   if (firestore) return firestore;
@@ -79,39 +54,33 @@ export function isDuplicateSkuError(error: unknown) {
 }
 
 async function ensureInventorySeeded() {
+  seedCheck ??= initializeInventory().catch((error) => { seedCheck = undefined; throw error; });
+  await seedCheck;
+}
+
+async function initializeInventory() {
   const db = database();
   const inventory = db.collection(INVENTORY_COLLECTION);
-  const existing = await inventory.limit(1).get();
-  if (!existing.empty) return;
-
-  const now = new Date().toISOString();
-  const batch = db.batch();
-  for (const product of products) {
-    const item: StoredInventoryItem = {
-      sku: product.id.toUpperCase(),
-      name: product.name,
-      platform: product.platform,
-      category: product.category,
-      condition: product.condition,
-      stock: 1,
-      price: product.price,
-      tradeInVoucher: product.tradeInVoucher,
-      tradeInCash: product.tradeInCash,
-      imageSrc: product.image.src,
-      imageWidth: product.image.width,
-      imageHeight: product.image.height,
-      featured: product.featured ?? false,
-      status: "active",
-      createdAt: now,
-      updatedAt: now,
-    };
-    batch.set(inventory.doc(product.id), item);
-    batch.set(db.collection(INVENTORY_SKUS_COLLECTION).doc(skuDocumentId(item.sku)), {
-      inventoryId: product.id,
-      sku: item.sku,
-    });
-  }
-  await batch.commit();
+  const marker = db.collection("settings").doc("inventoryInitialized");
+  await db.runTransaction(async (transaction) => {
+    if ((await transaction.get(marker)).exists) return;
+    const existing = await transaction.get(inventory.limit(1));
+    const now = new Date().toISOString();
+    if (existing.empty) {
+      for (const product of products) {
+        const item: StoredInventoryItem = {
+          sku: product.id.toUpperCase(), name: product.name, platform: product.platform,
+          category: product.category, condition: product.condition, stock: 1,
+          price: product.price, tradeInVoucher: product.tradeInVoucher, tradeInCash: product.tradeInCash,
+          imageSrc: product.image.src, imageWidth: product.image.width, imageHeight: product.image.height,
+          featured: product.featured ?? false, status: "active", createdAt: now, updatedAt: now,
+        };
+        transaction.set(inventory.doc(product.id), item);
+        transaction.set(db.collection(INVENTORY_SKUS_COLLECTION).doc(skuDocumentId(item.sku)), { inventoryId: product.id, sku: item.sku });
+      }
+    }
+    transaction.set(marker, { initialized: true, createdAt: now });
+  });
 }
 
 export async function listInventory() {
@@ -132,7 +101,7 @@ export async function listPublicInventory() {
     .toSorted((a, b) => Number(b.featured) - Number(a.featured) || b.updatedAt.localeCompare(a.updatedAt));
 }
 
-export async function listPublicProducts(): Promise<Product[]> {
+async function readPublicProducts(): Promise<Product[]> {
   const projectId = process.env.FIREBASE_PROJECT_ID?.trim();
   if (!projectId || projectId === "your-firebase-project-id") {
     if (!warnedAboutLocalProductFallback) {
@@ -155,6 +124,10 @@ export async function listPublicProducts(): Promise<Product[]> {
     featured: item.featured,
   }));
 }
+
+export const listPublicProducts = unstable_cache(readPublicProducts,
+  ["public-products-v1", process.env.FIREBASE_PROJECT_ID ?? "demo", process.env.FIREBASE_DATABASE_ID ?? "(default)"],
+  { revalidate: 60, tags: [PUBLIC_PRODUCTS_TAG] });
 
 export async function createInventoryItem(input: Omit<InventoryItem, "id" | "createdAt" | "updatedAt">) {
   const db = database();

@@ -14,18 +14,22 @@ npx playwright install chromium && npm run test:e2e
 
 The protected admin area is available at `/admin/login`. It manages live storefront inventory and private customer service records in Cloud Firestore through the server-only Firebase Admin SDK.
 
+Homepage promotions are managed at `/admin/banners`. Set `FIREBASE_STORAGE_BUCKET` for image uploads. Admins can preview, reorder, save drafts, publish up to five slides and replace or delete images. Upload requirements are shown in the editor. See the banner upload section of `FIREBASE_SETUP.md` for Storage setup and artwork sizes.
+
 Copy `.env.example` to `.env.local` and replace every placeholder before production:
 
 ```text
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=replace-with-a-long-unique-password
-ADMIN_SESSION_SECRET=replace-with-at-least-32-random-characters
+FIREBASE_ADMIN_UIDS=your-admin-firebase-auth-uid
+NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-web-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_APP_ID=your-web-app-id
 FIREBASE_PROJECT_ID=your-firebase-project-id
 FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-firebase-project-id.iam.gserviceaccount.com
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nreplace-with-your-private-key\n-----END PRIVATE KEY-----\n"
 ```
 
-Local development falls back to the temporary login credentials shown on the login page when admin environment variables are absent. Production has no login fallback. Until `FIREBASE_PROJECT_ID` is configured, public product pages use the local demo catalog in `src/data/products.ts` and log a warning; admin inventory and service-record pages require a working Firestore connection. Once a project ID is set, Firestore credential or connection errors remain visible. See `FIREBASE_SETUP.md` for the complete setup, named database, and Application Default Credentials options.
+Admin login requires Firebase Authentication with Identity Platform, a verified email, mandatory TOTP, and an approved Firebase Auth UID. There is no development or password-only bypass. Follow `FIREBASE_SETUP.md` for enabling TOTP, first-time enrollment, recovery, named databases, and Application Default Credentials. Until `FIREBASE_PROJECT_ID` is configured, public product pages use the local demo catalog in `src/data/products.ts` and log a warning; admin inventory and service-record pages require a working Firestore connection. Once a project ID is set, Firestore credential or connection errors remain visible.
 
 ## Where to connect things later
 | What | Where |
@@ -48,7 +52,7 @@ The default theme follows the visitor's local time: light from 6:00 AM through 5
 
 ## Environment & security notes
 
-- Admin sessions are signed, HTTP-only, same-site cookies with an eight-hour lifetime. Change the development login before sharing the application.
+- Admin sessions are Firebase-issued, HTTP-only, same-site cookies with an eight-hour lifetime. Server checks enforce the UID allowlist, verified email, TOTP authentication and enrollment, account status, and revocation. Legacy environment passwords are no longer accepted.
 - Set `ENQUIRY_SECRET` (long random string) in production; it signs the single-use enquiry tokens. Without it a per-process fallback is used, so tokens won't survive restarts or multiple instances.
 - Rate limits are in-memory per server process. For multiple instances, back them with a shared store (e.g. Redis).
 - The CSP still allows `script-src 'unsafe-inline'` (theme boot script, JSON-LD, Next inline scripts). Development also allows `unsafe-eval` for React and Turbopack debugging; production does not. Moving inline scripts to nonces is a known follow-up.

@@ -2,19 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Boxes, LayoutDashboard, Wrench } from "lucide-react";
+import { Boxes, Images, LayoutDashboard, Wrench } from "lucide-react";
 
 const items = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/inventory", label: "Inventory", icon: Boxes },
   { href: "/admin/services", label: "Service records", icon: Wrench },
+  { href: "/admin/banners", label: "Homepage banners", icon: Images },
 ] as const;
 
 export function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Admin" className="grid gap-1 sm:grid-cols-3 lg:grid-cols-1">
+    <nav aria-label="Admin" className="grid gap-1 sm:grid-cols-2 lg:grid-cols-1">
       {items.map((item) => {
         const active = item.href === "/admin" ? pathname === item.href : pathname.startsWith(item.href);
         const Icon = item.icon;
