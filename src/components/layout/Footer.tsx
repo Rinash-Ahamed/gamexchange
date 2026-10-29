@@ -2,6 +2,7 @@ import Link from "next/link";
 import { branches, mapsUrl, navItems, site, whatsappUrl } from "@/data/site";
 import { Wordmark } from "./Wordmark";
 import { FooterVideo } from "./FooterVideo";
+import { SocialIcon } from "@/components/ui/SocialIcon";
 
 export function Footer() {
   return (
@@ -14,11 +15,15 @@ export function Footer() {
         <div>
           <Wordmark className="footer-logo-heartbeat" />
           <p className="mt-4 max-w-sm text-white/75">Premium repairs, seamless upgrades and an immersive gaming zone in Coimbatore.</p>
-          <p className="mt-4 flex flex-wrap gap-x-2 text-sm">
-            <a className="inline-flex min-h-11 items-center px-2 underline-offset-4 transition-colors hover:text-white/75 hover:underline" href={site.social.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
-            <a className="inline-flex min-h-11 items-center px-2 underline-offset-4 transition-colors hover:text-white/75 hover:underline" href={site.social.facebook} target="_blank" rel="noopener noreferrer">Facebook</a>
-            <a className="inline-flex min-h-11 items-center px-2 underline-offset-4 transition-colors hover:text-white/75 hover:underline" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">WhatsApp</a>
-          </p>
+          <nav aria-label="Social media" className="mt-4 flex flex-wrap gap-2">
+            {([
+              { network: "instagram", label: "Instagram", href: site.social.instagram },
+              { network: "facebook", label: "Facebook", href: site.social.facebook },
+              { network: "whatsapp", label: "WhatsApp", href: whatsappUrl() },
+            ] as const).map((social) => <a key={social.network} href={social.href} aria-label={`${social.label} (opens in a new tab)`} title={social.label} target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-full border border-white/20 bg-white/5 text-white/80 transition-colors hover:border-[#a9bfff] hover:bg-white/10 hover:text-[#a9bfff]">
+              <SocialIcon network={social.network} />
+            </a>)}
+          </nav>
         </div>
 
         <nav aria-label="Footer">

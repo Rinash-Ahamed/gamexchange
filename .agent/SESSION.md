@@ -82,6 +82,11 @@ This is historical context. Later entries and the Current State section supersed
 
 ## Recent Updates
 
+### 2026-10-30: Footer social icons
+
+- Replaced Instagram, Facebook and WhatsApp footer text with lightweight inline SVG icons using a shared SocialIcon component. Kept existing URLs and safe external-link attributes.
+- Added accessible link labels, tooltips and 44 px tap targets with a footer-themed hover treatment. Source and whitespace reviewed; runtime checks remain deferred.
+
 ### 2026-10-30: Homepage admin group and FAQ management
 
 - Grouped Banners and FAQs as sub-items under Homepage in admin navigation. Existing banner URL and saved data are unchanged; shared nav styling keeps parent-level and nested links consistent.
