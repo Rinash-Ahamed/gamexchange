@@ -1,32 +1,23 @@
-import { site } from "./site";
-
-/**
- * The live site lists six FAQ questions but its answers were not retrievable, so answers here
- * only state facts published elsewhere on the site. Anything unpublished points to the team.
- */
+/** Supplied FAQs, copy-edited and adapted to the current enquiry-based website. */
 export const faqs = [
   {
-    q: "What types of gaming consoles do you repair?",
-    a: "The repair form covers PlayStation 2, 3, 4 and 5 consoles, plus official PlayStation and Xbox controllers and the PlayStation Move controller. Pick “Other” and describe it if yours isn’t listed.",
+    "q": "What is the difference between new and pre-owned games?",
+    "a": "New games are manufacturer-sealed products. Any included downloadable content (DLC) will be specified in the product description or confirmed by our team.\n\nPre-owned games have been previously owned and sold to GamexChange by customers. Each game is tested before being listed for sale. Digital codes and DLC are not guaranteed unless expressly included."
   },
   {
-    q: "How long do repairs take?",
-    a: `The site lists repairs as typically completed in ${site.repairTurnaround}. Your exact timeline depends on the fault, so the shop confirms it after looking at your device.`,
+    "q": "How does the buying process work?",
+    "a": "1. Browse the Shop and choose the product you are interested in.\n2. Select Enquire to prepare a WhatsApp message, then send it to our team.\n3. Confirm availability, product condition, included accessories, price and warranty with the team.\n4. Agree on an available payment method and collection or delivery arrangements before completing the purchase.\n\nOnce your order is confirmed, it will be processed according to our shipping policy. Tracking details will be shared after dispatch, where available. This website currently handles enquiries rather than online checkout."
   },
   {
-    q: "Do you offer warranties on repairs?",
-    a: "Warranty terms aren’t published on the site yet. Ask the team on WhatsApp before you book so you have it in writing.",
+    "q": "When will my products arrive?",
+    "a": "Delivery timing depends on your location, product availability, order processing and courier service. Share your delivery PIN code with our team before confirming your order to check serviceability and obtain an estimated delivery date.\n\nTracking information will be shared after dispatch, where available. Actual delivery times may vary because of courier or local delivery conditions."
   },
   {
-    q: "Can I trade in my old gaming console?",
-    a: "Yes. Start an exchange enquiry and tell us the console, its condition and what you want to upgrade to. Final trade-in value is always confirmed by the shop after checking the device.",
+    "q": "How does the selling process work?",
+    "a": "1. Open the Trade page and choose Sell.\n2. Provide your console or product details, condition, included accessories and any known faults. For items not listed, contact our team directly.\n3. Prepare and send your WhatsApp enquiry. The team will confirm product eligibility and discuss an estimated valuation.\n4. Agree on available shipping or collection arrangements and the payment method before handing over the product.\n5. Our team will inspect and test it. If its condition differs from the information provided, a revised valuation will be offered for your approval.\n6. Once the product is approved and the transaction is finalised, payment will be processed through the agreed method. Store credit is available only where offered and agreed.\n\nAcceptance, valuation, shipping arrangements and payment timelines are subject to our Trade-In Policy. There is no online sell cart or automatic valuation tool on the current website."
   },
   {
-    q: "What can I expect in the gaming zone?",
-    a: "PlayStation 4 and PlayStation 5 sessions are charged per head for 30 or 60 minutes, with a complimentary beverage, and there is an arcade Tekken tournament. See the Game Zone page for the listed rates.",
-  },
-  {
-    q: "Do you sell gaming accessories and parts?",
-    a: "Yes, accessory replacement is part of the service list. Availability changes, so message the shop to confirm what’s in stock.",
-  },
+    "q": "Do pre-owned products come with a warranty?",
+    "a": "GamexChange offers a 7-day return policy for pre-owned games with eligible product issues, subject to our Cancellation, Return and Refund Policy.\n\nSelected pre-owned hardware, including consoles, accessories, PC components and assembled PCs, may include a 30-day (one-month) warranty from delivery, as specified in the product listing or warranty documentation. Coverage is not automatic for every product.\n\nReview the applicable return and warranty terms before purchasing. For assistance, email support@gamexchange.co.in or call +91 77088 45461."
+  }
 ] as const;

@@ -11,3 +11,7 @@ export const adminButtonClass =
 
 export const adminGhostButtonClass =
   "admin-control inline-flex items-center justify-center rounded-lg border border-line-strong bg-surface px-3 font-display text-xs font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:border-blue hover:text-accent-text active:scale-[0.98]";
+
+export function adminNavLinkClass(active: boolean) {
+  return `admin-control flex items-center gap-2.5 rounded-lg px-3 font-display text-xs font-semibold uppercase tracking-[0.08em] transition-colors ${active ? "bg-gradient-to-r from-fill to-fill-2 text-accent-ink" : "text-muted hover:bg-surface-2 hover:text-ink"}`;
+}

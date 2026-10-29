@@ -48,7 +48,13 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <p className="relative z-10 mx-auto mt-10 max-w-7xl px-5 text-xs text-white/60 sm:px-8">© {new Date().getFullYear()} GamexChange. All rights reserved.</p>
+      <div className="relative z-10 mx-auto mt-10 flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 text-xs text-white/60 sm:px-8">
+        <p>© {new Date().getFullYear()} GamexChange. All rights reserved.</p>
+        <nav aria-label="Legal" className="flex flex-wrap gap-x-5">
+          <Link href="/terms" className="py-3 transition-colors hover:text-white">Terms and conditions</Link>
+          <Link href="/policies" className="py-3 transition-colors hover:text-white">Policies and support</Link>
+        </nav>
+      </div>
     </footer>
   );
 }

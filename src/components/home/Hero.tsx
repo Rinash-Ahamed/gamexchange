@@ -104,7 +104,7 @@ export function Hero() {
           <ul className="anim-rise mt-9 hidden flex-wrap gap-x-7 gap-y-2 text-sm text-muted sm:flex" style={d("1.35s")}>
             <li><span className="font-display font-semibold text-ink">2</span> branches</li>
             <li>Repairs in <span className="font-display font-semibold text-ink">{site.repairTurnaround}</span></li>
-            <li><span className="font-display font-semibold text-ink">PS4 · PS5</span> · Arcade</li>
+            <li><span className="font-display font-semibold text-ink">PS4 · PS5</span> · G29 Racing</li>
           </ul>
         </div>
 

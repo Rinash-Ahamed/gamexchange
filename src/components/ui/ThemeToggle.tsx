@@ -8,14 +8,6 @@ import { millisecondsUntilThemeBoundary, scheduledTheme, THEME_KEY, type Theme }
 const root = () => document.documentElement;
 let fallbackTimer: number | undefined;
 
-type ThemeTransitionDocument = Document & {
-  startViewTransition?: (update: () => void) => {
-    ready: Promise<void>;
-    updateCallbackDone: Promise<void>;
-    finished: Promise<void>;
-  };
-};
-
 function readTheme(): Theme {
   return root().getAttribute("data-theme") === "light" ? "light" : "dark";
 }
@@ -86,37 +78,19 @@ function applyTheme(next: Theme, animate: boolean) {
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "light" ? "#f3f6fc" : "#07090f");
   };
 
-  // Background tabs still need the correct theme, but cannot capture transition snapshots.
-  if (!animate || reduce || document.visibilityState !== "visible") {
-    commit();
-    return;
-  }
-
-  const transitionDocument = document as ThemeTransitionDocument;
-  if (transitionDocument.startViewTransition) {
-    el.classList.add("theme-anim");
-    const cleanup = () => el.classList.remove("theme-anim");
-    try {
-      const transition = transitionDocument.startViewTransition(commit);
-      // The tab can become hidden after the visibility check. A skipped animation
-      // rejects ready even when the theme update itself succeeds.
-      void transition.ready.catch(() => {});
-      void transition.updateCallbackDone.catch(() => {});
-      // Use both handlers: finally alone creates another rejecting promise.
-      void transition.finished.then(cleanup, cleanup);
-    } catch {
-      cleanup();
-      commit();
-    }
-    return;
-  }
-
   window.clearTimeout(fallbackTimer);
-  el.classList.add("theme-anim-fallback");
-  window.requestAnimationFrame(() => {
+  // Apply background and reduced-motion updates immediately, without animation.
+  if (!animate || reduce || document.visibilityState !== "visible") {
+    el.classList.remove("theme-anim-fallback");
     commit();
-    fallbackTimer = window.setTimeout(() => el.classList.remove("theme-anim-fallback"), 220);
-  });
+    return;
+  }
+
+  // A short CSS colour fade avoids document snapshots and their hidden-tab aborts.
+  // Commit synchronously so tab suspension cannot delay the actual theme change.
+  el.classList.add("theme-anim-fallback");
+  commit();
+  fallbackTimer = window.setTimeout(() => el.classList.remove("theme-anim-fallback"), 220);
 }
 
 export function ThemeToggle({ className = "" }: { className?: string }) {

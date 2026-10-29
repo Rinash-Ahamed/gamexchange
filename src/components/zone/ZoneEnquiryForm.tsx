@@ -4,8 +4,7 @@ import { useRef } from "react";
 import { ContactBlock, SelectField, TextAreaField, TextField } from "@/components/forms/fields";
 import { SubmitArea, SuccessPanel } from "@/components/forms/SubmitArea";
 import { formToPayload, useEnquiry } from "@/components/forms/use-enquiry";
-
-const stations = ["PlayStation 4", "PlayStation 5", "Arcade Tekken Tournament", "Not sure yet"] as const;
+import { zoneStationNames } from "@/data/gamezone";
 
 /** Honest enquiry flow: there is no live slot booking, so availability is confirmed by the shop. */
 export function ZoneEnquiryForm() {
@@ -26,8 +25,8 @@ export function ZoneEnquiryForm() {
         <h2 className="font-display text-2xl font-bold uppercase">Enquire about a session</h2>
         <p className="mt-1 text-sm text-muted">We don’t show live slot availability. The shop confirms timing when they reply.</p>
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
-          <SelectField label="Station" name="station" errors={errors} options={stations} />
-          <TextField label="Players" name="people" errors={errors} type="number" inputMode="numeric" placeholder="2" />
+          <SelectField label="Station" name="station" errors={errors} options={zoneStationNames} />
+          <SelectField label="Players" name="people" errors={errors} options={["1", "2", "3"]} />
           <TextField label="When would you like to come?" name="when" errors={errors} placeholder="e.g. Saturday evening" className="sm:col-span-2" />
           <div className="sm:col-span-2"><TextAreaField label="Anything else?" name="message" errors={errors} required={false} rows={3} /></div>
         </div>

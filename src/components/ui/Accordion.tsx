@@ -34,7 +34,7 @@ export function Accordion({ items }: { items: readonly Item[] }) {
             </h3>
             <div id={panel} role="region" aria-labelledby={btn} className={`grid transition-[grid-template-rows] duration-300 ease-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
               <div className="overflow-hidden">
-                <p className="px-5 pb-6 leading-relaxed text-muted sm:px-7">{item.a}</p>
+                <p className="whitespace-pre-line px-5 pb-6 leading-relaxed text-muted sm:px-7">{item.a}</p>
               </div>
             </div>
           </div>

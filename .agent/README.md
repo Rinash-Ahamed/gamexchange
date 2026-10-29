@@ -5,6 +5,7 @@
 - [Session context and current work](SESSION.md): read first when continuing development.
 - [Firebase setup](FIREBASE_SETUP.md): authentication, database, Storage and upload requirements.
 - [Performance audit](PERFORMANCE_AUDIT.md): applied optimizations, verification limits and follow-up measurements.
+- [Privacy policy draft](PRIVACY_POLICY_DRAFT.md): proposed wording and business/legal checks required before publication.
 
 These documents live in `.agent/`. Source paths and commands below are relative to the repository root, not this directory. The root [AGENTS.md](../AGENTS.md) directs coding agents here.
 
@@ -27,6 +28,8 @@ Use `/admin/categories` to add or rename shop categories and delete unused ones.
 In `/admin/inventory`, search by product name or SKU and combine category, platform, status and stock filters. Select **Apply filters** to update the list or **Clear filters** to reset it. Filter selections are stored in the page URL; saving or deleting a product returns to the unfiltered list.
 
 Homepage promotions are managed at `/admin/banners`. Set `FIREBASE_STORAGE_BUCKET` for image uploads. Admins can preview, reorder, save drafts, publish up to five slides and replace or delete images. Upload requirements are shown in the editor. See the banner upload section of `FIREBASE_SETUP.md` for Storage setup and artwork sizes.
+
+The admin navigation groups **Banners** and **FAQs** under **Homepage**. Use `/admin/faqs` to manage question text, answers, display order and draft/published visibility. Existing FAQ content is copied into Firestore on the first admin visit; later edits are saved there and published questions appear on subsequent homepage visits or refreshes.
 
 Copy `.env.example` to `.env.local` and replace every placeholder before production:
 
@@ -60,7 +63,8 @@ The default theme follows the visitor's local time: light from 6:00 AM through 5
 ## Notes
 - Forms never claim a booking. Success means "ready to send on WhatsApp".
 - Product images load from the existing site's CDN (`framerusercontent.com`); self-host them before decommissioning the old site.
-- FAQ answers and warranty terms were not published on the old site. Review `src/data/faq.ts`.
+- FAQs and legal policies now come from the supplied `GXC Concepts Website Content.docx`, with grammar/formatting edits. FAQ purchase and sell instructions match the current enquiry workflow rather than advertising unimplemented cart, checkout or PIN-code tools.
+- Public legal routes: `/terms`, `/policies` and `/policies/[slug]`. Shared content lives in `src/data/legal.ts`. The source contains no privacy policy; its separately drafted replacement is available for review at the protected `/admin/privacy-preview` route and in `.agent/PRIVACY_POLICY_DRAFT.md`, not public navigation or the sitemap.
 
 ## Environment & security notes
 

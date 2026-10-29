@@ -132,3 +132,9 @@ Manage categories at `/admin/categories`. No extra environment variables or Fire
 Inventory writes require a registered category ID, checked inside the same transaction as the product write. New and edited items store `categoryId` plus a label snapshot. Legacy items retain their documents and resolve through the registry's original-name aliases. The live registry supplies the current label, so renaming a category updates inventory and storefront displays without rewriting every product. Original aliases remain reserved while the category exists to avoid ambiguous legacy assignments.
 
 Names must be 1 to 160 characters; new categories are limited to 100. Duplicate names are rejected regardless of case or spacing. Deletion checks all inventory, including drafts and out-of-stock items, and is blocked while products still belong to the category. Change those products to another category first. Admin mutations require the approved MFA session, confirmation dialogs and public-cache invalidation. The shop continues to hide categories with no active, in-stock products.
+
+## 9. Homepage FAQs
+
+The admin menu groups Banners and FAQs under Homepage. Open `/admin/faqs` to add, edit, order, publish, save drafts or delete questions. There are up to 30 saved questions. All changes require an approved MFA session and a confirmation dialog. Only published questions and answers are sent to the public accordion; draft content stays server-side.
+
+The first admin visit copies the current five FAQs from `src/data/faq.ts` to `settings/homepageFaqs`. This document is the persistent source once created. An intentionally empty list is not reseeded. Until initialization, the homepage uses the existing FAQ text. Public FAQ reads are cached for 60 seconds and streamed independently of the hero; admin changes invalidate the FAQ cache and homepage. Already open pages need a refresh. No new Firebase environment variables or indexes are required.

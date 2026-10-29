@@ -82,6 +82,36 @@ This is historical context. Later entries and the Current State section supersed
 
 ## Recent Updates
 
+### 2026-10-30: Homepage admin group and FAQ management
+
+- Grouped Banners and FAQs as sub-items under Homepage in admin navigation. Existing banner URL and saved data are unchanged; shared nav styling keeps parent-level and nested links consistent.
+- Added `/admin/faqs` with collapsed add/edit forms, question and answer fields, order, draft/published visibility, counts and delete actions. Mutations require MFA admin authorization and the existing confirmation popup; server validation blocks duplicate questions, invalid values and more than 30 saved FAQs.
+- Added the Firestore-backed FAQ registry at `settings/homepageFaqs`, copying the five current questions once from source on first admin access. Empty/unpublished lists stay empty and are not automatically reseeded. No new environment variables, dependencies or indexes are required.
+- Homepage streams the published FAQ list with a dedicated 60-second cache and immediate invalidation after admin changes, without blocking the hero. Draft text is not sent to the public accordion; zero published FAQs hides that section.
+- Source and whitespace reviewed; build, lint, typecheck, browser and live Firebase workflows remain deferred until requested.
+
+### 2026-10-30: Three static Game Zone rate cards
+
+- Replaced the six alternating gallery/rate slides with `GameZoneCards`: one static, background-image card each for PS5, PS4 and Logitech G29 Racing. Prices and player counts remain unchanged.
+- Homepage and Game Zone reuse the same three-card grid, three columns on wider screens and vertically stacked on phones. Dark overlays and scoped high-contrast colours keep prices readable in both themes.
+- Removed carousel controls, horizontal/pinned scrolling, motion hooks and the duplicate pricing section on the Game Zone page. Existing local gaming artwork is reused as decoration; no new image assets or dependencies were added.
+- Updated the Game Zone regression test source for card count, all rates, background images, no Next/Previous controls and viewport width. Source and whitespace reviewed; build, lint, typecheck and runtime tests remain deferred until requested.
+
+### 2026-10-30: Supplied terms and policies and replacement FAQ
+
+- Read `GXC Concepts Website Content.docx` from Downloads. Added source-based Terms and Conditions and six related policy pages: returns/refunds, pre-owned products, shipping/delivery, trade-in, wallet/store credit and extended warranty. Business identity, registered address, CIN and support details come from the source.
+- Added `/terms`, `/policies`, `/policies/[slug]`, footer legal links and sitemap entries. The shared static legal layout uses semantic theme tokens, gradient headings, mobile-safe text wrapping, section anchors and a sticky desktop contents panel. Original Word file is unchanged.
+- Replaced six old FAQs with the document's five questions. Corrected grammar and formatting; adapted buying/selling/delivery instructions to actual WhatsApp enquiries because checkout, sell carts, automatic valuation and PIN-code lookup are not implemented. Preserved supplied 7-day eligible game returns and conditional 30-day hardware warranty; did not turn them into unconditional guarantees.
+- No privacy policy was present in the source. User explicitly requested a draft for review. Added `.agent/PRIVACY_POLICY_DRAFT.md` with assumptions/approval checklist and a themed, MFA-protected `/admin/privacy-preview` page. Draft data is server-only and excluded from public navigation/sitemap. It requires approval and business/legal review before publication; live provider regions, logs, retention schedules, marketing and children's-data processes are not verified.
+- Document-reading skill was used for source extraction and editorial review, not DOCX authoring. No new Word artifact was created. Source/reference/whitespace checks only; build, lint, typecheck, browser and live-data verification remain deferred as requested.
+
+### 2026-10-30: Three Game Zone packages and recurring transition error
+
+- Updated available experiences to PlayStation 5, PlayStation 4 and Logitech G29 Racing, using the supplied poster. Solo/Duo/Trio hourly rates: PS5 150/200/250 INR; PS4 100/150/200 INR; G29 250/300/350 INR. Prices are total package rates, not per-person prices.
+- Shared `ZoneRates` renders player counts and hourly prices in the gallery and pricing cards. Removed obsolete arcade, half-hour and complimentary-beverage listings, and the arcade-themed gallery slide. Updated home/hero copy, FAQ, metadata, enquiry choices and server validation to match. Historical customer reviews mentioning arcade remain untouched.
+- Removed native View Transition calls from theme switching after the hidden-document error recurred. The existing lightweight 220 ms CSS colour fade remains for visible pages; hidden/reduced-motion updates commit immediately. No global error suppression was added.
+- Updated pricing and theme regression test source. Reviewed references and whitespace; build, lint, typecheck, tests and browser verification remain deferred until requested.
+
 ### 2026-10-30: Testimonial copy polish
 
 - Removed decorative quotation marks from testimonial cards. Corrected spelling, grammar, punctuation, console naming and spacing in the supplied review text at the user's request, preserving customer names and the meaning of each review.

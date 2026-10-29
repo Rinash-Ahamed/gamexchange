@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zoneStationNames } from "@/data/gamezone";
 import { repairCategories, repairFaults, repairDevices, exchangeConsoles, exchangeConditions, exchangeAccessories, exchangeUpgrades } from "@/data/repair";
 
 /** Single-line text: control characters (incl. CR/LF) become spaces, runs collapse. */
@@ -48,8 +49,8 @@ export const exchangeSchema = z.object({
 export const zoneSchema = z.object({
   kind: z.literal("gamezone"),
   ...common,
-  station: z.enum(["PlayStation 4", "PlayStation 5", "Arcade Tekken Tournament", "Not sure yet"], { error: "Choose a station" }),
-  people: z.coerce.number({ error: "Enter a number" }).int().min(1, "At least 1 player").max(20, "For groups above 20, message us"),
+  station: z.enum(zoneStationNames, { error: "Choose a station" }),
+  people: z.coerce.number({ error: "Choose the number of players" }).int().min(1, "At least 1 player").max(3, "Choose Solo, Duo or Trio for up to 3 players"),
   when: z.string({ error: "Tell us when you’d like to come" }).transform(oneLine).pipe(z.string().min(3, "Tell us when you’d like to come").max(80)),
   message: z.string().transform(multiLine).pipe(z.string().max(500, "Keep it under 500 characters")).default(""),
   branch,

@@ -100,21 +100,18 @@ test.describe("interrupted theme transitions", () => {
     expect(errors).toEqual([]);
   });
 
-  test("an aborted transition does not surface an unhandled rejection", async ({ page }) => {
+  test("theme changes do not invoke document snapshot transitions", async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     await page.goto("/");
     await page.evaluate(() => {
-      Object.defineProperty(document, "startViewTransition", { configurable: true, value: (update: () => void) => {
-        update();
-        const aborted = () => Promise.reject(new DOMException("Transition was aborted because of invalid state. Document hidden", "InvalidStateError"));
-        return { ready: aborted(), updateCallbackDone: aborted(), finished: aborted() };
+      Object.defineProperty(document, "startViewTransition", { configurable: true, value: () => {
+        throw new DOMException("Transition was aborted because of invalid state. Document hidden", "InvalidStateError");
       } });
     });
     await page.getByRole("button", { name: "Switch to light theme" }).click();
     await expect.poll(() => theme(page)).toBe("light");
     await expect(page.locator("html")).not.toHaveClass(/theme-anim/);
-    await page.waitForTimeout(50);
     expect(errors).toEqual([]);
   });
 });

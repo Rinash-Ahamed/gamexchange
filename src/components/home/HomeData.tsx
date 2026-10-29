@@ -2,6 +2,18 @@ import type { BannerSlide } from "@/data/banners";
 import type { Product } from "@/data/products";
 import { PromoSwitch } from "./PromoSwitch";
 import { ShelfShowcase } from "./ShelfShowcase";
+import { Accordion } from "@/components/ui/Accordion";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import type { PublicFaq } from "@/lib/admin/faqs";
+
+export async function HomeFaqs({ data }: { data: Promise<PublicFaq[]> }) {
+  const faqs = await data;
+  if (!faqs.length) return null;
+  return <section data-tone="blue" aria-labelledby="faq-h" className="mx-auto max-w-4xl px-5 py-16 sm:px-8">
+    <SectionHeading title={<span id="faq-h">Quick answers</span>} align="center" />
+    <div className="mt-8"><Accordion items={faqs} /></div>
+  </section>;
+}
 
 export async function HomeBanners({ data }: { data: Promise<BannerSlide[]> }) {
   const banners = await data;

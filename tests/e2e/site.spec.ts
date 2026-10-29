@@ -80,23 +80,19 @@ test("exchange wizard: gates each step and submits", async ({ page }) => {
   await expect(page.getByRole("status").filter({ hasText: "Exchange enquiry ready" })).toBeVisible({ timeout: 12_000 });
 });
 
-test("game zone: pricing shown and gallery moves (pinned on desktop, native rail on touch)", async ({ page, isMobile }) => {
+test("game zone: three static image-backed cards show every hourly package", async ({ page }) => {
   await page.goto("/game-zone");
-  await expect(page.getByText("₹170").filter({ visible: true }).first()).toBeVisible();
-  if (isMobile) {
-    const rail = page.getByRole("region", { name: /Game zone gallery/ });
-    const before = await rail.evaluate((el) => el.scrollLeft);
-    await page.getByRole("button", { name: "Next" }).click();
-    await expect.poll(() => rail.evaluate((el) => el.scrollLeft)).toBeGreaterThan(before);
-  } else {
-    const track = page.locator(".will-change-transform").filter({ has: page.locator("img, h3, h2") }).last();
-    const xOf = () => track.evaluate((el) => new DOMMatrixReadOnly(getComputedStyle(el).transform).m41);
-    const runway = page.locator("div.relative.h-\\[300vh\\]");
-    await runway.scrollIntoViewIfNeeded();
-    const start = await xOf();
-    await runway.evaluate((el) => window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + (el as HTMLElement).offsetHeight * 0.6, behavior: "instant" }));
-    await expect.poll(xOf).toBeLessThan(start - 200);
+  const cards = page.locator("[data-zone-station]");
+  await expect(cards).toHaveCount(3);
+  for (const [id, prices] of [["ps5", [150, 200, 250]], ["ps4", [100, 150, 200]], ["g29", [250, 300, 350]]] as const) {
+    const card = page.locator(`[data-zone-station="${id}"]`);
+    await card.scrollIntoViewIfNeeded();
+    await expect(card).toBeVisible();
+    await expect(card.locator("img")).toHaveAttribute("src", /game-zone/);
+    for (const price of prices) await expect(card).toContainText(`₹${price}`);
   }
+  await expect(page.getByRole("button", { name: /^(Next|Previous)$/ })).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
 test("FAQ accordion toggles", async ({ page }) => {

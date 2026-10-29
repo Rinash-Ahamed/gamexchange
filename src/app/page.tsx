@@ -1,26 +1,26 @@
 import { Hero } from "@/components/home/Hero";
 import { Suspense } from "react";
-import { BannerPlaceholder, HomeBanners, HomeShelf } from "@/components/home/HomeData";
+import { BannerPlaceholder, HomeBanners, HomeFaqs, HomeShelf } from "@/components/home/HomeData";
 import { Services } from "@/components/home/Services";
 import { TradeTeaser } from "@/components/home/TradeTeaser";
 import { RepairTeaser } from "@/components/home/RepairTeaser";
 import { Reviews } from "@/components/home/Reviews";
 import { FinalCta } from "@/components/home/FinalCta";
-import { GameZoneRail } from "@/components/zone/GameZoneRail";
+import { GameZoneCards } from "@/components/zone/GameZoneCards";
 import { SectionGate } from "@/components/ui/SectionGate";
 import { AmbientLight } from "@/components/ui/AmbientLight";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ControllerButton } from "@/components/ui/ControllerButton";
-import { Accordion } from "@/components/ui/Accordion";
-import { faqs } from "@/data/faq";
 import { listPublicProducts } from "@/lib/admin/db";
 import { listPublicBanners } from "@/lib/admin/banners";
+import { listPublicFaqs } from "@/lib/admin/faqs";
 
 export const dynamic = "force-dynamic";
 
 export default function Home() {
   const products = listPublicProducts();
   const banners = listPublicBanners();
+  const faqs = listPublicFaqs();
   return (
     <main>
       <AmbientLight />
@@ -43,17 +43,14 @@ export default function Home() {
       <section data-tone="violet" aria-labelledby="zone-h" className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <SectionHeading title={<span id="zone-h">Enter<br /><span className="text-gradient">the arena.</span></span>}>
-            PlayStation 4 and 5 stations, an arcade Tekken tournament and a space built for gamers.
+            PlayStation 5, PlayStation 4 and Logitech G29 racing, with Solo, Duo and Trio hourly packages.
           </SectionHeading>
           <ControllerButton href="/game-zone" glyph="tri" size="lg">Discover</ControllerButton>
         </div>
-        <GameZoneRail />
+        <GameZoneCards />
       </section>
       <Reviews />
-      <section data-tone="blue" aria-labelledby="faq-h" className="mx-auto max-w-4xl px-5 py-16 sm:px-8">
-        <SectionHeading title={<span id="faq-h">Quick answers</span>} align="center" />
-        <div className="mt-8"><Accordion items={faqs} /></div>
-      </section>
+      <Suspense fallback={<div aria-label="Loading frequently asked questions" className="mx-auto min-h-80 max-w-4xl" />}><HomeFaqs data={faqs} /></Suspense>
       <FinalCta />
     </main>
   );
