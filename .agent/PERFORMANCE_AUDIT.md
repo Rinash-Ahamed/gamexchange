@@ -1,5 +1,7 @@
 # Quick performance audit
 
+Related documents: [project overview](README.md), [session context](SESSION.md), [Firebase setup](FIREBASE_SETUP.md).
+
 Date: 2026-10-29
 
 Scope: homepage rendering, public catalogue/banner data, banner image API, animation activity, footer video and enquiry API. Findings are from source inspection and local checks, not a production browser trace.

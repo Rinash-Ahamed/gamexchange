@@ -76,3 +76,45 @@ test.describe("reduced motion", () => {
     await expect(page.locator("html")).not.toHaveClass(/theme-anim/);
   });
 });
+
+test.describe("interrupted theme transitions", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.clock.setFixedTime("2026-10-15T22:00:00+05:30");
+  });
+
+  test("hidden tabs apply storage changes without starting a transition", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto("/");
+    await expect(page.getByRole("button", { name: "Switch to light theme" })).toBeVisible();
+    await page.evaluate(() => {
+      Object.defineProperty(document, "visibilityState", { configurable: true, value: "hidden" });
+      Object.defineProperty(document, "startViewTransition", { configurable: true, value: () => {
+        throw new Error("A transition must not start in a hidden document");
+      } });
+      localStorage.setItem("gx-theme", "light");
+      window.dispatchEvent(new StorageEvent("storage", { key: "gx-theme", newValue: "light" }));
+    });
+    await expect.poll(() => theme(page)).toBe("light");
+    await expect(page.locator("html")).not.toHaveClass(/theme-anim/);
+    expect(errors).toEqual([]);
+  });
+
+  test("an aborted transition does not surface an unhandled rejection", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto("/");
+    await page.evaluate(() => {
+      Object.defineProperty(document, "startViewTransition", { configurable: true, value: (update: () => void) => {
+        update();
+        const aborted = () => Promise.reject(new DOMException("Transition was aborted because of invalid state. Document hidden", "InvalidStateError"));
+        return { ready: aborted(), updateCallbackDone: aborted(), finished: aborted() };
+      } });
+    });
+    await page.getByRole("button", { name: "Switch to light theme" }).click();
+    await expect.poll(() => theme(page)).toBe("light");
+    await expect(page.locator("html")).not.toHaveClass(/theme-anim/);
+    await page.waitForTimeout(50);
+    expect(errors).toEqual([]);
+  });
+});

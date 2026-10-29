@@ -5,7 +5,6 @@ import { whatsappUrl } from "@/data/site";
 import { LightCard } from "@/components/ui/LightCard";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ControllerButton } from "@/components/ui/ControllerButton";
 
 const offerings = [
   { title: "Consoles & game discs", action: "Explore the shop", href: "/products", icon: Gamepad2, image: "/promos/console-arrivals.png" },
@@ -45,10 +44,6 @@ export function Services() {
         })}
       </ul>
 
-      <div className="mt-8 flex flex-wrap gap-4">
-        <ControllerButton href="/repair-service" glyph="sq">Book a service</ControllerButton>
-        <ControllerButton href="/exchange" glyph="tri" variant="ghost">Trade in</ControllerButton>
-      </div>
     </section>
   );
 }

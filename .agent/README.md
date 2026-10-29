@@ -1,5 +1,13 @@
 # GamexChange
 
+## Project documentation
+
+- [Session context and current work](SESSION.md): read first when continuing development.
+- [Firebase setup](FIREBASE_SETUP.md): authentication, database, Storage and upload requirements.
+- [Performance audit](PERFORMANCE_AUDIT.md): applied optimizations, verification limits and follow-up measurements.
+
+These documents live in `.agent/`. Source paths and commands below are relative to the repository root, not this directory. The root [AGENTS.md](../AGENTS.md) directs coding agents here.
+
 Next.js 16 (App Router) · React 19 · TypeScript strict · Tailwind 4 · Motion · Zod.
 
 ## Run
@@ -13,6 +21,10 @@ npx playwright install chromium && npm run test:e2e
 ## Admin dashboard
 
 The protected admin area is available at `/admin/login`. It manages live storefront inventory and private customer service records in Cloud Firestore through the server-only Firebase Admin SDK.
+
+Use `/admin/categories` to add or rename shop categories and delete unused ones. Inventory uses a required category dropdown. Existing category names are imported automatically; renames follow linked products. Categories with products cannot be deleted until those products are reassigned. Public shop filters include only categories with active, in-stock products.
+
+In `/admin/inventory`, search by product name or SKU and combine category, platform, status and stock filters. Select **Apply filters** to update the list or **Clear filters** to reset it. Filter selections are stored in the page URL; saving or deleting a product returns to the unfiltered list.
 
 Homepage promotions are managed at `/admin/banners`. Set `FIREBASE_STORAGE_BUCKET` for image uploads. Admins can preview, reorder, save drafts, publish up to five slides and replace or delete images. Upload requirements are shown in the editor. See the banner upload section of `FIREBASE_SETUP.md` for Storage setup and artwork sizes.
 
@@ -51,6 +63,13 @@ The default theme follows the visitor's local time: light from 6:00 AM through 5
 - FAQ answers and warranty terms were not published on the old site. Review `src/data/faq.ts`.
 
 ## Environment & security notes
+
+Shared implementation helpers:
+
+- `src/lib/admin/form-data.ts`: allowlisted form text fields and optional file extraction.
+- `src/lib/admin/revalidate.ts`: resource-specific route and public-cache invalidation after successful admin mutations.
+- `src/lib/firebase/firestore.ts` and `storage.ts`: server-only database and bucket access, sharing the existing Firebase Admin app.
+- `src/lib/byte-cache.ts`: bounded immutable-byte LRU with concurrent-download coalescing. It must never cache admin authorization or image visibility.
 
 - Admin sessions are Firebase-issued, HTTP-only, same-site cookies with an eight-hour lifetime. Server checks enforce the UID allowlist, verified email, TOTP authentication and enrollment, account status, and revocation. Legacy environment passwords are no longer accepted.
 - Set `ENQUIRY_SECRET` (long random string) in production; it signs the single-use enquiry tokens. Without it a per-process fallback is used, so tokens won't survive restarts or multiple instances.

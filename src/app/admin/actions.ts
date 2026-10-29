@@ -1,12 +1,11 @@
 "use server";
 
-import { revalidatePath, updateTag } from "next/cache";
-import { PUBLIC_PRODUCTS_TAG } from "@/lib/public-cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin, clearAdminSession } from "@/lib/admin/auth";
 import {
   createInventoryItem,
+  CategoryError,
   createServiceRecord,
   deleteInventoryItem,
   isDuplicateSkuError,
@@ -14,33 +13,22 @@ import {
   updateServiceRecord,
 } from "@/lib/admin/db";
 import { inventoryStatuses, serviceStatuses } from "@/lib/admin/types";
+import { InventoryImageError, removeInventoryImage, uploadInventoryImage } from "@/lib/admin/inventory-images";
+import { formFile, formText, formTextFields } from "@/lib/admin/form-data";
+import { refreshAdminData } from "@/lib/admin/revalidate";
 
 const requiredText = z.string().trim().min(1).max(160);
 const money = z.coerce.number().int().min(0).max(10_000_000);
 const count = z.coerce.number().int().min(0).max(100_000);
-const validImageSource = (value: string) => {
-  if (value.startsWith("/")) return !value.startsWith("//");
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" && url.hostname === "framerusercontent.com";
-  } catch {
-    return false;
-  }
-};
 
 const inventoryCreateSchema = z.object({
   sku: requiredText.transform((value) => value.toUpperCase()),
   name: requiredText,
   platform: requiredText,
-  category: requiredText,
+  categoryId: z.string().regex(/^[a-zA-Z0-9-]{1,128}$/),
   condition: requiredText,
   stock: count,
   price: money,
-  tradeInVoucher: money,
-  tradeInCash: money,
-  imageSrc: z.string().trim().min(1).max(2_000).refine(validImageSource, "Enter a local path or an approved image URL."),
-  imageWidth: z.coerce.number().int().min(1).max(8_000).default(480),
-  imageHeight: z.coerce.number().int().min(1).max(8_000).default(480),
   featured: z.boolean(),
   status: z.enum(inventoryStatuses),
 });
@@ -65,7 +53,19 @@ const serviceUpdateSchema = z.object({
   notes: z.string().trim().max(4_000),
 });
 
-const value = (formData: FormData, key: string) => String(formData.get(key) ?? "");
+function inventoryFields(formData: FormData) {
+  return {
+    ...formTextFields(formData, ["sku", "name", "platform", "categoryId", "condition", "stock", "price", "status"]),
+    featured: formData.get("featured") === "on",
+  };
+}
+
+function handleInventoryError(error: unknown): never {
+  if (error instanceof CategoryError) redirect("/admin/inventory?error=category");
+  if (error instanceof InventoryImageError) redirect(`/admin/inventory?error=${error.code}`);
+  if (isDuplicateSkuError(error)) redirect("/admin/inventory?error=duplicate");
+  throw error;
+}
 
 export async function logoutAction() {
   await clearAdminSession();
@@ -74,114 +74,70 @@ export async function logoutAction() {
 
 export async function createInventoryAction(formData: FormData) {
   await requireAdmin();
-  const parsed = inventoryCreateSchema.safeParse({
-    sku: value(formData, "sku"),
-    name: value(formData, "name"),
-    platform: value(formData, "platform"),
-    category: value(formData, "category"),
-    condition: value(formData, "condition"),
-    stock: value(formData, "stock"),
-    price: value(formData, "price"),
-    tradeInVoucher: value(formData, "tradeInVoucher"),
-    tradeInCash: value(formData, "tradeInCash"),
-    imageSrc: value(formData, "imageSrc"),
-    imageWidth: value(formData, "imageWidth") || 480,
-    imageHeight: value(formData, "imageHeight") || 480,
-    featured: formData.get("featured") === "on",
-    status: value(formData, "status"),
-  });
+  const parsed = inventoryCreateSchema.safeParse(inventoryFields(formData));
   if (!parsed.success) redirect("/admin/inventory?error=invalid");
 
+  const file = formFile(formData, "image");
+  if (!file) redirect("/admin/inventory?error=image");
+  let uploaded: Awaited<ReturnType<typeof uploadInventoryImage>> | undefined;
   try {
-    await createInventoryItem(parsed.data);
+    uploaded = await uploadInventoryImage(file);
+    await createInventoryItem({ ...parsed.data, ...uploaded, tradeInVoucher: 0, tradeInCash: 0 });
   } catch (error) {
-    if (isDuplicateSkuError(error)) redirect("/admin/inventory?error=duplicate");
-    throw error;
+    await removeInventoryImage(uploaded?.imageStoragePath);
+    handleInventoryError(error);
   }
-  revalidatePath("/admin");
-  revalidatePath("/admin/inventory");
-  updateTag(PUBLIC_PRODUCTS_TAG);
-  revalidatePath("/products");
-  revalidatePath("/");
+  refreshAdminData("inventory");
   redirect(`/admin/inventory?notice=created&saved=${Date.now()}#inventory-list`);
 }
 
 export async function updateInventoryAction(formData: FormData) {
   await requireAdmin();
   const parsed = inventoryUpdateSchema.safeParse({
-    id: value(formData, "id"),
-    sku: value(formData, "sku"),
-    name: value(formData, "name"),
-    platform: value(formData, "platform"),
-    category: value(formData, "category"),
-    condition: value(formData, "condition"),
-    stock: value(formData, "stock"),
-    price: value(formData, "price"),
-    tradeInVoucher: value(formData, "tradeInVoucher"),
-    tradeInCash: value(formData, "tradeInCash"),
-    imageSrc: value(formData, "imageSrc"),
-    imageWidth: value(formData, "imageWidth"),
-    imageHeight: value(formData, "imageHeight"),
-    status: value(formData, "status"),
-    featured: formData.get("featured") === "on",
+    ...inventoryFields(formData),
+    id: formText(formData, "id"),
   });
   if (!parsed.success) redirect("/admin/inventory?error=invalid");
+  const file = formFile(formData, "image");
+  let uploaded: Awaited<ReturnType<typeof uploadInventoryImage>> | undefined;
   try {
-    await updateInventoryItem(parsed.data.id, parsed.data);
+    if (file) uploaded = await uploadInventoryImage(file);
+    const { id, ...fields } = parsed.data;
+    const previousPath = await updateInventoryItem(id, { ...fields, ...uploaded });
+    await removeInventoryImage(previousPath);
   } catch (error) {
-    if (isDuplicateSkuError(error)) redirect("/admin/inventory?error=duplicate");
-    throw error;
+    await removeInventoryImage(uploaded?.imageStoragePath);
+    handleInventoryError(error);
   }
-  revalidatePath("/admin");
-  revalidatePath("/admin/inventory");
-  updateTag(PUBLIC_PRODUCTS_TAG);
-  revalidatePath("/products");
-  revalidatePath("/");
+  refreshAdminData("inventory");
   redirect(`/admin/inventory?notice=updated&saved=${Date.now()}#inventory-list`);
 }
 
 export async function deleteInventoryAction(formData: FormData) {
   await requireAdmin();
-  const id = value(formData, "id");
+  const id = formText(formData, "id");
   if (!documentId.safeParse(id).success) redirect("/admin/inventory?error=invalid");
-  await deleteInventoryItem(id);
-  revalidatePath("/admin");
-  revalidatePath("/admin/inventory");
-  updateTag(PUBLIC_PRODUCTS_TAG);
-  revalidatePath("/products");
-  revalidatePath("/");
+  const previousPath = await deleteInventoryItem(id);
+  await removeInventoryImage(previousPath);
+  refreshAdminData("inventory");
   redirect("/admin/inventory?notice=deleted");
 }
 
 export async function createServiceAction(formData: FormData) {
   await requireAdmin();
-  const parsed = serviceCreateSchema.safeParse({
-    customerName: value(formData, "customerName"),
-    phone: value(formData, "phone"),
-    device: value(formData, "device"),
-    issue: value(formData, "issue"),
-    status: value(formData, "status"),
-    estimatedCost: value(formData, "estimatedCost"),
-    notes: value(formData, "notes"),
-  });
+  const parsed = serviceCreateSchema.safeParse(formTextFields(formData,
+    ["customerName", "phone", "device", "issue", "status", "estimatedCost", "notes"]));
   if (!parsed.success) redirect("/admin/services?error=invalid");
   const ticket = await createServiceRecord(parsed.data);
-  revalidatePath("/admin");
-  revalidatePath("/admin/services");
+  refreshAdminData("services");
   redirect(`/admin/services?notice=created&ticket=${encodeURIComponent(ticket)}`);
 }
 
 export async function updateServiceAction(formData: FormData) {
   await requireAdmin();
-  const parsed = serviceUpdateSchema.safeParse({
-    id: value(formData, "id"),
-    status: value(formData, "status"),
-    estimatedCost: value(formData, "estimatedCost"),
-    notes: value(formData, "notes"),
-  });
+  const parsed = serviceUpdateSchema.safeParse(formTextFields(formData, ["id", "status", "estimatedCost", "notes"]));
   if (!parsed.success) redirect("/admin/services?error=invalid");
   await updateServiceRecord(parsed.data.id, parsed.data);
-  revalidatePath("/admin");
-  revalidatePath("/admin/services");
+  refreshAdminData("services");
   redirect("/admin/services?notice=updated");
 }

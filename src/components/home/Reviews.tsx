@@ -21,21 +21,10 @@ function ReviewCard({ review, hidden = false }: { review: (typeof reviews)[numbe
           <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full border border-line-strong bg-gradient-to-br from-fill to-fill-2 font-display text-sm font-bold text-accent-ink">
             {review.name.charAt(0)}
           </span>
-          <span className="min-w-0">
-            <span className="flex items-center gap-1.5 font-display text-sm font-semibold uppercase tracking-wide text-ink">
-              <span className="truncate">{review.name}</span>
-              <span aria-label="Verified review" className="grid size-4 shrink-0 place-items-center rounded-full bg-fill text-[9px] text-accent-ink">✓</span>
-            </span>
-            <span className="mt-0.5 block text-xs text-muted">{review.source} review</span>
-          </span>
+          <span className="min-w-0 break-words font-display text-sm font-semibold uppercase tracking-wide text-ink">{review.name}</span>
         </div>
 
-        <blockquote className="mt-4 min-h-16 text-sm leading-relaxed text-muted">“{review.text}”</blockquote>
-
-        <span className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
-          <span>Verified player</span>
-          <span aria-label="5 out of 5 stars" className="tracking-wider text-accent-text">★★★★★</span>
-        </span>
+        <blockquote className="mt-4 min-h-16 whitespace-pre-line text-sm leading-relaxed text-muted">{review.text}</blockquote>
       </div>
     </li>
   );

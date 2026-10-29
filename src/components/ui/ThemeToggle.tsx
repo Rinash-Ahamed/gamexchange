@@ -9,7 +9,11 @@ const root = () => document.documentElement;
 let fallbackTimer: number | undefined;
 
 type ThemeTransitionDocument = Document & {
-  startViewTransition?: (update: () => void) => { finished: Promise<void> };
+  startViewTransition?: (update: () => void) => {
+    ready: Promise<void>;
+    updateCallbackDone: Promise<void>;
+    finished: Promise<void>;
+  };
 };
 
 function readTheme(): Theme {
@@ -82,7 +86,8 @@ function applyTheme(next: Theme, animate: boolean) {
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "light" ? "#f3f6fc" : "#07090f");
   };
 
-  if (!animate || reduce) {
+  // Background tabs still need the correct theme, but cannot capture transition snapshots.
+  if (!animate || reduce || document.visibilityState !== "visible") {
     commit();
     return;
   }
@@ -90,8 +95,19 @@ function applyTheme(next: Theme, animate: boolean) {
   const transitionDocument = document as ThemeTransitionDocument;
   if (transitionDocument.startViewTransition) {
     el.classList.add("theme-anim");
-    const transition = transitionDocument.startViewTransition(commit);
-    void transition.finished.finally(() => el.classList.remove("theme-anim"));
+    const cleanup = () => el.classList.remove("theme-anim");
+    try {
+      const transition = transitionDocument.startViewTransition(commit);
+      // The tab can become hidden after the visibility check. A skipped animation
+      // rejects ready even when the theme update itself succeeds.
+      void transition.ready.catch(() => {});
+      void transition.updateCallbackDone.catch(() => {});
+      // Use both handlers: finally alone creates another rejecting promise.
+      void transition.finished.then(cleanup, cleanup);
+    } catch {
+      cleanup();
+      commit();
+    }
     return;
   }
 

@@ -96,8 +96,8 @@ export function ConfirmSubmit({ children, message, submitAction, title = "Delete
       >
         <div className="admin-confirm-panel">
           <div className="flex items-start justify-between gap-5">
-            <div className={`grid size-12 shrink-0 place-items-center rounded-2xl border ${intent === "danger" ? "border-danger/30 bg-danger/10 text-danger" : "border-blue/30 bg-blue/10 text-accent-text"}`}>
-              {intent === "danger" ? <AlertTriangle className="size-6" aria-hidden /> : <Check className="size-6" aria-hidden />}
+            <div className={`grid size-10 shrink-0 place-items-center rounded-xl border ${intent === "danger" ? "border-danger/30 bg-danger/10 text-danger" : "border-blue/30 bg-blue/10 text-accent-text"}`}>
+              {intent === "danger" ? <AlertTriangle className="size-5" aria-hidden /> : <Check className="size-5" aria-hidden />}
             </div>
             <button
               type="button"
@@ -109,21 +109,21 @@ export function ConfirmSubmit({ children, message, submitAction, title = "Delete
             </button>
           </div>
 
-          <h2 id={titleId} className="mt-5 font-display text-2xl font-bold uppercase">
+          <h2 id={titleId} className="mt-4 font-display text-xl font-bold uppercase">
             {title}
           </h2>
           <p id={descriptionId} className="mt-2 text-sm leading-6 text-muted">
             {message}
           </p>
 
-          <div className="mt-7 grid gap-3 sm:grid-cols-2">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
             <button type="button" autoFocus onClick={closeDialog} className={adminGhostButtonClass}>
               {cancelLabel}
             </button>
             <button
               type="button"
               onClick={confirmAction}
-              className={intent === "danger" ? "inline-flex min-h-11 items-center justify-center rounded-xl bg-danger px-4 font-display text-xs font-semibold uppercase tracking-[0.14em] text-danger-ink transition-[filter,transform] hover:brightness-110 active:scale-[0.98]" : adminButtonClass}
+              className={intent === "danger" ? "admin-control inline-flex items-center justify-center rounded-lg bg-danger px-3 font-display text-xs font-semibold uppercase tracking-[0.08em] text-danger-ink transition-[filter,transform] hover:brightness-110 active:scale-[0.98]" : adminButtonClass}
             >
               {intent === "danger" && <Trash2 className="mr-2 size-4" aria-hidden />}
               {confirmLabel}

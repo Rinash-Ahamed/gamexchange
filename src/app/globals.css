@@ -180,11 +180,15 @@ a {
   text-decoration-thickness: 0.08em;
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
+/* Keep form defaults below utility classes, just like Tailwind's preflight.
+   An unlayered font shorthand overrides text sizes, weights and font families. */
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
 }
 
 strong,
@@ -238,6 +242,11 @@ html.theme-anim-fallback .metal {
 }
 
 /* ---------- Admin confirmation dialog ---------- */
+.admin-control { min-height: 2.25rem; }
+@media (pointer: coarse) {
+  .admin-control { min-height: 2.75rem; }
+}
+
 .admin-confirm-dialog {
   --confirm-tone: var(--danger);
   width: min(30rem, calc(100vw - 2rem));

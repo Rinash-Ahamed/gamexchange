@@ -1,5 +1,7 @@
 # Firebase setup
 
+Project files and command paths in this guide are relative to the repository root. Run commands there, not inside `.agent/`.
+
 GamexChange stores inventory and customer service records in Cloud Firestore through the Firebase Admin SDK. Firebase Admin credentials are used only by server code and must never be exposed to the browser. Admin sign-in uses Firebase Authentication with mandatory TOTP MFA.
 
 ## 1. Create the database
@@ -114,3 +116,19 @@ The banner name is internal. A descriptive image alt text is required. The optio
 Saving a published banner updates subsequent homepage visits or refreshes. Already open pages are not automatically refreshed. The carousel retains its 2.5-second interval, Joy-Con controls and reduced-motion behavior; zero published slides hide the section, and a single published slide stays still.
 
 Public catalogue and banner data use a 60-second server cache. Admin saves immediately invalidate the relevant cache and public routes. Changes made directly in Firebase Console may take roughly one cache window to appear. Admin records and authorization are not cached. Uploaded image bytes have a bounded per-process cache, while the image endpoint still checks current visibility and draft access. See `PERFORMANCE_AUDIT.md` for the current optimization scope and measurement limits.
+
+## 7. Inventory image uploads
+
+Inventory uses the same `FIREBASE_STORAGE_BUCKET` and server service account as banners. No additional environment variables or public upload rules are required. Restart the development server after changing environment variables.
+
+In `/admin/inventory`, choose a product image when adding stock. Editing a product lets you replace its image; leaving the file picker empty keeps the current image. Recommended artwork is 1200 x 1200 px. Static JPG, PNG and WebP are accepted up to 5 MB, with each side between 300 and 4096 px. Portrait and landscape images are supported without cropping. The server checks the decoded file, corrects orientation, strips metadata and converts it to WebP, fitting within 1600 x 1600 px without enlargement.
+
+Files are saved under `inventory-images/`; Firestore stores their reference and actual dimensions. A same-origin, versioned image endpoint serves active, in-stock product images publicly. Draft and unavailable stock images require an admin session. Existing bundled and approved external product images remain supported. Replacing or deleting an uploaded product image removes its previous Storage object when possible; cleanup failures are logged. As with banners, previously public images can remain briefly in browser or optimized-image caches, so never upload private customer information as product artwork.
+
+## 8. Shop categories
+
+Manage categories at `/admin/categories`. No extra environment variables or Firebase indexes are required. The registry lives in `settings/inventoryCategories` and initializes once from the suggested category names and all existing inventory categories, merging case/spacing variations. Deleting unused defaults does not cause them to reappear.
+
+Inventory writes require a registered category ID, checked inside the same transaction as the product write. New and edited items store `categoryId` plus a label snapshot. Legacy items retain their documents and resolve through the registry's original-name aliases. The live registry supplies the current label, so renaming a category updates inventory and storefront displays without rewriting every product. Original aliases remain reserved while the category exists to avoid ambiguous legacy assignments.
+
+Names must be 1 to 160 characters; new categories are limited to 100. Duplicate names are rejected regardless of case or spacing. Deletion checks all inventory, including drafts and out-of-stock items, and is blocked while products still belong to the category. Change those products to another category first. Admin mutations require the approved MFA session, confirmation dialogs and public-cache invalidation. The shop continues to hide categories with no active, in-stock products.

@@ -1,12 +1,12 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
-import { getFirestore } from "firebase-admin/firestore";
-import { getStorage } from "firebase-admin/storage";
 import { unstable_cache } from "next/cache";
 import { PUBLIC_BANNERS_TAG } from "@/lib/public-cache";
 import { z } from "zod";
-import { firebaseAdminApp } from "@/lib/firebase/admin";
+import { firebaseFirestore as db } from "@/lib/firebase/firestore";
+import { firebaseStorageBucket } from "@/lib/firebase/storage";
+import { createByteCache } from "@/lib/byte-cache";
 import { bannerImageRequirements as requirements, defaultBannerSlides, type BannerSlide } from "@/data/banners";
 
 export type StoredBanner = Omit<BannerSlide, "image"> & {
@@ -35,16 +35,10 @@ export const bannerFieldsSchema = z.object({
 export type BannerFields = z.infer<typeof bannerFieldsSchema>;
 export const bannerIdSchema = z.string().regex(/^[a-zA-Z0-9-]{1,80}$/);
 
-function db() {
-  const id = process.env.FIREBASE_DATABASE_ID?.trim();
-  return id ? getFirestore(firebaseAdminApp(), id) : getFirestore(firebaseAdminApp());
-}
 function collection() { return db().collection("homepageBanners"); }
 function settings() { return db().collection("settings").doc("homepageBanners"); }
 function bucket() {
-  const name = process.env.FIREBASE_STORAGE_BUCKET?.trim();
-  if (!name || name.startsWith("gs://") || name.includes("/")) throw new BannerError("Set FIREBASE_STORAGE_BUCKET to the bucket name from Firebase Storage, without gs://.");
-  return getStorage(firebaseAdminApp()).bucket(name);
+  return firebaseStorageBucket(() => new BannerError("Set FIREBASE_STORAGE_BUCKET to the bucket name from Firebase Storage, without gs://."));
 }
 
 export function bannerStorageConfigured() { return Boolean(process.env.FIREBASE_STORAGE_BUCKET?.trim()); }
@@ -184,34 +178,14 @@ export async function deleteBanner(id: string) {
   if (path) await removeImage(path);
 }
 
-const imageCache = new Map<string, Buffer>();
-const imageLoads = new Map<string, Promise<Buffer>>();
-const IMAGE_CACHE_LIMIT = 8 * 1024 * 1024;
-let imageCacheBytes = 0;
+const imageCache = createByteCache(8 * 1024 * 1024);
 
 /** Cache only immutable bytes; the route still checks current visibility and authorization. */
 export async function readBannerImage(banner: StoredBanner) {
   if (!/^homepage-banners\/[a-f0-9-]+\.webp$/.test(banner.storagePath)) throw new BannerError("Invalid banner image.");
   const key = `${process.env.FIREBASE_STORAGE_BUCKET}:${banner.storagePath}`;
-  const cached = imageCache.get(key);
-  if (cached) {
-    imageCache.delete(key); imageCache.set(key, cached);
-    return cached;
-  }
-  const pending = imageLoads.get(key);
-  if (pending) return pending;
-  const load = bucket().file(banner.storagePath).download().then(([data]) => {
-    if (data.length <= IMAGE_CACHE_LIMIT) {
-      while (imageCacheBytes + data.length > IMAGE_CACHE_LIMIT) {
-        const oldest = imageCache.keys().next().value;
-        if (oldest === undefined) break;
-        imageCacheBytes -= imageCache.get(oldest)!.length;
-        imageCache.delete(oldest);
-      }
-      imageCache.set(key, data); imageCacheBytes += data.length;
-    }
+  return imageCache.read(key, async () => {
+    const [data] = await bucket().file(banner.storagePath).download();
     return data;
-  }).finally(() => imageLoads.delete(key));
-  imageLoads.set(key, load);
-  return load;
+  });
 }

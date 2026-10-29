@@ -18,7 +18,7 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
   return (
     <div className="mx-auto max-w-7xl">
       <div>
-        <h1 className="font-display text-3xl font-bold uppercase sm:text-4xl">Service records</h1>
+        <h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Service records</h1>
         <p className="mt-2 text-muted">Track every customer device from intake through collection.</p>
       </div>
 
@@ -26,12 +26,12 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
       {query.notice === "updated" && <p role="status" className="mt-6 rounded-xl border border-ok/30 bg-ok/10 px-4 py-3 text-sm text-ok">Service record updated.</p>}
       {query.error && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">Check the submitted values and try again.</p>}
 
-      <details className="metal group mt-8 rounded-3xl p-5 sm:p-6">
+      <details className="metal group mt-6 rounded-2xl p-4 sm:p-5">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-lg font-bold uppercase">
           <span className="flex items-center gap-3"><ClipboardPlus className="size-5 text-accent-text" aria-hidden />New service record</span>
           <span aria-hidden className="text-2xl text-muted transition-transform group-open:rotate-45">+</span>
         </summary>
-        <ConfirmSubmit submitAction={createServiceAction} title="Create service ticket?" confirmLabel="Create ticket" cancelLabel="Keep editing" intent="primary" message="Create this customer service record with the entered device, issue and estimated cost?" className="mt-6 grid gap-4 border-t border-line pt-6 sm:grid-cols-2 lg:grid-cols-4">
+        <ConfirmSubmit submitAction={createServiceAction} title="Create service ticket?" confirmLabel="Create ticket" cancelLabel="Keep editing" intent="primary" message="Create this customer service record with the entered device, issue and estimated cost?" className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-2 lg:grid-cols-4">
           <label><span className={adminLabelClass}>Customer name</span><input name="customerName" required maxLength={160} autoComplete="name" className={adminInputClass} /></label>
           <label><span className={adminLabelClass}>Phone</span><input name="phone" required minLength={7} maxLength={24} type="tel" autoComplete="tel" className={adminInputClass} /></label>
           <label><span className={adminLabelClass}>Device</span><input name="device" required placeholder="PS5 Standard" className={adminInputClass} /></label>
@@ -52,7 +52,7 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
         {records.length ? (
           <div className="mt-4 space-y-4">
             {records.map((record) => (
-              <article key={record.id} className="metal rounded-2xl p-5">
+              <article key={record.id} className="metal rounded-2xl p-4">
                 <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">

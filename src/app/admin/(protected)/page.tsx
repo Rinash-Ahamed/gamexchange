@@ -20,10 +20,10 @@ export default async function AdminDashboardPage() {
     <div className="mx-auto max-w-7xl">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold uppercase sm:text-4xl">Operations dashboard</h1>
+          <h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Operations dashboard</h1>
           <p className="mt-2 text-muted">Inventory and repair activity at a glance.</p>
         </div>
-        <p className="rounded-full border border-line bg-surface px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-ok">Live Firestore data</p>
+        <p className="rounded-full border border-line bg-surface px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-ok">Live Data</p>
       </div>
 
       <section aria-label="Summary" className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">

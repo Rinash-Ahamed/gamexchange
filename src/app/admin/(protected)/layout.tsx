@@ -14,8 +14,8 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
   const session = await requireAdmin();
 
   return (
-    <div className="min-h-dvh bg-void lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
-      <aside className="border-b border-line bg-surface/80 p-4 backdrop-blur lg:sticky lg:top-0 lg:h-dvh lg:border-b-0 lg:border-r lg:p-5">
+    <div className="min-h-dvh bg-void lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
+      <aside className="border-b border-line bg-surface/80 p-3 backdrop-blur lg:sticky lg:top-0 lg:h-dvh lg:border-b-0 lg:border-r lg:p-4">
         <div className="flex items-center justify-between gap-3">
           <Wordmark />
           <ThemeToggle />
@@ -31,7 +31,7 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
           </div>
         </div>
       </aside>
-      <main className="min-w-0 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">{children}</main>
+      <main className="min-w-0 px-4 py-6 sm:px-6">{children}</main>
     </div>
   );
 }

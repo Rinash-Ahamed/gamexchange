@@ -1,7 +1,7 @@
 export const inventoryStatuses = ["active", "draft", "out-of-stock"] as const;
 export type InventoryStatus = (typeof inventoryStatuses)[number];
 
-/** Suggested labels keep storefront browsing tidy while allowing real stock to use a custom category. */
+/** Initial categories only. The live category registry is managed in Firestore. */
 export const inventoryCategories = [
   "Console",
   "Controller",
@@ -11,6 +11,8 @@ export const inventoryCategories = [
   "VR & Sim",
   "Collectible",
 ] as const;
+
+export type InventoryCategory = { id: string; name: string; aliases: string[] };
 
 export const serviceStatuses = [
   "received",
@@ -29,6 +31,7 @@ export type InventoryItem = {
   name: string;
   platform: string;
   category: string;
+  categoryId?: string;
   condition: string;
   stock: number;
   price: number;
@@ -37,6 +40,8 @@ export type InventoryItem = {
   imageSrc: string;
   imageWidth: number;
   imageHeight: number;
+  imageStoragePath?: string;
+  imageVersion?: string;
   featured: boolean;
   status: InventoryStatus;
   createdAt: string;

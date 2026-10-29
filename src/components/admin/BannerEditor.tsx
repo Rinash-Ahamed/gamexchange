@@ -5,7 +5,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { saveBannerAction, type BannerSaveState } from "@/app/admin/banner-actions";
 import { bannerImageRequirements as requirements } from "@/data/banners";
 import type { AdminBanner } from "@/lib/admin/banners";
-import { adminButtonClass, adminInputClass, adminLabelClass } from "./styles";
+import { adminButtonClass, adminFileInputClass, adminGhostButtonClass, adminInputClass, adminLabelClass } from "./styles";
 import { ConfirmSubmit } from "./ConfirmSubmit";
 
 const initialState: BannerSaveState = {};
@@ -42,14 +42,14 @@ export function BannerEditor({ banner, nextPosition = 1, storageConfigured }: { 
   }, [state]);
 
   return (
-    <ConfirmSubmit formRef={form} submitAction={action} className="space-y-5" intent="primary" title={fields.status === "published" ? "Publish this banner?" : banner?.status === "published" ? "Unpublish this banner?" : "Save banner draft?"} confirmLabel={fields.status === "published" ? "Publish banner" : banner?.status === "published" ? "Unpublish and save" : "Save draft"} cancelLabel="Keep editing" message={fields.status === "published" ? "Save this banner and make it visible on the homepage? Its artwork, text and display order will be updated." : banner?.status === "published" ? "Remove this banner from the public carousel and save it as a draft?" : "Save this draft in the admin portal? It will remain hidden from the website."}>
+    <ConfirmSubmit formRef={form} submitAction={action} className="space-y-4" intent="primary" title={fields.status === "published" ? "Publish this banner?" : banner?.status === "published" ? "Unpublish this banner?" : "Save banner draft?"} confirmLabel={fields.status === "published" ? "Publish banner" : banner?.status === "published" ? "Unpublish and save" : "Save draft"} cancelLabel="Keep editing" message={fields.status === "published" ? "Save this banner and make it visible on the homepage? Its artwork, text and display order will be updated." : banner?.status === "published" ? "Remove this banner from the public carousel and save it as a draft?" : "Save this draft in the admin portal? It will remain hidden from the website."}>
       {banner && <input type="hidden" name="id" value={banner.id} />}
-      <fieldset disabled={pending} className="min-w-0 space-y-5 disabled:opacity-60">
+      <fieldset disabled={pending} className="min-w-0 space-y-4 disabled:opacity-60">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted">Artwork preview</p>
           <div className="flex gap-2">
-            <button type="button" aria-pressed={!mobilePreview} onClick={() => setMobilePreview(false)} className="min-h-11 rounded-lg border border-line-strong px-3 text-xs aria-pressed:border-blue aria-pressed:text-accent-text">Desktop</button>
-            <button type="button" aria-pressed={mobilePreview} onClick={() => setMobilePreview(true)} className="min-h-11 rounded-lg border border-line-strong px-3 text-xs aria-pressed:border-blue aria-pressed:text-accent-text">Mobile crop</button>
+            <button type="button" aria-pressed={!mobilePreview} onClick={() => setMobilePreview(false)} className={`${adminGhostButtonClass} aria-pressed:border-blue aria-pressed:text-accent-text`}>Desktop</button>
+            <button type="button" aria-pressed={mobilePreview} onClick={() => setMobilePreview(true)} className={`${adminGhostButtonClass} aria-pressed:border-blue aria-pressed:text-accent-text`}>Mobile crop</button>
           </div>
         </div>
         <div className={`relative isolate overflow-hidden rounded-2xl border border-line-strong bg-[#05070c] text-white ${mobilePreview ? "mx-auto aspect-[5/4] w-full max-w-[15rem]" : "aspect-[16/7]"}`}>
@@ -71,7 +71,7 @@ export function BannerEditor({ banner, nextPosition = 1, storageConfigured }: { 
             id={`banner-image-${banner?.id ?? "new"}`}
             name="image" type="file" accept="image/jpeg,image/png,image/webp" required={!banner} disabled={!storageConfigured}
             aria-describedby="banner-size-requirements"
-            className={`${adminInputClass} py-2 file:mr-3 file:rounded-lg file:border-0 file:bg-fill file:px-3 file:py-1 file:text-accent-ink`}
+            className={adminFileInputClass}
             onChange={(event) => {
               const file = event.currentTarget.files?.[0];
               setFileError("");
@@ -87,7 +87,7 @@ export function BannerEditor({ banner, nextPosition = 1, storageConfigured }: { 
           />
           {fileError && <p role="alert" className="mt-2 text-sm text-danger">{fileError}</p>}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <label className="sm:col-span-2"><span className={adminLabelClass}>Banner name (admin only)</span><input name="title" required maxLength={100} value={fields.title} onChange={(event) => setFields({ ...fields, title: event.target.value })} placeholder="November game releases" className={adminInputClass} /></label>
           <label className="sm:col-span-2"><span className={adminLabelClass}>Image description for accessibility</span><input name="alt" required maxLength={200} value={fields.alt} onChange={(event) => setFields({ ...fields, alt: event.target.value })} placeholder="Describe the game or promotion shown in the image" className={adminInputClass} /></label>
           <label className="sm:col-span-2"><span className={adminLabelClass}>Headline (optional)</span><input name="headline" maxLength={70} value={headline} onChange={(event) => setHeadline(event.target.value)} placeholder="Leave empty if your poster already contains text" className={adminInputClass} /></label>
@@ -95,7 +95,7 @@ export function BannerEditor({ banner, nextPosition = 1, storageConfigured }: { 
           <label><span className={adminLabelClass}>Display order</span><input name="position" type="number" min={1} max={999} required value={fields.position} onChange={(event) => setFields({ ...fields, position: event.target.value })} className={adminInputClass} /></label>
           <label><span className={adminLabelClass}>Visibility</span><select name="status" value={fields.status} onChange={(event) => setFields({ ...fields, status: event.target.value as "draft" | "published" })} className={adminInputClass}><option value="draft">Draft (hidden)</option><option value="published">Published (live)</option></select></label>
         </div>
-        <p className="text-xs leading-relaxed text-muted">Leave both text fields empty for an image-only poster. No links or action buttons appear on the banner. Lower display-order numbers appear first.</p>
+        <p className="text-xs text-muted">Headline and supporting text are optional.</p>
         <button type="submit" disabled={Boolean(fileError) || (!banner && !storageConfigured)} className={`${adminButtonClass} w-full disabled:cursor-not-allowed disabled:opacity-50`}>{pending ? "Uploading and saving..." : banner ? "Save changes" : "Save banner"}</button>
       </fieldset>
       {state.error && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">{state.error} If you were uploading an image, select it again before retrying. Your text and visibility selections are kept.</p>}

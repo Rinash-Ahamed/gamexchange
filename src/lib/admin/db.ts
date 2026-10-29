@@ -3,16 +3,15 @@ import "server-only";
 import { createHash, randomUUID } from "node:crypto";
 import { unstable_cache } from "next/cache";
 import { PUBLIC_PRODUCTS_TAG } from "@/lib/public-cache";
-import { firebaseAdminApp as firebaseApp } from "@/lib/firebase/admin";
+import { firebaseFirestore as database } from "@/lib/firebase/firestore";
 import {
   AggregateField,
-  getFirestore,
-  type Firestore,
+  type DocumentData,
   type Query,
   type QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 import { products, type Product } from "@/data/products";
-import type { DashboardStats, InventoryItem, ServiceRecord, ServiceStatus } from "./types";
+import { inventoryCategories, type InventoryCategory, type DashboardStats, type InventoryItem, type ServiceRecord, type ServiceStatus } from "./types";
 
 const INVENTORY_COLLECTION = "inventory";
 const INVENTORY_SKUS_COLLECTION = "inventorySkus";
@@ -20,17 +19,101 @@ const SERVICES_COLLECTION = "serviceRecords";
 const DUPLICATE_SKU_CODE = "inventory/duplicate-sku";
 
 type StoredInventoryItem = Omit<InventoryItem, "id">;
+type InventoryInput = Omit<InventoryItem, "id" | "createdAt" | "updatedAt" | "category" | "categoryId"> & { categoryId: string };
+type InventoryImageFields = Pick<InventoryItem, "imageSrc" | "imageWidth" | "imageHeight" | "imageStoragePath" | "imageVersion">;
+
+function inventoryImageSource(id: string, input: Partial<InventoryImageFields>) {
+  return input.imageStoragePath && input.imageVersion
+    ? { imageSrc: `/api/inventory/${id}/image?v=${encodeURIComponent(input.imageVersion)}` } : {};
+}
 type StoredServiceRecord = Omit<ServiceRecord, "id">;
 
-let firestore: Firestore | undefined;
 let warnedAboutLocalProductFallback = false;
 let seedCheck: Promise<void> | undefined;
+let categoryCheck: Promise<void> | undefined;
 
-function database() {
-  if (firestore) return firestore;
-  const databaseId = process.env.FIREBASE_DATABASE_ID?.trim();
-  firestore = databaseId ? getFirestore(firebaseApp(), databaseId) : getFirestore(firebaseApp());
-  return firestore;
+export class CategoryError extends Error {
+  constructor(public readonly code: "category-missing" | "category-duplicate" | "category-used" | "category-limit") { super(code); }
+}
+
+export function normalizeCategoryName(name: string) {
+  return name.normalize("NFKC").trim().replace(/\s+/g, " ");
+}
+
+function categoryKey(name: string) { return normalizeCategoryName(name).toLocaleLowerCase("en") || "uncategorized"; }
+function categoryRegistry() { return database().collection("settings").doc("inventoryCategories"); }
+function storedCategories(data: DocumentData | undefined): InventoryCategory[] {
+  return (data?.categories ?? []) as InventoryCategory[];
+}
+
+function categoryMatches(category: InventoryCategory, item: Pick<InventoryItem, "categoryId" | "category">) {
+  return item.categoryId ? item.categoryId === category.id : category.aliases.includes(categoryKey(item.category));
+}
+
+async function ensureCategoriesInitialized() {
+  await ensureInventorySeeded();
+  categoryCheck ??= database().runTransaction(async (transaction) => {
+    const ref = categoryRegistry();
+    if ((await transaction.get(ref)).exists) return;
+    const inventory = await transaction.get(database().collection(INVENTORY_COLLECTION));
+    const names = new Map<string, string>();
+    for (const name of [...inventoryCategories, ...inventory.docs.map((doc) => String(doc.data().category ?? "Uncategorized"))]) {
+      const cleaned = normalizeCategoryName(name) || "Uncategorized";
+      if (!names.has(categoryKey(cleaned))) names.set(categoryKey(cleaned), cleaned);
+    }
+    const categories = [...names].map(([key, name]) => ({
+      id: createHash("sha256").update(key).digest("hex"), name, aliases: [key],
+    }));
+    transaction.set(ref, { categories, updatedAt: new Date().toISOString() });
+  }).catch((error) => { categoryCheck = undefined; throw error; });
+  await categoryCheck;
+}
+
+export async function listInventoryCategories() {
+  await ensureCategoriesInitialized();
+  return storedCategories((await categoryRegistry().get()).data()).toSorted((a, b) => a.name.localeCompare(b.name));
+}
+
+function resolveInventoryCategory(item: InventoryItem, categories: InventoryCategory[]): InventoryItem {
+  const category = categories.find((entry) => categoryMatches(entry, item));
+  return category ? { ...item, categoryId: category.id, category: category.name } : item;
+}
+
+export async function saveInventoryCategory(name: string, id?: string) {
+  await ensureCategoriesInitialized();
+  const cleaned = normalizeCategoryName(name);
+  const key = categoryKey(cleaned);
+  if (!cleaned || cleaned.length > 160) throw new CategoryError("category-missing");
+  await database().runTransaction(async (transaction) => {
+    const ref = categoryRegistry();
+    const categories = storedCategories((await transaction.get(ref)).data());
+    if (id && !categories.some((category) => category.id === id)) throw new CategoryError("category-missing");
+    if (categories.some((category) => category.id !== id && (categoryKey(category.name) === key || category.aliases.includes(key)))) {
+      throw new CategoryError("category-duplicate");
+    }
+    if (id) {
+      // Keep original aliases so legacy product records follow renames without a bulk rewrite.
+      const index = categories.findIndex((category) => category.id === id);
+      categories[index] = { ...categories[index], name: cleaned };
+    } else {
+      if (categories.length >= 100) throw new CategoryError("category-limit");
+      categories.push({ id: randomUUID(), name: cleaned, aliases: [key] });
+    }
+    transaction.set(ref, { categories, updatedAt: new Date().toISOString() });
+  });
+}
+
+export async function deleteInventoryCategory(id: string) {
+  await ensureCategoriesInitialized();
+  await database().runTransaction(async (transaction) => {
+    const ref = categoryRegistry();
+    const categories = storedCategories((await transaction.get(ref)).data());
+    const category = categories.find((entry) => entry.id === id);
+    if (!category) throw new CategoryError("category-missing");
+    const inventory = await transaction.get(database().collection(INVENTORY_COLLECTION));
+    if (inventory.docs.some((doc) => categoryMatches(category, doc.data() as StoredInventoryItem))) throw new CategoryError("category-used");
+    transaction.set(ref, { categories: categories.filter((entry) => entry.id !== id), updatedAt: new Date().toISOString() });
+  });
 }
 
 function inventoryFromDocument(document: QueryDocumentSnapshot): InventoryItem {
@@ -85,18 +168,25 @@ async function initializeInventory() {
 
 export async function listInventory() {
   await ensureInventorySeeded();
-  const snapshot = await database().collection(INVENTORY_COLLECTION).orderBy("updatedAt", "desc").get();
-  return snapshot.docs.map(inventoryFromDocument);
+  const [snapshot, categories] = await Promise.all([
+    database().collection(INVENTORY_COLLECTION).orderBy("updatedAt", "desc").get(), listInventoryCategories(),
+  ]);
+  return snapshot.docs.map((doc) => resolveInventoryCategory(inventoryFromDocument(doc), categories));
+}
+
+export async function getInventoryItem(id: string): Promise<InventoryItem | null> {
+  if (!/^[a-zA-Z0-9-]{1,128}$/.test(id)) return null;
+  const document = await database().collection(INVENTORY_COLLECTION).doc(id).get();
+  return document.exists ? { ...(document.data() as StoredInventoryItem), id: document.id } : null;
 }
 
 export async function listPublicInventory() {
   await ensureInventorySeeded();
-  const snapshot = await database()
-    .collection(INVENTORY_COLLECTION)
-    .where("status", "==", "active")
-    .get();
+  const [snapshot, categories] = await Promise.all([
+    database().collection(INVENTORY_COLLECTION).where("status", "==", "active").get(), listInventoryCategories(),
+  ]);
   return snapshot.docs
-    .map(inventoryFromDocument)
+    .map((doc) => resolveInventoryCategory(inventoryFromDocument(doc), categories))
     .filter((item) => item.status === "active" && item.stock > 0)
     .toSorted((a, b) => Number(b.featured) - Number(a.featured) || b.updatedAt.localeCompare(a.updatedAt));
 }
@@ -129,7 +219,8 @@ export const listPublicProducts = unstable_cache(readPublicProducts,
   ["public-products-v1", process.env.FIREBASE_PROJECT_ID ?? "demo", process.env.FIREBASE_DATABASE_ID ?? "(default)"],
   { revalidate: 60, tags: [PUBLIC_PRODUCTS_TAG] });
 
-export async function createInventoryItem(input: Omit<InventoryItem, "id" | "createdAt" | "updatedAt">) {
+export async function createInventoryItem(input: InventoryInput) {
+  await ensureCategoriesInitialized();
   const db = database();
   const id = randomUUID();
   const now = new Date().toISOString();
@@ -137,8 +228,11 @@ export async function createInventoryItem(input: Omit<InventoryItem, "id" | "cre
   const skuRef = db.collection(INVENTORY_SKUS_COLLECTION).doc(skuDocumentId(input.sku));
 
   await db.runTransaction(async (transaction) => {
+    const categories = storedCategories((await transaction.get(categoryRegistry())).data());
+    const category = categories.find((entry) => entry.id === input.categoryId);
+    if (!category) throw new CategoryError("category-missing");
     if ((await transaction.get(skuRef)).exists) throw duplicateSkuError();
-    transaction.set(itemRef, { ...input, createdAt: now, updatedAt: now } satisfies StoredInventoryItem);
+    transaction.set(itemRef, { ...input, category: category.name, ...inventoryImageSource(id, input), createdAt: now, updatedAt: now } satisfies StoredInventoryItem);
     transaction.set(skuRef, { inventoryId: id, sku: input.sku });
   });
   return id;
@@ -146,12 +240,16 @@ export async function createInventoryItem(input: Omit<InventoryItem, "id" | "cre
 
 export async function updateInventoryItem(
   id: string,
-  input: Omit<InventoryItem, "id" | "createdAt" | "updatedAt">,
+  input: Omit<InventoryInput, keyof InventoryImageFields | "tradeInVoucher" | "tradeInCash"> & Partial<InventoryImageFields>,
 ) {
+  await ensureCategoriesInitialized();
   const db = database();
   const itemRef = db.collection(INVENTORY_COLLECTION).doc(id);
 
-  await db.runTransaction(async (transaction) => {
+  return db.runTransaction(async (transaction) => {
+    const categories = storedCategories((await transaction.get(categoryRegistry())).data());
+    const category = categories.find((entry) => entry.id === input.categoryId);
+    if (!category) throw new CategoryError("category-missing");
     const current = await transaction.get(itemRef);
     if (!current.exists) throw new Error("Inventory item not found.");
 
@@ -164,19 +262,21 @@ export async function updateInventoryItem(
       transaction.delete(previousSkuRef);
       transaction.set(nextSkuRef, { inventoryId: id, sku: input.sku });
     }
-    transaction.update(itemRef, { ...input, updatedAt: new Date().toISOString() });
+    transaction.update(itemRef, { ...input, category: category.name, ...inventoryImageSource(id, input), updatedAt: new Date().toISOString() });
+    return input.imageStoragePath && input.imageStoragePath !== currentItem.imageStoragePath ? currentItem.imageStoragePath : undefined;
   });
 }
 
 export async function deleteInventoryItem(id: string) {
   const db = database();
   const itemRef = db.collection(INVENTORY_COLLECTION).doc(id);
-  await db.runTransaction(async (transaction) => {
+  return db.runTransaction(async (transaction) => {
     const current = await transaction.get(itemRef);
     if (!current.exists) return;
     const item = current.data() as StoredInventoryItem;
     transaction.delete(itemRef);
     transaction.delete(db.collection(INVENTORY_SKUS_COLLECTION).doc(skuDocumentId(item.sku)));
+    return item.imageStoragePath;
   });
 }
 
