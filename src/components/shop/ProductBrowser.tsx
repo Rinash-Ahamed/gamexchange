@@ -62,9 +62,9 @@ export function ProductBrowser({ products, initialFilters = {} }: { products: re
     </div>
 
     <div className="mt-6 grid items-start gap-5 lg:grid-cols-[15rem_minmax(0,1fr)]">
-      <aside className="min-w-0 lg:sticky lg:top-24">
+      <aside className="min-w-0">
         <button type="button" aria-expanded={mobileFilters} aria-controls={panelId} onClick={() => setMobileFilters((open) => !open)} className="mb-3 inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-strong bg-surface px-4 text-sm font-semibold lg:hidden"><SlidersHorizontal className="size-4" aria-hidden />{mobileFilters ? "Hide filters" : "Filters and sorting"}</button>
-        <div id={panelId} data-native-scroll className={`${mobileFilters ? "block" : "hidden lg:block"} lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto`}><CatalogFilters filters={filters} groups={groups} priceCeiling={priceCeiling} update={update} clear={clear} /></div>
+        <div id={panelId} className={mobileFilters ? "block" : "hidden lg:block"}><CatalogFilters filters={filters} groups={groups} priceCeiling={priceCeiling} update={update} clear={clear} /></div>
       </aside>
       <div ref={results} role="region" aria-label="Shop results" tabIndex={-1} className="min-w-0 scroll-mt-28">
         <div className="flex flex-wrap items-center justify-between gap-2"><p role="status" className="text-sm text-muted">{pagination.total ? `Showing ${pagination.from} to ${pagination.to} of ${pagination.total} ${pagination.total === 1 ? "product" : "products"}` : "Showing 0 products"}</p><span className="text-xs text-muted">Available stock only</span></div>
@@ -73,8 +73,8 @@ export function ProductBrowser({ products, initialFilters = {} }: { products: re
           {filters.minDiscount > 0 && <button type="button" onClick={() => update({ minDiscount: 0 })} className="inline-flex min-h-9 items-center gap-2 rounded-full border border-blue/30 px-3 text-xs text-accent-text">{filters.minDiscount}% or more<X className="size-3" aria-hidden /></button>}
           <button type="button" onClick={clear} className="min-h-9 px-2 text-xs text-accent-text hover:underline">Clear all filters</button>
         </div>}
-        <ul className="mt-4 grid grid-cols-2 gap-3 min-[600px]:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {pagination.items.map((product, index) => <li key={product.id} className="min-w-0"><CatalogCard product={product} priority={index === 0} eager={index < 4} /></li>)}
+        <ul className="mt-4 grid grid-cols-2 gap-3 min-[600px]:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+          {pagination.items.map((product, index) => <li key={product.id} className="min-w-0"><CatalogCard product={product} priority={index === 0} eager={index < 5} /></li>)}
         </ul>
         {!visible.length && <div className="rounded-2xl border border-dashed border-line-strong p-6 text-center sm:p-10"><h2 className="font-display text-xl font-semibold">No matching gear right now</h2><p className="mt-2 text-sm leading-relaxed text-muted">Try another search or clear your filters. We only list stock we actually have.</p><button type="button" onClick={clear} className="mt-4 min-h-11 rounded-xl bg-fill px-4 text-sm font-semibold text-accent-ink">Reset filters</button><a href={whatsappUrl("Hi GamexChange, can you help me find a game, console or accessory?")} target="_blank" rel="noopener noreferrer" className="mx-3 mt-4 inline-flex min-h-11 items-center text-sm text-accent-text underline">Ask the team</a></div>}
         <CatalogPagination page={pagination.page} pageCount={pagination.pageCount} onPageChange={goToPage} />

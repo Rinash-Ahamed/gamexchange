@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, Gamepad2, Headphones, Joystick, Repeat, Store, Wrench } from "lucide-react";
-import { whatsappUrl } from "@/data/site";
 import { LightCard } from "@/components/ui/LightCard";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -13,7 +12,7 @@ const offerings = [
   { title: "Sell or trade in", action: "Get a trade-in quote", href: "/exchange", icon: Repeat, image: "/hero/gamexchange-hardware-stage.png" },
   { title: "Console & controller repairs", action: "Book a repair", href: "/repair-service", icon: Wrench, image: "/images/game-zone/controller-station.png" },
   { title: "Play at the game zone", action: "See the game zone", href: "/game-zone", icon: Joystick, image: "/images/game-zone/multiplayer-station.png" },
-  { title: "Franchise enquiry", action: "Partner with us", href: whatsappUrl("Hi GamexChange, I would like to know more about your franchise opportunities."), icon: Store, image: "/images/game-zone/neon-console-lounge.png" },
+  { title: "Franchise enquiry", action: "Partner with us", href: "/franchise", icon: Store, image: "/franchise/kovai-pudur.webp" },
 ] as const;
 
 export function Services() {

@@ -7,6 +7,7 @@ import { listPublicProducts } from "@/lib/admin/db";
 import { serializeJsonLd } from "@/lib/structured-data";
 import { normalizePlatform, shopSections } from "@/data/catalog";
 import { availableCatalog, type CatalogFilters } from "@/lib/catalog";
+import { productConditionSchema, productHref } from "@/lib/product-links";
 
 export const metadata: Metadata = {
   title: "Shop consoles & gaming gear",
@@ -33,8 +34,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       item: {
         "@type": "Product",
         name: p.name,
+        url: new URL(productHref(p.id), site.url).href,
         image: p.image.src,
-        itemCondition: /pre.?owned/i.test(p.condition) ? "https://schema.org/UsedCondition" : /refurbished/i.test(p.condition) ? "https://schema.org/RefurbishedCondition" : /new/i.test(p.condition) ? "https://schema.org/NewCondition" : undefined,
+        itemCondition: productConditionSchema(p.condition),
         offers: { "@type": "Offer", priceCurrency: "INR", price: p.price, seller: { "@type": "Organization", name: site.name } },
       },
     })),

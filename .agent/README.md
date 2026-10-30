@@ -34,6 +34,8 @@ The public shop groups stock into Games, Consoles and Accessories, with platform
 
 Shop browsing uses numbered pagination with 20 products per page, Previous/Next, first/last page links, bounded ellipses and exact result ranges. Filter/sort changes reset page 1; page changes retain filters and return focus/scroll to the results, respecting reduced motion. Pagination currently limits rendered cards, not the underlying Firestore query or catalogue payload; cursor-based backend pagination remains a separate scalability follow-up. Page/filter state is client-local, not stored in the URL.
 
+Shop cards use a compact responsive grid: two columns on mobile, three to four on laptops and five on wide desktops. Homepage showcase sizes stay unchanged. Cards open `/products/[id]`; cart and enquiry actions remain separate. Detail pages show uncropped inventory artwork, saved prices/discounts, condition, supplied descriptions/metadata and cart actions. Related active stock is labelled More to explore, not purchase-history recommendations. Public visibility uses the same catalogue boundary as the shop. Missing/unpublished stock is unavailable, and inventory/category saves invalidate detail routes.
+
 The consumer sidebar keeps sort, price inputs/sliders, condition, platforms and discounted-only choices. Categories appear when there are multiple subcategories, hardware brand when supplied, and game genre/format/player modes/age rating/release year only when stocked products provide the data. Edition/model remains searchable and visible on cards but is not a separate default filter. The minimum-discount dropdown was removed as redundant clutter; biggest-discount sorting remains. Optional inventory metadata is preserved. Selected facets remain removable even with no matching products. No fake stock, gameplay-hour guesses, preorder or PC-component offerings are added.
 
 Visitors can collect multiple products at `/cart`, change quantities and send one combined WhatsApp enquiry. Razorpay checkout is test-only and needs the three server environment values in `RAZORPAY_SETUP.md`. Admin > Test orders shows sandbox records. Live keys are blocked; simulated orders do not change stock or create deliveries.
@@ -72,6 +74,9 @@ Admin login requires Firebase Authentication with Identity Platform, a verified 
 The default theme follows the visitor's local time: light from 6:00 AM through 5:59 PM and dark from 6:00 PM through 5:59 AM. The navigation toggle stores an explicit light or dark preference that overrides the schedule.
 
 ## Notes
+
+- `/franchise` is a dedicated public franchise page, linked from the homepage service card and footer. Supplied store photos and a cropped locations-only map are optimized under `public/franchise/`; captions and accessible location text live in `src/data/franchise.ts`. Enquiry opens a draft WhatsApp message without automatic submission. Fees, profitability, territory availability and support packages are not invented. This page does not change the separate contact branch registry.
+
 - Forms never claim a booking. Success means "ready to send on WhatsApp".
 - Product images load from the existing site's CDN (`framerusercontent.com`); self-host them before decommissioning the old site.
 - FAQs and legal policies now come from the supplied `GXC Concepts Website Content.docx`, with grammar/formatting edits. FAQ purchase and sell instructions match the current enquiry workflow rather than advertising unimplemented cart, checkout or PIN-code tools.

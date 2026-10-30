@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, m, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
 import { formatINR, type Product } from "@/data/products";
 import { whatsappUrl } from "@/data/site";
@@ -10,6 +11,7 @@ import { ControllerButton } from "@/components/ui/ControllerButton";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { ConditionBadge } from "@/components/shop/ConditionBadge";
 import { DiscountBadge, ProductPrice } from "@/components/shop/ProductPrice";
+import { productHref } from "@/lib/product-links";
 
 /**
  * Signature moment C: product spotlight. On desktop the section pins and scrolling advances
@@ -63,7 +65,7 @@ export function ShelfShowcase({ products }: { products: readonly Product[] }) {
               <AnimatePresence mode="wait">
                 <m.div key={p.id} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}>
                   <div className="mt-6 flex flex-wrap items-center gap-3"><span className="text-sm font-medium text-muted">{p.platform}</span><ConditionBadge condition={p.condition} /><DiscountBadge product={p} /></div>
-                  <h3 className="mt-4 font-display text-5xl font-bold uppercase leading-[0.95] xl:text-6xl">{p.name}</h3>
+                  <h3 className="mt-4 font-display text-5xl font-bold uppercase leading-[0.95] xl:text-6xl"><Link href={productHref(p.id)} prefetch={false} className="hover:text-accent-text">{p.name}</Link></h3>
                   <div className="mt-6"><ProductPrice product={p} className="text-6xl tracking-tight" /></div>
                   <dl className="mt-6 flex gap-8 text-sm">
                     <div><dt className="text-muted">Trade-in · voucher</dt><dd className="font-display text-xl font-semibold tabular-nums">{formatINR(p.tradeInVoucher)}</dd></div>
@@ -72,6 +74,7 @@ export function ShelfShowcase({ products }: { products: readonly Product[] }) {
                   <p className="mt-3 max-w-md text-xs text-muted">As listed on our current site. Confirm availability on WhatsApp; trade-in value is confirmed after the shop checks your device.</p>
                   <div className="mt-8 flex flex-wrap gap-4">
                     <AddToCartButton product={p} />
+                    <Link href={productHref(p.id)} prefetch={false} className="inline-flex min-h-11 items-center px-2 font-display text-sm font-semibold text-accent-text hover:underline">View details</Link>
                     <ControllerButton href={whatsappUrl(message)} external glyph="x" size="lg">Enquire</ControllerButton>
                     <ControllerButton href="/products" glyph="sq" size="lg" variant="ghost">View all</ControllerButton>
                   </div>

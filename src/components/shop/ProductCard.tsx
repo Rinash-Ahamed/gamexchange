@@ -1,6 +1,7 @@
 "use client";
 
 import { m, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
+import Link from "next/link";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { useFinePointer } from "@/lib/use-media";
 import { formatINR, type Product } from "@/data/products";
@@ -9,6 +10,7 @@ import { ProductStage } from "./ProductStage";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { ConditionBadge } from "./ConditionBadge";
 import { DiscountBadge, ProductPrice } from "./ProductPrice";
+import { productHref } from "@/lib/product-links";
 
 export function ProductCard({ product, index, total, priority = false }: { product: Product; index: number; total: number; priority?: boolean }) {
   const fine = useFinePointer();
@@ -46,7 +48,7 @@ export function ProductCard({ product, index, total, priority = false }: { produ
           <ConditionBadge condition={product.condition} />
         </div>
         <m.div style={tilt ? { rotateX: rotX, rotateY: rotY } : undefined} className="size-full [transform-style:preserve-3d]">
-          <ProductStage product={product} priority={priority} sizes="(min-width: 1024px) 28vw, (min-width: 640px) 45vw, 92vw" className="size-full" />
+          <Link href={productHref(product.id)} prefetch={false} aria-label={`View ${product.name} details`} className="block size-full"><ProductStage product={product} priority={priority} sizes="(min-width: 1024px) 28vw, (min-width: 640px) 45vw, 92vw" className="size-full" /></Link>
         </m.div>
         <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent group-hover:animate-[flare_1.1s_ease-out]" />
       </div>
@@ -54,7 +56,7 @@ export function ProductCard({ product, index, total, priority = false }: { produ
       <div className="relative flex flex-1 flex-col gap-4 p-6 pt-3">
         <div>
           <p className="font-display text-[11px] font-semibold uppercase tracking-[0.3em] text-accent-text">{product.platform}</p>
-          <h3 id={`${product.id}-name`} className="mt-1 font-display text-xl font-bold uppercase leading-tight tracking-wide">{product.name}</h3>
+          <h3 id={`${product.id}-name`} className="mt-1 font-display text-xl font-bold uppercase leading-tight tracking-wide"><Link href={productHref(product.id)} prefetch={false} className="hover:text-accent-text">{product.name}</Link></h3>
         </div>
 
         <div className="flex flex-wrap items-start gap-3"><ProductPrice product={product} className="text-4xl tracking-tight" /><DiscountBadge product={product} /></div>

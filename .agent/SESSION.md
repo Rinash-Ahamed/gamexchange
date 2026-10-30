@@ -10,7 +10,7 @@ This file stores durable context between development sessions. Keep entries conc
 
 ## Current State
 
-- Shop now uses 20-product numbered client-side pagination and a curated consumer sidebar. These latest changes are source/whitespace reviewed only; they are newer than the successful build/lint run recorded below.
+- Shop now uses compact responsive cards, public product-detail pages, 20-product numbered client-side pagination and a curated consumer sidebar. These latest changes are source/whitespace reviewed only; they are newer than the successful build/lint run recorded below.
 
 - Cart and Razorpay sandbox checkout are implemented. See `RAZORPAY_SETUP.md` for the three server-only environment values, webhook setup, data handling and recovery limits. Live keys are blocked. Test orders do not reserve/decrement stock or create deliveries. Provider/dashboard configuration and an actual test payment are not verified.
 
@@ -88,6 +88,26 @@ This is historical context. Later entries and the Current State section supersed
 - Run typecheck, lint, build, and Playwright only when explicitly requested.
 
 ## Recent Updates
+
+### 2026-10-30: Dedicated franchise page with supplied store photos
+
+- Added static `/franchise` in the existing theme with an introduction, six-photo responsive gallery, locations overview, readable location lists and franchise-specific WhatsApp draft enquiries. Homepage franchise card now navigates internally rather than directly to WhatsApp; added a footer link, canonical metadata and sitemap entry. Kept main navigation unchanged.
+- Inspected all seven supplied JPEGs from the owner's Downloads/franchisepage folder. Converted photos to metadata-stripped WebP under `public/franchise/`, preserving original aspect ratios and complete photos. Extracted only the geographic map from the poster to avoid publishing its conflicting VR/arcade/12-month-warranty claims. Original source files remain unchanged. Added full-size map access and corresponding text locations; no invented map coordinates or branch phone numbers.
+- Location text and photo captions are isolated in `src/data/franchise.ts`. The supplied network includes Coimbatore, Pollachi, Perundurai and Karur; did not change the existing two-branch contact registry or globally claim all facilities at every location. Investment, space and partnership terms require discussion with the team. No Firebase/auth/environment changes, new dependencies or deployment.
+- Used the Sites skill's local-only workflow. Added browser regression source; reviewed map asset visually and source/whitespace. Build, lint, tests and browser/responsive/theme verification remain deferred until requested. Earlier Vercel 500 report still needs the deployment URL and sanitized runtime logs; this feature does not establish or fix its cause.
+
+### 2026-10-30: Shop filters without nested scrolling
+
+- Removed the shop sidebar's viewport height cap, internal scrollbar and sticky positioning. Filter option groups also expand to their full content height instead of using individual scroll areas. The entire filter column now moves with normal page scrolling, so lower options stay reachable without nested scroll traps.
+- Kept existing collapsible groups, theme tokens, filtering logic and mobile Show/Hide control. No admin filters, inventory data or dependencies changed. Source and whitespace reviewed only; build, lint, tests and browser layouts were not run, per the batched-check convention.
+
+### 2026-10-30: Compact cards and real inventory product details
+
+- Applied the approved compact shop-card treatment: two mobile columns, three to four laptop columns and five wide-desktop columns, smaller uncropped images/spacing and two-line titles. Removed descriptions from listing cards only. Kept homepage showcase sizing intact and existing condition/discount badges visible.
+- Added `/products/[id]` with larger contained artwork, saved final/original prices, discount and condition badges, factual optional metadata, inventory description, cart actions and WhatsApp enquiry. Added breadcrumbs, canonical/Open Graph metadata, Product structured data and a helpful unavailable page. Related public stock is labelled More to explore; no fabricated purchase history, product specifications or delivery promises.
+- Shop cards open details through a full-card link; Add to cart and Enquire remain separate sibling controls above the link. Homepage image/title links, desktop shelf details and cart names also link to details. Shared helpers handle product URLs and structured-data conditions. Inventory description guidance and inventory/category detail-route invalidation were added. No data migration, Firebase mutation, dependency or environment change.
+- Added regression test source for navigation, independent cart controls, detail image loading, overflow, unavailable products and link/condition helpers. Reviewed source and whitespace only. Build, lint, typecheck, tests, responsive/browser/theme checks and live Firebase workflows were not run for this update, per the user's batched-check convention.
+- Warned the user to rotate the MFA secret exposed in IDE context wherever it is used. Did not read environment files, repeat/store the secret, rotate credentials or change authentication.
 
 ### 2026-10-30: Numbered shop pagination and consumer-focused filters
 

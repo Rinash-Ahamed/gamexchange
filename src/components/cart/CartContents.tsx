@@ -10,6 +10,7 @@ import { ProductImage } from "@/components/shop/ProductImage";
 import { TestCheckout } from "./TestCheckout";
 import { ConditionBadge } from "@/components/shop/ConditionBadge";
 import { DiscountBadge, ProductPrice } from "@/components/shop/ProductPrice";
+import { productHref } from "@/lib/product-links";
 
 export function CartContents({ products, checkoutEnabled }: { products: Product[]; checkoutEnabled: boolean }) {
   const cart = useCart();
@@ -27,7 +28,7 @@ export function CartContents({ products, checkoutEnabled }: { products: Product[
       <fieldset disabled={busy} className="min-w-0 space-y-3"><legend className="sr-only">Cart items</legend>
         {lines.map(({ id, quantity, product }, index) => <article key={id} className="flex min-w-0 gap-3 rounded-2xl border border-line-strong bg-surface p-3 sm:gap-5 sm:p-5">
           {product && <div className="size-20 shrink-0 rounded-xl bg-surface-2 p-2 sm:size-28"><ProductImage product={product} eager={index < 3} presentation="catalog" sizes="112px" /></div>}
-          <div className="min-w-0 flex-1"><h2 className="break-words font-display text-sm font-semibold sm:text-base">{product?.name ?? "Item no longer available"}</h2>
+          <div className="min-w-0 flex-1"><h2 className="break-words font-display text-sm font-semibold sm:text-base">{product ? <Link href={productHref(product.id)} prefetch={false} className="hover:text-accent-text">{product.name}</Link> : "Item no longer available"}</h2>
             {product && <><p className="mt-1 text-xs text-muted">{product.platform}</p><div className="mt-2 flex flex-wrap gap-2"><ConditionBadge condition={product.condition} /><DiscountBadge product={product} /></div><div className="mt-2"><ProductPrice product={product} quantity={quantity} className="text-base" /></div></>}
             {(!product || quantity > (product.stock ?? 1)) && <p role="alert" className="mt-2 text-xs text-danger">{product ? `Only ${product.stock ?? 1} available. Reduce the quantity to continue.` : "Remove this item before continuing."}</p>}
             <div className="mt-3 flex flex-wrap items-center gap-2">

@@ -34,6 +34,7 @@ export function Footer() {
                 <Link href={i.href} className="inline-block py-1.5 text-white/75 transition-colors hover:text-white">{i.label}</Link>
               </li>
             ))}
+            <li><Link href="/franchise" className="inline-block py-1.5 text-white/75 transition-colors hover:text-white">Franchise opportunities</Link></li>
           </ul>
         </nav>
 
