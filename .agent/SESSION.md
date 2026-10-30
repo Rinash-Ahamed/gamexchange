@@ -10,12 +10,19 @@ This file stores durable context between development sessions. Keep entries conc
 
 ## Current State
 
+- Shop now uses 20-product numbered client-side pagination and a curated consumer sidebar. These latest changes are source/whitespace reviewed only; they are newer than the successful build/lint run recorded below.
+
+- Cart and Razorpay sandbox checkout are implemented. See `RAZORPAY_SETUP.md` for the three server-only environment values, webhook setup, data handling and recovery limits. Live keys are blocked. Test orders do not reserve/decrement stock or create deliveries. Provider/dashboard configuration and an actual test payment are not verified.
+
+- Architecture review completed on 2026-10-30: see `ARCHITECTURE_REVIEW.md` for scope, fixes and major follow-ups. Latest requested lint and production build passed after the expanded filter, discount and image-loading updates, including TypeScript and all 12 automatic API smoke checks. This does not verify browser layouts, live Firebase/MFA/uploads, backups or production performance.
+- `npm run build` now runs the API smoke gate via postbuild; failures fail the command. `npm run healthcheck` repeats it against the existing build. `/api/health` is liveness only. Use npm's build script rather than direct `next build` in CI/hosting.
+
 - Admin access uses Firebase Authentication, verified email, a UID allowlist and mandatory TOTP. No development-password bypass exists.
 - Inventory and customer service records use Firestore. Banner and stock image uploads use the configured Firebase Storage bucket; never copy credentials from `.env.local` into documentation.
 - Inventory supports category-grouped lists, collapsed editors, image previews and confirmation dialogs. Category selection uses a required dropdown managed from `/admin/categories`.
 - Categories can be added, renamed and deleted if unused. Stable IDs and legacy-name mapping preserve existing product assignments and follow renames without bulk rewriting product documents. Public shop categories still come only from active, in-stock products.
 - Latest UI fix moved the global form font reset into the base cascade layer so utility typography works consistently on buttons and fields.
-- Recent inventory-upload and typography work passed typecheck. Live Firebase uploads, build, lint and end-to-end checks have not been verified in these updates.
+- Live Firebase uploads, manual layouts/themes and full end-to-end workflows remain unverified. Latest local build/lint/API results are recorded above and in Recent Updates.
 
 ## Earlier Work
 
@@ -81,6 +88,80 @@ This is historical context. Later entries and the Current State section supersed
 - Run typecheck, lint, build, and Playwright only when explicitly requested.
 
 ## Recent Updates
+
+### 2026-10-30: Numbered shop pagination and consumer-focused filters
+
+- Used the user's supplied full sidebar/grid screenshot as an organisational reference, retaining GamexChange styling rather than copying its visual design. Replaced Show more batches with numbered client-side pages of 20, Previous/Next, first/last and adjacent page buttons with ellipses, current-page semantics, exact result ranges and disabled boundary controls. Pagination wraps on narrow screens instead of extending beyond the container.
+- Filters/sort changes reset page 1; changing page preserves selections and returns focus/scroll to the result region, respecting reduced motion. Page bounds clamp safely if inventory/results shrink. No timer, dependency, database mutation or per-page network request was introduced. This is rendered-list pagination, not Firestore cursor pagination or a smaller catalogue payload. State remains local to the client, not URL-persistent.
+- Curated the consumer sidebar to useful supplied product data: core sorting, price, condition, platforms and on-sale; multiple subcategories and hardware brand where relevant; game genre/format/player modes/age rating/release year where stock has metadata. Removed the standalone edition/model facet and redundant minimum-discount dropdown from the default UI; existing admin metadata/search/cards and filter helper compatibility remain intact. No PC, preorder, gameplay-hours or unsupported online-requirement guesses were added.
+- Added pagination/clamping/bounded-link regression source and consumer-facet curation cases; updated shop result-range selectors. Source and whitespace reviewed only. Build, lint, typecheck, tests, browser responsive/keyboard checks and live Firebase verification were not run for this update, following the batched-check convention.
+
+### 2026-10-30: Expanded shop filtering and requested final checks
+
+- Identified why filters looked limited: groups were removed when stock had no matching metadata; platform chips selected only one platform, and admin lacked brand/publisher/player-mode/age-rating/release-year inputs. Earlier reference treatment was organisational only, not a full storefront feature clone.
+- Revisited GameNation's public Games/Consoles/Accessories pages with web tools. Live text exposes navigation but not the JavaScript-rendered sidebar. Browser inspection was attempted using the computer-use skill; browser host was unavailable and native Chrome app approval timed out. Did not claim a complete current interactive-sidebar comparison or copy its design.
+- Expanded original GamexChange filters with multi-select platforms, standard platform/condition zero counts, collapsible groups and empty metadata explanations, brand/publisher, edition/model, game player modes/age rating/release year, native min/max price sliders, minimum discount and biggest-discount sorting. Counts exclude each facet's own selections while respecting other groups. Unavailable options are disabled unless already selected, so selections can always be removed.
+- Added corresponding optional admin metadata, validation and public model fields. Legacy records stay unchanged and missing metadata is never invented. Added canonical condition handling and PS4/PS5 search aliases. No PC components, preorder purchases or unavailable-stock listings were added. Public catalogue cache key bumped; existing save invalidation remains in effect.
+- Added source regression cases for metadata combinations, counts, empty groups and discount thresholds. Final `npm.cmd run lint` passed with no warnings/errors. Final `npm.cmd run build` passed compilation, TypeScript, static generation and all 12 automatic API smoke checks, covering the accumulated discount/image changes too. Fixed an unused import caught by the first lint and a strict Zod form-input generic mismatch caught by the first build before rerunning successfully. Diff whitespace check passed. Full browser tests, live Firebase edits and a complete external-sidebar inspection remain unverified.
+
+### 2026-10-30: Banner LCP loading warning and image-policy guardrails
+
+- Read the current Next Image documentation and local LCP observer implementation. PromoSwitch initially rendered its active slide lazy until a viewport callback, then could mark previously visible slides lazy again. Mounted banner slides now always render eager; the first is eager in server HTML, and remaining slides mount near the viewport using a one-time 300 px observer. Auto-rotation remains gated by current visibility, page visibility and reduced motion.
+- Added shared `imageLoading` intents (critical eager/high, visible eager, deferred lazy) and applied them to every Next Image call site. Removed direct priority/preload props from underlying Next Images; the existing ProductImage priority input maps to the critical intent. First shop row and initial cart items are eager, dedicated Game Zone cards are eager, homepage Game Zone cards remain lazy, and reused hero/promo service art does not downgrade matching image URLs to lazy.
+- Added an ESLint guard requiring the shared policy on imported Next Image elements and rejecting competing loading/priority/preload props. Updated root agent instructions and documentation. Page error collection now also catches LCP and priority/lazy warnings; added policy/banner regression source. No warnings were suppressed or disabled.
+- Source and whitespace reviewed. Build, lint, typecheck, tests and browser LCP/responsiveness checks were not run in this update. Actual future LCP candidates depend on viewport/content; guardrails reduce regressions but do not constitute a universal warning-free guarantee.
+
+### 2026-10-30: Inventory percentage discounts and prominent product conditions
+
+- Added compact shared inventory pricing fields: price before discount, decimal discount percentage, live final selling price and rupee savings. Rounded whole-rupee calculation is shared with server validation; client final-price submissions are not trusted. The saved `price` remains the final price used by cart, sorting, structured data and checkout, with `originalPrice` and `discountPercent` for presentation. Setting 0% removes the discount. Non-zero discounts that do not reduce the price by a rupee are rejected. 100% is supported as a zero-price item, but the existing Razorpay flow rejects zero-price checkout.
+- Existing records are not rewritten. Legacy original/final price pairs derive a percentage that preserves their saved price when reopened without changes. Added optional discount metadata to the public model and bumped the product cache key; inventory/category saves also revalidate `/cart`.
+- Added reusable ProductPrice, DiscountBadge and ConditionBadge components. Shop grid, homepage mobile cards/desktop shelf, cart and admin list show the final price and genuine savings consistently; customer condition tags use blue for New, violet for Pre-Owned and a contrasting green outline for Refurbished. Shop badges sit above the image, leaving artwork uncropped. No new animation loops or dependencies were added.
+- Added source regression cases for rounding, legacy price preservation, invalid/no discounts and inconsistent percentages. Reviewed source and whitespace only. Build, lint, typecheck, tests, browser layout and live Firebase save/checkout checks have not been run for this update, following the batched-check convention.
+
+### 2026-10-30: Reported shop hydration mismatch
+
+- Read the supplied pasted hydration trace. It shows old client platform radio markup and old filter-panel classes hydrating newer server pressed-button markup/native-scroll attributes. The current ProductBrowser source consistently uses the newer markup and prioritizes the first catalogue image; no time/random/browser branch controls those attributes.
+- This points to stale client/development assets from different source revisions, not evidence of a cart/theme-state bug. Did not add suppressHydrationWarning or disable SSR.
+- Process inspection was denied by the environment, so no server was stopped and no generated cache was removed or moved. User must stop/restart the development server and hard-refresh the browser; if needed, move only `.next/dev` aside while the server is stopped. No customer/Firebase data needs clearing.
+- Source reviewed only. Did not run build/lint/tests or claim a browser reproduction/resolution for this report.
+
+### 2026-10-30: Multi-product cart and Razorpay test-mode checkout
+
+- User explicitly selected test-mode checkout in addition to the cart. Added stock-aware Add to cart on shop/home shelf, desktop/mobile cart link and quantity badge, and themed `/cart` with quantities, removal, unavailable-stock handling, subtotal and one combined WhatsApp message. Persist only IDs and quantities with hydration-safe cross-tab subscriptions and in-memory fallback.
+- Added server-only Razorpay REST integration with test-key-only gating, uncached current Firestore price/stock validation, integer-paise totals, request UUID duplicate-create protection, stored order snapshots, constant-time checkout signature verification and authenticated captured-payment verification. Added signed webhook reconciliation with idempotent paid updates. These paths have not processed a real or sandbox payment during this session.
+- Added protected, read-only Admin > Test orders (latest 50). Sandbox records live in `checkoutTestOrders`, separate from inventory/service records. No real-stock reservation, decrement, delivery or live-payment enablement is implemented. Updated CSP for hosted checkout and its CDN; the external script loads only on a configured cart page. No new SDK dependency is needed.
+- Added `.env.example` placeholders RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET and RAZORPAY_WEBHOOK_SECRET without reading/modifying `.env.local`. Documented webhook/capture settings and live-payment prerequisites in `RAZORPAY_SETUP.md`; flagged cart/provider changes for the unapproved privacy draft and preview.
+- Added cart browser regression source and expanded postbuild smoke checks from 8 to 12, covering invalid cart/payment requests, origin rejection and unsigned webhooks without provider calls or Firebase writes. Lint passed. Production build passed compilation, TypeScript, static generation and all 12 automatic API checks. Diff whitespace check passed. Full browser tests, visual layouts, sandbox checkout, callback/webhook replay and actual Firebase/Razorpay connectivity remain unverified.
+
+### 2026-10-30: Architecture review and automatic build health checks
+
+- Reviewed application boundaries, shop filtering, protected admin actions, Firestore transactions/initialization, uploads, caches, enquiry controls and build workflow. Preserved pre-existing worktree changes; no dependency upgrade or Firebase configuration/data mutation was performed.
+- Fixed the strict-TypeScript category rename lookup, bounded streaming JSON byte limits, consistent no-store/retry headers, and a hard cap for process-local rate-limit keys. Platform chips now use pressed-button semantics. Nested admin/filter scrolling uses native scroll; admin footer controls no longer use overlapping absolute placement on short screens.
+- Added recoverable themed route error UI and no-index metadata for protected admin pages. Updated stale contact-test fixtures and platform selectors without running Playwright.
+- Added `/api/health` and an isolated loopback production smoke runner with eight checks, including origin guards, token issuance, unsigned payload rejection and declared/chunked UTF-8 body limits. The runner never submits a valid customer enquiry, accesses Firestore or stops the user's development server. Health failures propagate through npm postbuild.
+- Final `npm.cmd run lint` passed with no reported issues. Final `npm.cmd run build` passed compilation, TypeScript, static generation and all eight postbuild API checks. An earlier build failed on the category rename type error; it was fixed before the successful builds. Diff whitespace check passed.
+- Major recommendations, not implemented: explicit admin-only demo seeding, verified backup/restore policy, distributed abuse/replay protection and proxy trust, privacy approval/CSP planning, collection pagination, and optimistic concurrency/audit history. Live provider readiness, browser/mobile/theme verification, full end-to-end tests and deployment measurements remain unverified.
+
+### 2026-10-30: Category-led shop in the GamexChange theme
+
+- Inspected the supplied GameNation reference and screenshot for browsing organisation only. Implemented original GamexChange blue/violet department controls, platform chips, compact image-led cards and a responsive filter panel, not the reference's visual design or branding.
+- Shop supports Games, Consoles and Accessories plus All gear; text search; platform, category, condition, genre and Disc/Cartridge filters; min/max prices; genuine-discount filtering; recommended/latest/name/price sorting; clearable selections and client-side batches of 24. Mobile filters expand inline and cards use two columns on phones. No per-keystroke database reads or list-wide Motion layout animations.
+- Added optional inventory metadata (shopSection, genre, format, edition, description, originalPrice) and platform suggestions/normalisation, while preserving existing image uploads and legacy records. Public cards render uploaded game covers and hardware photos uncropped, retain WhatsApp enquiry rather than pretending there is checkout, and never fabricate stock or savings.
+- Removed Gaming PC from default category suggestions, blocked new PC-component categories/assignments and excluded existing PC-category stock from public results without deleting records. Updated fallback FAQ wording; already-managed Firestore FAQs are not silently overwritten.
+- Updated public metadata/structured condition data and category links. Old records infer their shop section from category until edited; optional new fields do not require a migration or new Firebase settings.
+- Updated shop regression test source. Reviewed source, references and whitespace only; build, lint, typecheck, browser responsiveness and live upload checks remain deferred until requested.
+
+### 2026-10-30: Four aligned hero shortcuts
+
+- Added Shop, Sell & Exchange, Repairs and Game Zone as a labelled Quick actions navigation group, pointing to the existing product, exchange, repair and gaming routes. Shop is primary; the other three are secondary.
+- Used equal-width columns and matching 56 px minimum heights in a 2 by 2 grid. Smaller icon discs, responsive typography and naturally wrapping labels fit narrow phones without clipping; styles are scoped to hero buttons.
+- Removed magnetic movement on these four buttons to keep the grid aligned while preserving existing hover/tap styling and reduced-motion handling. Source and whitespace reviewed; browser and full validation remain deferred until requested.
+
+### 2026-10-30: Larger hero art on large screens
+
+- At viewport widths of 1536 px and above, the product stage expands into the unused right-hand gutter by up to 160 px. The rule retains the container's existing 32 px viewport-edge margin, without moving the headline or changing tablet/mobile sizing.
+- Kept object-contain and the existing motion scale instead of adding zoom/cropping. The stage's normal-flow aspect ratio reserves the extra height so the following banner cannot overlap. Updated the image sizes hint for the larger rendered artwork.
+- Source and whitespace reviewed. Actual browser clipping, orientations and themes have not been visually verified; build, lint, typecheck and tests remain deferred until requested.
 
 ### 2026-10-30: Footer social icons
 

@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Boxes, House, Images, LayoutDashboard, MessageCircleQuestion, Tags, Wrench } from "lucide-react";
+import { Boxes, House, Images, LayoutDashboard, MessageCircleQuestion, Tags, Wrench, ShoppingCart } from "lucide-react";
 import { adminNavLinkClass } from "./styles";
 
 const items = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/inventory", label: "Inventory", icon: Boxes },
+  { href: "/admin/orders", label: "Test orders", icon: ShoppingCart },
   { href: "/admin/categories", label: "Categories", icon: Tags },
   { href: "/admin/services", label: "Service records", icon: Wrench },
 ] as const;

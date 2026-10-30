@@ -1,3 +1,5 @@
+import type { ShopSection } from "./catalog";
+
 export type Product = {
   id: string;
   name: string;
@@ -6,11 +8,24 @@ export type Product = {
   condition: string;
   /** Price in INR as listed on the live site. */
   price: number;
+  stock?: number;
   /** Trade-in figures as listed on the live site. Indicative only; confirmed in store. */
   tradeInVoucher: number;
   tradeInCash: number;
   image: { src: string; width: number; height: number };
   featured?: boolean;
+  shopSection?: ShopSection;
+  genre?: string;
+  brand?: string;
+  playModes?: string[];
+  ageRating?: string;
+  releaseYear?: number;
+  format?: string;
+  edition?: string;
+  description?: string;
+  originalPrice?: number;
+  discountPercent?: number;
+  createdAt?: string;
 };
 
 const img = (id: string, ext: "webp", width: number, height: number) => ({

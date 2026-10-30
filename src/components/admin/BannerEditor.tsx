@@ -7,6 +7,7 @@ import { bannerImageRequirements as requirements } from "@/data/banners";
 import type { AdminBanner } from "@/lib/admin/banners";
 import { adminButtonClass, adminFileInputClass, adminGhostButtonClass, adminInputClass, adminLabelClass } from "./styles";
 import { ConfirmSubmit } from "./ConfirmSubmit";
+import { imageLoading } from "@/lib/image-loading";
 
 const initialState: BannerSaveState = {};
 
@@ -53,7 +54,7 @@ export function BannerEditor({ banner, nextPosition = 1, storageConfigured }: { 
           </div>
         </div>
         <div className={`relative isolate overflow-hidden rounded-2xl border border-line-strong bg-[#05070c] text-white ${mobilePreview ? "mx-auto aspect-[5/4] w-full max-w-[15rem]" : "aspect-[16/7]"}`}>
-          {preview ? <Image src={preview} alt="Banner preview" fill unoptimized sizes="(min-width: 1280px) 600px, 100vw" className="object-cover" /> : <p className="absolute inset-0 grid place-items-center px-6 text-center text-sm text-white/60">Choose a banner image to preview it here.</p>}
+          {preview ? <Image src={preview} alt="Banner preview" fill unoptimized sizes="(min-width: 1280px) 600px, 100vw" {...imageLoading("visible")} className="object-cover" /> : <p className="absolute inset-0 grid place-items-center px-6 text-center text-sm text-white/60">Choose a banner image to preview it here.</p>}
           {(headline || description) && (
             <>
               <span aria-hidden className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent" />

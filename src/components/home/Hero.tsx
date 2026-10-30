@@ -7,6 +7,7 @@ import { ControllerButton } from "@/components/ui/ControllerButton";
 import { useMedia } from "@/lib/use-media";
 import { usePageVisible } from "@/lib/use-page-visible";
 import { site } from "@/data/site";
+import { imageLoading } from "@/lib/image-loading";
 
 const d = (s: string) => ({ ["--d" as string]: s });
 
@@ -97,10 +98,12 @@ export function Hero() {
           <p className="anim-rise mt-5 font-display text-[13px] font-medium uppercase tracking-[0.14em] text-muted min-[400px]:text-[15px] sm:text-lg sm:tracking-[0.2em]" style={d("0.98s")}>
             {site.tagline}
           </p>
-          <div className="hero-cta-actions anim-rise mt-8 flex flex-wrap gap-3 sm:gap-4" style={d("1.15s")}>
-            <ControllerButton href="/products" glyph="x" size="lg" className="hero-cta" magnetic>Explore gear</ControllerButton>
-            <ControllerButton href="/game-zone" glyph="o" size="lg" variant="ghost" className="hero-cta" magnetic>Enter game zone</ControllerButton>
-          </div>
+          <nav aria-label="Quick actions" className="hero-cta-actions anim-rise mt-8" style={d("1.15s")}>
+            <ControllerButton href="/products" glyph="x" size="lg" className="hero-cta">Shop</ControllerButton>
+            <ControllerButton href="/exchange" glyph="sq" size="lg" variant="ghost" className="hero-cta">Sell &amp; Exchange</ControllerButton>
+            <ControllerButton href="/repair-service" glyph="tri" size="lg" variant="ghost" className="hero-cta">Repairs</ControllerButton>
+            <ControllerButton href="/game-zone" glyph="o" size="lg" variant="ghost" className="hero-cta">Game Zone</ControllerButton>
+          </nav>
           <ul className="anim-rise mt-9 hidden flex-wrap gap-x-7 gap-y-2 text-sm text-muted sm:flex" style={d("1.35s")}>
             <li><span className="font-display font-semibold text-ink">2</span> branches</li>
             <li>Repairs in <span className="font-display font-semibold text-ink">{site.repairTurnaround}</span></li>
@@ -144,8 +147,8 @@ export function Hero() {
                     src="/hero/gamexchange-hardware-stage.png"
                     alt="Gaming console, controller, VR headset and handheld system on an illuminated display platform"
                     fill
-                    priority
-                    sizes="(min-width: 1280px) 680px, (min-width: 1024px) 54vw, (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)"
+                    {...imageLoading("critical")}
+                    sizes="(min-width: 1536px) 880px, (min-width: 1280px) 680px, (min-width: 1024px) 54vw, (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)"
                     className="hero-product-art object-contain"
                   />
                 </div>

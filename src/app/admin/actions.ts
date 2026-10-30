@@ -16,25 +16,43 @@ import { inventoryStatuses, serviceStatuses } from "@/lib/admin/types";
 import { InventoryImageError, removeInventoryImage, uploadInventoryImage } from "@/lib/admin/inventory-images";
 import { formFile, formText, formTextFields } from "@/lib/admin/form-data";
 import { refreshAdminData } from "@/lib/admin/revalidate";
+import { normalizePlatform, playModeChoices } from "@/data/catalog";
+import { discountedPrice } from "@/lib/pricing";
 
 const requiredText = z.string().trim().min(1).max(160);
-const money = z.coerce.number().int().min(0).max(10_000_000);
+const money = z.coerce.number<string>().int().min(0).max(10_000_000);
 const count = z.coerce.number().int().min(0).max(100_000);
 
-const inventoryCreateSchema = z.object({
+const inventoryFieldsSchema = z.object({
   sku: requiredText.transform((value) => value.toUpperCase()),
   name: requiredText,
-  platform: requiredText,
+  platform: requiredText.transform(normalizePlatform),
+  shopSection: z.enum(["games", "consoles", "accessories"]),
+  genre: z.string().trim().max(80),
+  brand: z.string().trim().max(80),
+  playModes: z.array(z.enum(playModeChoices)).max(playModeChoices.length).transform((modes) => [...new Set(modes)]),
+  ageRating: z.string().trim().max(40),
+  releaseYear: z.coerce.number().int().refine((year) => year === 0 || (year >= 1970 && year <= 2100)),
+  format: z.enum(["", "Disc", "Cartridge"]),
+  edition: z.string().trim().max(80),
+  description: z.string().trim().max(1000),
+  basePrice: z.string().trim().min(1).pipe(money),
+  discountPercent: z.coerce.number().min(0).max(100),
   categoryId: z.string().regex(/^[a-zA-Z0-9-]{1,128}$/),
   condition: requiredText,
   stock: count,
-  price: money,
   featured: z.boolean(),
   status: z.enum(inventoryStatuses),
 });
 
 const documentId = z.string().trim().min(1).max(128).refine((id) => !id.includes("/"));
-const inventoryUpdateSchema = inventoryCreateSchema.extend({ id: documentId });
+const validPricing = (item: { basePrice: number; discountPercent: number }) => item.discountPercent === 0 || discountedPrice(item.basePrice, item.discountPercent) < item.basePrice;
+function sellingPrice<T extends { basePrice: number; discountPercent: number }>(input: T) {
+  const { basePrice, ...fields } = input;
+  return { ...fields, price: discountedPrice(basePrice, input.discountPercent), originalPrice: input.discountPercent > 0 ? basePrice : 0 };
+}
+const inventoryCreateSchema = inventoryFieldsSchema.refine(validPricing, { message: "Discount must reduce the selling price.", path: ["discountPercent"] }).transform(sellingPrice);
+const inventoryUpdateSchema = inventoryFieldsSchema.extend({ id: documentId }).refine(validPricing, { path: ["discountPercent"] }).transform(sellingPrice);
 
 const serviceCreateSchema = z.object({
   customerName: requiredText,
@@ -55,7 +73,8 @@ const serviceUpdateSchema = z.object({
 
 function inventoryFields(formData: FormData) {
   return {
-    ...formTextFields(formData, ["sku", "name", "platform", "categoryId", "condition", "stock", "price", "status"]),
+    ...formTextFields(formData, ["sku", "name", "platform", "categoryId", "condition", "stock", "basePrice", "discountPercent", "status", "shopSection", "genre", "format", "edition", "description", "brand", "ageRating", "releaseYear"]),
+    playModes: formData.getAll("playModes").map(String),
     featured: formData.get("featured") === "on",
   };
 }

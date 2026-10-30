@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { BOOT_SCREEN_KEY } from "@/lib/boot-screen";
+import { imageLoading } from "@/lib/image-loading";
 
 type Phase = "booting" | "leaving" | "hidden";
 
@@ -99,14 +100,14 @@ export function BootScreen() {
         <div className="boot-reactor" aria-hidden>
           <span className="boot-reactor-ring" />
           <span className="boot-reactor-ring boot-reactor-ring-inner" />
-          <Image src="/brand/gamexchange-mark.png" alt="" width={256} height={256} priority className="boot-mark" />
+          <Image src="/brand/gamexchange-mark.png" alt="" width={256} height={256} {...imageLoading("visible")} className="boot-mark" />
         </div>
         <Image
           src="/brand/gamexchange-logo-900.png"
           alt="GamexChange"
           width={900}
           height={368}
-          priority
+          {...imageLoading("visible")}
           className="boot-wordmark"
         />
 

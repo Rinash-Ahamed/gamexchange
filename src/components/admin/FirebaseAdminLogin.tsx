@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { firebaseClientAuth, firebaseClientConfigured } from "@/lib/firebase/client";
 import { adminButtonClass, adminGhostButtonClass, adminInputClass, adminLabelClass } from "./styles";
+import { imageLoading } from "@/lib/image-loading";
 
 async function serverIdentity(user: User, checkOnly = false) {
   const response = await fetch("/api/admin/session", {
@@ -169,7 +170,7 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
               {stage === "enroll" && secret ? (
                 <div className="space-y-3 text-sm text-muted">
                   <p>Scan this QR code with Google Authenticator, Microsoft Authenticator or another TOTP app.</p>
-                  {qr && <Image src={qr} alt="Scan to connect your admin authenticator" width={240} height={240} unoptimized className="mx-auto h-auto max-w-full rounded-xl" />}
+                  {qr && <Image src={qr} alt="Scan to connect your admin authenticator" width={240} height={240} unoptimized {...imageLoading("visible")} className="mx-auto h-auto max-w-full rounded-xl" />}
                   <p>Or enter this setup key manually:</p>
                   <code className="block select-all break-all rounded-xl border border-line bg-surface p-3 text-ink">{secret.secretKey}</code>
                   <p>Keep this key private. Enter the current six-digit code below to finish setup.</p>

@@ -18,6 +18,6 @@ export const faqs = [
   },
   {
     "q": "Do pre-owned products come with a warranty?",
-    "a": "GamexChange offers a 7-day return policy for pre-owned games with eligible product issues, subject to our Cancellation, Return and Refund Policy.\n\nSelected pre-owned hardware, including consoles, accessories, PC components and assembled PCs, may include a 30-day (one-month) warranty from delivery, as specified in the product listing or warranty documentation. Coverage is not automatic for every product.\n\nReview the applicable return and warranty terms before purchasing. For assistance, email support@gamexchange.co.in or call +91 77088 45461."
+    "a": "GamexChange offers a 7-day return policy for pre-owned games with eligible product issues, subject to our Cancellation, Return and Refund Policy.\n\nSelected pre-owned hardware, including consoles and accessories, may include a 30-day (one-month) warranty from delivery, as specified in the product listing or warranty documentation. Coverage is not automatic for every product.\n\nReview the applicable return and warranty terms before purchasing. For assistance, email support@gamexchange.co.in or call +91 77088 45461."
   }
 ] as const;

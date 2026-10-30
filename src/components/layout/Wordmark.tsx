@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { imageLoading } from "@/lib/image-loading";
 
 /** The official GameXChange logo. Its cyan/magenta read on both themes, so one asset serves both. */
 export function Wordmark({ className = "" }: { className?: string }) {
@@ -10,7 +11,7 @@ export function Wordmark({ className = "" }: { className?: string }) {
         alt=""
         width={360}
         height={147}
-        priority
+        {...imageLoading("visible")}
         unoptimized
         className="h-8 w-auto transition-transform duration-300 group-hover:scale-[1.04] sm:h-9"
       />

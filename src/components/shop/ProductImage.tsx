@@ -4,9 +4,10 @@ import Image from "next/image";
 import { useState } from "react";
 import { Gamepad2 } from "lucide-react";
 import type { Product } from "@/data/products";
+import { imageLoading } from "@/lib/image-loading";
 
 /** Product photo from the client's own CDN, with an on-brand fallback if it can't load. */
-export function ProductImage({ product, priority = false, sizes }: { product: Product; priority?: boolean; sizes: string }) {
+export function ProductImage({ product, priority = false, eager = false, sizes, presentation = "stage" }: { product: Product; priority?: boolean; eager?: boolean; sizes: string; presentation?: "stage" | "catalog" }) {
   const [failed, setFailed] = useState(false);
 
   if (failed) {
@@ -27,10 +28,10 @@ export function ProductImage({ product, priority = false, sizes }: { product: Pr
       width={product.image.width}
       height={product.image.height}
       sizes={sizes}
-      priority={priority}
+      {...imageLoading(priority ? "critical" : eager ? "visible" : "deferred")}
       onError={() => setFailed(true)}
       quality={85}
-      className="themed-img size-full object-contain [filter:drop-shadow(0_26px_26px_var(--prod-shadow))] transition-transform duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-[1.04]"
+      className={presentation === "catalog" ? "size-full object-contain" : "themed-img size-full object-contain [filter:drop-shadow(0_26px_26px_var(--prod-shadow))] transition-transform duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-[1.04]"}
     />
   );
 }

@@ -2,6 +2,8 @@
 
 Status: Unapproved. Prepared 30 October 2026. Not published to the public website.
 
+Implementation update for reviewers: a browser-local cart now stores product IDs and quantities. Optional Razorpay test checkout loads the provider's hosted checkout script on the configured cart page and saves product/amount snapshots plus order/payment references in Firestore. Use dummy contact/payment details for testing. The provider may process technical request and checkout/contact information under its own policies. The app does not store card numbers or security codes. The body and protected preview below predate this integration and must both be revised and approved before any live payments or privacy-policy publication. See `RAZORPAY_SETUP.md` for the implemented data flow and limits.
+
 The supplied Word document does not include a privacy policy. This draft combines verified website data flows with proposed retention and support wording that the business must approve. It is not a legal compliance certification.
 
 ## Confirm before publication

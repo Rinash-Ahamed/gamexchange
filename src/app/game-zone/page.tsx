@@ -24,7 +24,7 @@ export default function GameZonePage() {
         <SectionHeading title={<span id="price-h">Pick your <span className="text-gradient">station.</span></span>}>
           Hourly package prices for one, two or three players. Check availability with the team before you visit.
         </SectionHeading>
-        <div className="mt-8"><GameZoneCards /></div>
+        <div className="mt-8"><GameZoneCards aboveFold /></div>
       </section>
 
       <SectionGate from="Pricing" to="Enquire" level={1} />

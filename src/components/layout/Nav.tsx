@@ -9,6 +9,7 @@ import { navItems, whatsappUrl, type NavItem } from "@/data/site";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { Wordmark } from "./Wordmark";
+import { CartLink } from "@/components/cart/CartLink";
 
 const icons: Record<NavItem["icon"], LucideIcon> = {
   home: House,
@@ -52,6 +53,7 @@ export function Nav() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <CartLink />
             <div className="hidden xl:block">
               <ControllerButton href={whatsappUrl("Hi GamexChange, I have an enquiry.")} external glyph="x" size="sm">
                 WhatsApp

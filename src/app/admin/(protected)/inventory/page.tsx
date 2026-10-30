@@ -4,11 +4,12 @@ import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
 import { InventoryFields } from "@/components/admin/InventoryFields";
 import { InventoryFilters } from "@/components/admin/InventoryFilters";
 import { adminButtonClass, adminGhostButtonClass } from "@/components/admin/styles";
-import { formatINR } from "@/data/products";
 import { listInventory, listInventoryCategories } from "@/lib/admin/db";
 import { requireAdmin } from "@/lib/admin/auth";
 import { formatAdminDate, titleCaseStatus } from "@/lib/admin/format";
 import { inventoryStatuses } from "@/lib/admin/types";
+import { ProductPrice } from "@/components/shop/ProductPrice";
+import { ConditionBadge } from "@/components/shop/ConditionBadge";
 import { filterInventory, groupInventory, queryValue, stockFilters, type InventoryFilters as Filters, type InventorySearchParams } from "@/lib/admin/inventory-filters";
 import { createInventoryAction, deleteInventoryAction, updateInventoryAction } from "../../actions";
 
@@ -16,7 +17,7 @@ export const metadata: Metadata = { title: "Inventory management", robots: { ind
 
 const notices: Record<string, string> = { created: "Inventory item created.", updated: "Inventory item updated.", deleted: "Inventory item deleted." };
 const errors: Record<string, string> = {
-  invalid: "Check the submitted values and try again.", duplicate: "That SKU is already in use.",
+  invalid: "Check the submitted values. Enter a whole-rupee price and a discount from 0 to 100%. A discount must reduce the final price by at least one rupee.", duplicate: "That SKU is already in use.",
   category: "That category has changed or been deleted. Reopen the form and select an available category.",
   image: "Choose a static JPG, PNG or WebP under 5 MB, between 300 and 4096 pixels on each side.",
   storage: "Image upload failed. Check the Firebase Storage bucket and server permissions, then try again.",
@@ -74,7 +75,8 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
                         <p className="mt-1 text-xs text-muted">{item.platform} · {item.condition} · Updated {formatAdminDate(item.updatedAt)}</p>
                       </div>
                       <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                        <p className="font-display text-lg font-bold tabular-nums">{formatINR(item.price)}</p>
+                        <ProductPrice product={item} className="text-lg" />
+                        <ConditionBadge condition={item.condition} />
                         <p className="text-sm text-muted">Stock: <strong className="text-ink">{item.stock}</strong></p>
                         <span className="rounded-full border border-line-strong bg-surface px-3 py-1 text-xs font-semibold">{titleCaseStatus(item.status)}</span>
                         <ConfirmSubmit submitAction={deleteInventoryAction} title="Delete inventory item?" message={`Delete ${item.name} (${item.sku}) from inventory and the public shop? This cannot be undone.`}>

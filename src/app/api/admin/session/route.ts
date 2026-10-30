@@ -3,6 +3,7 @@ import { z } from "zod";
 import { AdminAccessError, adminAuthConfigured, checkAdminIdentity, createAdminSession } from "@/lib/admin/auth";
 import { clientKey, isSameOrigin } from "@/lib/security";
 import { rateLimit } from "@/lib/rate-limit";
+import { readLimitedText, RequestBodyError } from "@/lib/request-body";
 
 export const runtime = "nodejs";
 
@@ -12,12 +13,12 @@ const json = (body: object, status = 200) => NextResponse.json(body, { status, h
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) return json({ error: "Request not allowed." }, 403);
   const limit = rateLimit(`admin-session:${clientKey(request)}`, 20, 15 * 60 * 1000);
-  if (!limit.ok) return json({ error: "Too many attempts. Please try again later." }, 429);
+  if (!limit.ok) return NextResponse.json({ error: "Too many attempts. Please try again later." }, { status: 429, headers: { "Cache-Control": "no-store", "Retry-After": String(limit.retryAfter) } });
   if (!adminAuthConfigured()) return json({ error: "Admin authentication is not configured. Contact the site owner." }, 503);
   if (Number(request.headers.get("content-length")) > 20000) return json({ error: "Request too large." }, 413);
   let parsed;
-  try { parsed = bodySchema.safeParse(await request.json()); }
-  catch { return json({ error: "Invalid request." }, 400); }
+  try { parsed = bodySchema.safeParse(JSON.parse(await readLimitedText(request, 20000))); }
+  catch (error) { return json({ error: error instanceof RequestBodyError ? error.message : "Invalid request." }, error instanceof RequestBodyError ? error.status : 400); }
   if (!parsed.success) return json({ error: "Invalid request." }, 400);
   try {
     if (parsed.data.checkOnly) return json({ ok: true, ...await checkAdminIdentity(parsed.data.idToken) });

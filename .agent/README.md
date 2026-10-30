@@ -5,6 +5,8 @@
 - [Session context and current work](SESSION.md): read first when continuing development.
 - [Firebase setup](FIREBASE_SETUP.md): authentication, database, Storage and upload requirements.
 - [Performance audit](PERFORMANCE_AUDIT.md): applied optimizations, verification limits and follow-up measurements.
+- [Architecture review](ARCHITECTURE_REVIEW.md): minor fixes, build health gate and major production decisions.
+- [Cart and Razorpay test setup](RAZORPAY_SETUP.md): test keys, webhook configuration, verification and live-payment limits.
 - [Privacy policy draft](PRIVACY_POLICY_DRAFT.md): proposed wording and business/legal checks required before publication.
 
 These documents live in `.agent/`. Source paths and commands below are relative to the repository root, not this directory. The root [AGENTS.md](../AGENTS.md) directs coding agents here.
@@ -16,6 +18,7 @@ Next.js 16 (App Router) · React 19 · TypeScript strict · Tailwind 4 · Motion
 npm install
 npm run dev          # http://localhost:3000
 npm run typecheck && npm run lint && npm run build
+npm run healthcheck  # repeat API checks against the existing production build
 npx playwright install chromium && npm run test:e2e
 ```
 
@@ -26,6 +29,14 @@ The protected admin area is available at `/admin/login`. It manages live storefr
 Use `/admin/categories` to add or rename shop categories and delete unused ones. Inventory uses a required category dropdown. Existing category names are imported automatically; renames follow linked products. Categories with products cannot be deleted until those products are reassigned. Public shop filters include only categories with active, in-stock products.
 
 In `/admin/inventory`, search by product name or SKU and combine category, platform, status and stock filters. Select **Apply filters** to update the list or **Clear filters** to reset it. Filter selections are stored in the page URL; saving or deleting a product returns to the unfiltered list.
+
+The public shop groups stock into Games, Consoles and Accessories, with platform chips, search and price/condition/category/game-detail filters. Admin inventory includes the matching shop section, optional genre/format/edition/details and genuine-discount pricing fields. Existing Firebase image uploads support uncropped portrait covers and hardware photos. PC components are not a public shop offering. See the shop browsing section of `FIREBASE_SETUP.md` for legacy-data behaviour.
+
+Shop browsing uses numbered pagination with 20 products per page, Previous/Next, first/last page links, bounded ellipses and exact result ranges. Filter/sort changes reset page 1; page changes retain filters and return focus/scroll to the results, respecting reduced motion. Pagination currently limits rendered cards, not the underlying Firestore query or catalogue payload; cursor-based backend pagination remains a separate scalability follow-up. Page/filter state is client-local, not stored in the URL.
+
+The consumer sidebar keeps sort, price inputs/sliders, condition, platforms and discounted-only choices. Categories appear when there are multiple subcategories, hardware brand when supplied, and game genre/format/player modes/age rating/release year only when stocked products provide the data. Edition/model remains searchable and visible on cards but is not a separate default filter. The minimum-discount dropdown was removed as redundant clutter; biggest-discount sorting remains. Optional inventory metadata is preserved. Selected facets remain removable even with no matching products. No fake stock, gameplay-hour guesses, preorder or PC-component offerings are added.
+
+Visitors can collect multiple products at `/cart`, change quantities and send one combined WhatsApp enquiry. Razorpay checkout is test-only and needs the three server environment values in `RAZORPAY_SETUP.md`. Admin > Test orders shows sandbox records. Live keys are blocked; simulated orders do not change stock or create deliveries.
 
 Homepage promotions are managed at `/admin/banners`. Set `FIREBASE_STORAGE_BUCKET` for image uploads. Admins can preview, reorder, save drafts, publish up to five slides and replace or delete images. Upload requirements are shown in the editor. See the banner upload section of `FIREBASE_SETUP.md` for Storage setup and artwork sizes.
 
@@ -86,5 +97,9 @@ Shared implementation helpers:
 - Logo: `public/brand/` (full logo + mark). Icons: `public/icons/` (16–512 px, maskable 192/512), `src/app/icon.png`, `apple-icon.png`, `favicon.ico`, and `src/app/manifest.ts`.
 
 ## Checks
+
+Image loading is explicit through `src/lib/image-loading.ts`: critical = eager/high fetch priority, visible = eager, deferred = lazy. Choose by layout role, not client-only viewport branches during hydration. ESLint requires this policy on imported Next Image elements and disallows competing loading/priority/preload overrides. The primary hero and first shop product are critical, likely above-fold rows are eager, and lower content remains deferred. Banner slides are eager whenever mounted: the first is present in server HTML; remaining slides mount near the banner. Do not eagerly mount every below-fold image just to silence a warning. Existing page regression checks now include LCP/priority-loading console warnings; `tests/e2e/image-loading.spec.ts` covers the policy and banner transitions. Browser checks are still needed after layout or artwork changes because the actual LCP candidate depends on the viewport and content.
+
+Use `npm run build` in CI/hosting. Its postbuild step starts an isolated loopback production server and runs 12 non-mutating API smoke checks, including checkout guards. A health-check failure fails the command. `/api/health` reports process liveness only, not Firebase/Auth/Storage/Razorpay connectivity. Direct `next build` does not run npm lifecycle hooks. See `ARCHITECTURE_REVIEW.md` and `RAZORPAY_SETUP.md` for scope and limits.
 
 `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:e2e` (set `PW_CHROMIUM_PATH` to use a system Chromium). Specs: site, theme, cta, security, a11y (axe).

@@ -5,17 +5,25 @@ import { ProductBrowser } from "@/components/shop/ProductBrowser";
 import { site } from "@/data/site";
 import { listPublicProducts } from "@/lib/admin/db";
 import { serializeJsonLd } from "@/lib/structured-data";
+import { normalizePlatform, shopSections } from "@/data/catalog";
+import { availableCatalog, type CatalogFilters } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Shop consoles & gaming gear",
-  description: "Pre-owned PlayStation consoles with listed prices and trade-in figures. Enquire on WhatsApp to confirm availability.",
+  description: "Browse available games, consoles, controllers and accessories. Filter by platform, condition and price, then enquire with GamexChange.",
   alternates: { canonical: "/products" },
 };
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductsPage() {
-  const products = await listPublicProducts();
+export default async function ProductsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const [stock, query] = await Promise.all([listPublicProducts(), searchParams]);
+  const products = availableCatalog(stock);
+  const value = (key: string) => { const entry = query[key]; return (Array.isArray(entry) ? entry[0] ?? "" : entry ?? "").trim(); };
+  const section = shopSections.find((entry) => entry.id === value("section"))?.id ?? "all";
+  const category = products.find((product) => product.category.toLowerCase() === value("category").toLowerCase())?.category;
+  const platform = products.find((product) => normalizePlatform(product.platform) === normalizePlatform(value("platform")))?.platform;
+  const initialFilters: Partial<CatalogFilters> = { section, q: value("q").slice(0, 160), categories: category ? [category] : [], platforms: platform ? [normalizePlatform(platform)] : [] };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -26,7 +34,7 @@ export default async function ProductsPage() {
         "@type": "Product",
         name: p.name,
         image: p.image.src,
-        itemCondition: "https://schema.org/UsedCondition",
+        itemCondition: /pre.?owned/i.test(p.condition) ? "https://schema.org/UsedCondition" : /refurbished/i.test(p.condition) ? "https://schema.org/RefurbishedCondition" : /new/i.test(p.condition) ? "https://schema.org/NewCondition" : undefined,
         offers: { "@type": "Offer", priceCurrency: "INR", price: p.price, seller: { "@type": "Organization", name: site.name } },
       },
     })),
@@ -35,9 +43,9 @@ export default async function ProductsPage() {
   return (
     <main>
       <PageHero title={<>Choose<br /><span className="text-gradient">your gear.</span></>}>
-        Pre-owned consoles from our shelf. Prices are as listed on our current site. Message the shop to confirm what’s available today.
+        Games, consoles and accessories, organised around the way you play. Find your platform, refine your options and ask us about the gear you want.
       </PageHero>
-      <div className="mx-auto max-w-7xl px-5 sm:px-8"><ProductBrowser products={products} /></div>
+      <div className="mx-auto max-w-[90rem] px-5 sm:px-8"><ProductBrowser key={JSON.stringify(initialFilters)} products={products} initialFilters={initialFilters} /></div>
       <Script
         id="gamexchange-products-jsonld"
         type="application/ld+json"

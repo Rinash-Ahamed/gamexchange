@@ -5,7 +5,7 @@ const ORIGIN = `http://localhost:${process.env.PW_PORT ?? 4173}`;
 let n = 0;
 const phone = () => "9" + String(Math.floor(Math.random() * 1e9)).padStart(9, "0");
 const ip = () => `203.0.113.${(++n % 250) + 1}`;
-const good = { kind: "contact", name: "Test User", phone: "9876543210", contactMethod: "WhatsApp", message: "Is the PS5 still available?", branch: "No preference" };
+const good = { kind: "contact", contactTopic: "General enquiry", name: "Test User", phone: "9876543210", contactMethod: "WhatsApp", message: "Is the PS5 still available?", branch: "No preference" };
 
 async function token(request: APIRequestContext, xff: string, wait = true) {
   const r = await request.get("/api/enquiry/token", { headers: { "x-forwarded-for": xff, origin: ORIGIN } });

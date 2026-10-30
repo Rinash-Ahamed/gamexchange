@@ -5,6 +5,7 @@ import { buildEnquiryMessage } from "@/lib/enquiry-message";
 import { rateLimit } from "@/lib/rate-limit";
 import { clientKey, isSameOrigin, verifyToken } from "@/lib/security";
 import { whatsappUrl } from "@/data/site";
+import { readLimitedText, RequestBodyError } from "@/lib/request-body";
 
 export const runtime = "nodejs";
 
@@ -25,13 +26,11 @@ export async function POST(req: NextRequest) {
   if (!perIp.ok) return fail("Too many enquiries. Please wait a few minutes and try again.", 429, {}, { "Retry-After": String(perIp.retryAfter) });
   if (!rateLimit("enquiry:global", 300, 10 * 60 * 1000).ok) return fail("We’re busy right now. Please try again shortly.", 429, {}, { "Retry-After": "120" });
 
-  const raw = await req.text();
-  if (raw.length > MAX_BODY_BYTES) return fail("Enquiry is too large.", 413);
-
   let json: unknown;
   try {
-    json = JSON.parse(raw);
-  } catch {
+    json = JSON.parse(await readLimitedText(req, MAX_BODY_BYTES));
+  } catch (error) {
+    if (error instanceof RequestBodyError && error.status === 413) return fail("Enquiry is too large.", 413);
     return fail("Invalid request.", 400);
   }
   if (typeof json !== "object" || json === null || Array.isArray(json)) return fail("Invalid request.", 400);
@@ -47,7 +46,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return fail("Please fix the highlighted fields.", 400, { fieldErrors: z.flattenError(parsed.error).fieldErrors });
 
   // Honeypot: people never see this field. Answer like success so bots learn nothing.
-  if (parsed.data.website) return NextResponse.json({ ok: true, whatsappUrl: whatsappUrl() });
+  if (parsed.data.website) return NextResponse.json({ ok: true, whatsappUrl: whatsappUrl() }, { headers: { "Cache-Control": "no-store" } });
 
   // One phone number can't flood the shop even from many IPs.
   if (!rateLimit(`phone:${parsed.data.phone}`, 3, 60 * 60 * 1000).ok) {

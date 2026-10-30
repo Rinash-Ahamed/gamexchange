@@ -13,6 +13,7 @@ const notices: Record<string, string> = {
   created: "Category added. You can now select it in inventory.", renamed: "Category renamed across inventory and the shop.", deleted: "Category deleted.",
 };
 const errors: Record<string, string> = {
+  "category-unsupported": "PC components are not sold here. Use a category for games, consoles or accessories.",
   invalid: "Enter a category name between 1 and 160 characters.",
   "category-missing": "This category is no longer available. Refresh and try again.",
   "category-duplicate": "That name is already used by another category or its existing products. Choose a different name.",

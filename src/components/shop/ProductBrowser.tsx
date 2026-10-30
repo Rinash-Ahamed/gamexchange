@@ -1,102 +1,84 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
-import { AnimatePresence, m } from "motion/react";
-import { ProductCard } from "./ProductCard";
-import { Glyph, glyphTint, type GlyphName } from "@/components/ui/Glyph";
+import { useId, useMemo, useRef, useState } from "react";
+import { Gamepad2, Headphones, Layers, Search, SlidersHorizontal, X } from "lucide-react";
+import { productSection, shopSections } from "@/data/catalog";
 import type { Product } from "@/data/products";
-import { ControllerButton } from "@/components/ui/ControllerButton";
 import { whatsappUrl } from "@/data/site";
+import { availableCatalog, catalogFacetKeys, consumerCatalogFacets, emptyCatalogFilters, filterCatalog, type CatalogFilters as Filters } from "@/lib/catalog";
+import { paginate } from "@/lib/pagination";
+import { CatalogCard } from "./CatalogCard";
+import { CatalogFilters } from "./CatalogFilters";
+import { CatalogPagination } from "./CatalogPagination";
 
-type Category = string;
+const icons = { games: Gamepad2, consoles: Layers, accessories: Headphones };
 
-const sorts = {
-  featured: "Featured",
-  "price-asc": "Price: low to high",
-  "price-desc": "Price: high to low",
-  name: "Name A–Z",
-} as const;
-type SortKey = keyof typeof sorts;
+export function ProductBrowser({ products, initialFilters = {} }: { products: readonly Product[]; initialFilters?: Partial<Filters> }) {
+  const [filters, setFilters] = useState<Filters>({ ...emptyCatalogFilters, ...initialFilters });
+  const [mobileFilters, setMobileFilters] = useState(false);
+  const [page, setPage] = useState(1);
+  const results = useRef<HTMLDivElement>(null);
+  const panelId = useId();
+  const catalog = useMemo(() => availableCatalog(products), [products]);
+  const scoped = useMemo(() => catalog.filter((product) => filters.section === "all" || productSection(product) === filters.section), [catalog, filters.section]);
+  const visible = useMemo(() => filterCatalog(catalog, filters), [catalog, filters]);
+  const groups = useMemo(() => consumerCatalogFacets(catalog, filters), [catalog, filters]);
+  const pagination = paginate(visible, page);
+  const platforms = groups.find((group) => group.key === "platforms")?.options ?? [];
+  const priceCeiling = scoped.reduce((maximum, product) => Math.max(maximum, product.price), 1);
+  const update = (next: Partial<Filters>) => { setFilters((current) => ({ ...current, ...next })); setPage(1); };
+  const clear = () => { setFilters({ ...emptyCatalogFilters }); setPage(1); };
+  const goToPage = (next: number) => {
+    if (next === pagination.page || next < 1 || next > pagination.pageCount) return;
+    setPage(next);
+    requestAnimationFrame(() => {
+      results.current?.focus({ preventScroll: true });
+      results.current?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    });
+  };
+  const chips = catalogFacetKeys.flatMap((key) => filters[key].map((value) => ({ key, value })));
 
-const categoryGlyphs: readonly GlyphName[] = ["o", "tri", "sq", "x"];
+  return <div className="pb-12">
+    <nav aria-label="Shop departments" className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+      <button type="button" aria-pressed={filters.section === "all"} onClick={() => update({ ...emptyCatalogFilters })} className={`min-h-14 rounded-2xl border px-3 text-left font-display text-sm font-semibold transition-colors ${filters.section === "all" ? "border-transparent bg-gradient-to-br from-fill to-fill-2 text-accent-ink" : "border-line-strong bg-surface text-ink hover:border-blue"}`}>All gear<span className="ml-2 text-xs opacity-70">{catalog.length}</span></button>
+      {shopSections.map((section) => {
+        const Icon = icons[section.id];
+        const count = catalog.filter((product) => productSection(product) === section.id).length;
+        return <button key={section.id} type="button" aria-pressed={filters.section === section.id} onClick={() => update({ ...emptyCatalogFilters, section: section.id, q: filters.q, sort: filters.sort })} className={`flex min-h-14 items-center gap-2 rounded-2xl border px-3 text-left font-display text-sm font-semibold transition-colors ${filters.section === section.id ? "border-transparent bg-gradient-to-br from-fill to-fill-2 text-accent-ink" : "border-line-strong bg-surface text-ink hover:border-blue"}`}><Icon className="size-4 shrink-0" aria-hidden /><span>{section.label}</span><span className="ml-auto text-xs opacity-70">{count}</span></button>;
+      })}
+    </nav>
 
-const sorters: Record<SortKey, (a: Product, b: Product) => number> = {
-  featured: (a, b) => Number(b.featured ?? false) - Number(a.featured ?? false),
-  "price-asc": (a, b) => a.price - b.price,
-  "price-desc": (a, b) => b.price - a.price,
-  name: (a, b) => a.name.localeCompare(b.name),
-};
+    <div className="mt-5 flex flex-wrap items-center gap-3">
+      <label className="relative block min-w-0 flex-1 basis-72"><span className="sr-only">Search the shop</span><Search className="pointer-events-none absolute left-3 top-3 size-5 text-muted" aria-hidden /><input type="search" value={filters.q} onChange={(event) => update({ q: event.target.value })} maxLength={160} placeholder="Search games, consoles and accessories" className="min-h-11 w-full rounded-xl border border-line-strong bg-surface pl-11 pr-3 text-base text-ink sm:text-sm" /></label>
+      <a href="/exchange" className="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-4 font-display text-xs font-semibold text-accent-text hover:border-blue">Sell or exchange your gear</a>
+    </div>
 
-export function ProductBrowser({ products }: { products: readonly Product[] }) {
-  const [category, setCategory] = useState<Category>("All");
-  const [sort, setSort] = useState<SortKey>("featured");
-  const sortId = useId();
-  const categories = useMemo(() => ["All", ...new Set(products.map((product) => product.category))], [products]);
+    <div role="group" aria-label="Filter by platform" className="mt-4 flex flex-wrap gap-2">
+      <button type="button" aria-pressed={!filters.platforms.length} onClick={() => update({ platforms: [] })} className={`min-h-11 rounded-full border px-4 text-xs font-semibold ${!filters.platforms.length ? "border-blue bg-fill/10 text-accent-text" : "border-line bg-surface text-muted"}`}>All</button>
+      {platforms.map(({ value: platform, count }) => {
+        const checked = filters.platforms.includes(platform);
+        return <button key={platform} type="button" aria-pressed={checked} disabled={!count && !checked} onClick={() => update({ platforms: checked ? filters.platforms.filter((value) => value !== platform) : [...filters.platforms, platform] })} className={`min-h-11 rounded-full border px-4 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${checked ? "border-blue bg-fill/10 text-accent-text" : "border-line bg-surface text-muted hover:border-blue hover:text-ink"}`}>{platform}<span aria-hidden className="ml-1.5 opacity-65">{count}</span></button>;
+      })}
+    </div>
 
-  const visible = useMemo(
-    () => products.filter((p) => category === "All" || p.category === category).toSorted(sorters[sort]),
-    [category, products, sort],
-  );
-
-  return (
-    <div>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div role="radiogroup" aria-label="Filter by category" className="flex flex-wrap gap-2">
-          {categories.map((item, categoryIndex) => {
-            const selected = item === category;
-            const glyph = item === "All" ? "x" : (categoryGlyphs[(categoryIndex - 1) % categoryGlyphs.length] ?? "sq");
-            return (
-              <button
-                key={item}
-                type="button"
-                role="radio"
-                aria-checked={selected}
-                onClick={() => setCategory(item)}
-                className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-display text-xs font-semibold uppercase tracking-[0.16em] transition-all duration-200 touch-manipulation active:scale-95 ${selected ? "border-transparent bg-gradient-to-b from-fill to-fill-2 text-accent-ink" : "glass text-muted hover:text-ink"}`}
-              >
-                <span style={{ color: selected ? undefined : glyphTint[glyph] }}><Glyph name={glyph} className="size-3.5" /></span>
-                {item}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <label htmlFor={sortId} className="text-sm text-muted">Sort</label>
-          <select
-            id={sortId}
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortKey)}
-            className="min-h-11 rounded-full border border-line-strong bg-surface px-4 text-sm text-ink"
-          >
-            {Object.entries(sorts).map(([k, label]) => <option key={k} value={k}>{label}</option>)}
-          </select>
-        </div>
-      </div>
-
-      <p role="status" className="mt-5 text-sm text-muted">
-        Showing {visible.length} {visible.length === 1 ? "product" : "products"}
-      </p>
-
-      <m.ul layout className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <AnimatePresence mode="popLayout">
-          {visible.map((p, i) => (
-            <m.li key={p.id} layout initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.3 }}>
-              <ProductCard product={p} index={i} total={visible.length} priority={i === 0} />
-            </m.li>
-          ))}
-        </AnimatePresence>
-      </m.ul>
-
-      {!visible.length && <p className="mt-6 rounded-2xl border border-dashed border-line-strong p-10 text-center text-muted">No products are currently available in this category.</p>}
-
-      <div className="metal mt-8 flex flex-wrap items-center justify-between gap-4 rounded-3xl p-6">
-        <div>
-          <h2 className="font-display text-2xl font-bold uppercase">Looking for games, controllers or accessories?</h2>
-          <p className="mt-1 max-w-xl text-muted">Stock changes often. Ask the shop and we’ll tell you what’s on the shelf today.</p>
-        </div>
-        <ControllerButton href={whatsappUrl("Hi GamexChange, what games, controllers and accessories do you have in stock?")} external glyph="tri">Ask on WhatsApp</ControllerButton>
+    <div className="mt-6 grid items-start gap-5 lg:grid-cols-[15rem_minmax(0,1fr)]">
+      <aside className="min-w-0 lg:sticky lg:top-24">
+        <button type="button" aria-expanded={mobileFilters} aria-controls={panelId} onClick={() => setMobileFilters((open) => !open)} className="mb-3 inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-strong bg-surface px-4 text-sm font-semibold lg:hidden"><SlidersHorizontal className="size-4" aria-hidden />{mobileFilters ? "Hide filters" : "Filters and sorting"}</button>
+        <div id={panelId} data-native-scroll className={`${mobileFilters ? "block" : "hidden lg:block"} lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto`}><CatalogFilters filters={filters} groups={groups} priceCeiling={priceCeiling} update={update} clear={clear} /></div>
+      </aside>
+      <div ref={results} role="region" aria-label="Shop results" tabIndex={-1} className="min-w-0 scroll-mt-28">
+        <div className="flex flex-wrap items-center justify-between gap-2"><p role="status" className="text-sm text-muted">{pagination.total ? `Showing ${pagination.from} to ${pagination.to} of ${pagination.total} ${pagination.total === 1 ? "product" : "products"}` : "Showing 0 products"}</p><span className="text-xs text-muted">Available stock only</span></div>
+        {(chips.length > 0 || filters.q || filters.min || filters.max || filters.sale || filters.minDiscount > 0) && <div className="mt-3 flex flex-wrap items-center gap-2">
+          {chips.map(({ key, value }) => <button key={`${key}-${value}`} type="button" aria-label={`Remove ${value} filter`} onClick={() => update({ [key]: filters[key].filter((entry) => entry !== value) })} className="inline-flex min-h-9 items-center gap-2 rounded-full border border-blue/30 bg-fill/10 px-3 text-xs text-accent-text">{value}<X className="size-3" aria-hidden /></button>)}
+          {filters.minDiscount > 0 && <button type="button" onClick={() => update({ minDiscount: 0 })} className="inline-flex min-h-9 items-center gap-2 rounded-full border border-blue/30 px-3 text-xs text-accent-text">{filters.minDiscount}% or more<X className="size-3" aria-hidden /></button>}
+          <button type="button" onClick={clear} className="min-h-9 px-2 text-xs text-accent-text hover:underline">Clear all filters</button>
+        </div>}
+        <ul className="mt-4 grid grid-cols-2 gap-3 min-[600px]:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          {pagination.items.map((product, index) => <li key={product.id} className="min-w-0"><CatalogCard product={product} priority={index === 0} eager={index < 4} /></li>)}
+        </ul>
+        {!visible.length && <div className="rounded-2xl border border-dashed border-line-strong p-6 text-center sm:p-10"><h2 className="font-display text-xl font-semibold">No matching gear right now</h2><p className="mt-2 text-sm leading-relaxed text-muted">Try another search or clear your filters. We only list stock we actually have.</p><button type="button" onClick={clear} className="mt-4 min-h-11 rounded-xl bg-fill px-4 text-sm font-semibold text-accent-ink">Reset filters</button><a href={whatsappUrl("Hi GamexChange, can you help me find a game, console or accessory?")} target="_blank" rel="noopener noreferrer" className="mx-3 mt-4 inline-flex min-h-11 items-center text-sm text-accent-text underline">Ask the team</a></div>}
+        <CatalogPagination page={pagination.page} pageCount={pagination.pageCount} onPageChange={goToPage} />
       </div>
     </div>
-  );
+  </div>;
 }

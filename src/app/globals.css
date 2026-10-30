@@ -672,6 +672,31 @@ html.theme-anim-fallback .metal {
 }
 
 /* ---------- hero staging ---------- */
+.hero-cta-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 32rem;
+}
+.hero-cta-actions .hero-cta {
+  width: 100%;
+  min-width: 0;
+  min-height: 3.5rem;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem 0.65rem 0.5rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+}
+.hero-cta > span:nth-child(2) { width: 2rem; height: 2rem; }
+.hero-cta > span:last-child { flex: 1; min-width: 0; text-align: center; }
+@media (min-width: 640px) {
+  .hero-cta-actions { gap: 1rem; }
+  .hero-cta-actions .hero-cta { gap: 0.75rem; padding-inline: 0.625rem 1rem; font-size: 0.875rem; letter-spacing: 0.06em; }
+  .hero-cta > span:nth-child(2) { width: 2.25rem; height: 2.25rem; }
+}
 .service-offering-image { transition: transform 600ms cubic-bezier(0.2, 0.75, 0.2, 1); }
 @media (prefers-reduced-motion: no-preference) {
   .service-offering:is(:hover, :focus-visible) .service-offering-image { transform: scale(1.045); }
@@ -690,6 +715,14 @@ html.theme-anim-fallback .metal {
 .hero-product-art {
   filter: var(--img-filter) drop-shadow(0 24px 42px rgb(18 39 124 / 0.36)) drop-shadow(0 0 36px var(--hero-aura));
   user-select: none;
+}
+@media (min-width: 1536px) {
+  .hero-product-stage {
+    /* Use only the spare desktop gutter, retaining the page's 32 px edge margin.
+       Aspect ratio grows the stage in normal flow, so the next section stays clear. */
+    width: calc(100% + min(10rem, (100vw - 80rem) / 2));
+    max-width: none;
+  }
 }
 @keyframes hero-product-showcase {
   0%, 100% { transform: translate3d(var(--hero-product-shift), 0, 0) rotateY(-4.5deg) rotateZ(-0.35deg) scale(var(--hero-product-scale)); }

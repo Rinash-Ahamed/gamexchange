@@ -7,6 +7,9 @@ import { whatsappUrl } from "@/data/site";
 import { ProductStage } from "@/components/shop/ProductStage";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { ControllerButton } from "@/components/ui/ControllerButton";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { ConditionBadge } from "@/components/shop/ConditionBadge";
+import { DiscountBadge, ProductPrice } from "@/components/shop/ProductPrice";
 
 /**
  * Signature moment C: product spotlight. On desktop the section pins and scrolling advances
@@ -59,15 +62,16 @@ export function ShelfShowcase({ products }: { products: readonly Product[] }) {
               </p>
               <AnimatePresence mode="wait">
                 <m.div key={p.id} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}>
-                  <p className="mt-6 text-sm font-medium text-muted">{p.platform} · {p.condition}</p>
+                  <div className="mt-6 flex flex-wrap items-center gap-3"><span className="text-sm font-medium text-muted">{p.platform}</span><ConditionBadge condition={p.condition} /><DiscountBadge product={p} /></div>
                   <h3 className="mt-4 font-display text-5xl font-bold uppercase leading-[0.95] xl:text-6xl">{p.name}</h3>
-                  <p className="mt-6 font-display text-6xl font-bold tabular-nums tracking-tight">{formatINR(p.price)}</p>
+                  <div className="mt-6"><ProductPrice product={p} className="text-6xl tracking-tight" /></div>
                   <dl className="mt-6 flex gap-8 text-sm">
                     <div><dt className="text-muted">Trade-in · voucher</dt><dd className="font-display text-xl font-semibold tabular-nums">{formatINR(p.tradeInVoucher)}</dd></div>
                     <div><dt className="text-muted">Trade-in · cash</dt><dd className="font-display text-xl font-semibold tabular-nums">{formatINR(p.tradeInCash)}</dd></div>
                   </dl>
                   <p className="mt-3 max-w-md text-xs text-muted">As listed on our current site. Confirm availability on WhatsApp; trade-in value is confirmed after the shop checks your device.</p>
                   <div className="mt-8 flex flex-wrap gap-4">
+                    <AddToCartButton product={p} />
                     <ControllerButton href={whatsappUrl(message)} external glyph="x" size="lg">Enquire</ControllerButton>
                     <ControllerButton href="/products" glyph="sq" size="lg" variant="ghost">View all</ControllerButton>
                   </div>

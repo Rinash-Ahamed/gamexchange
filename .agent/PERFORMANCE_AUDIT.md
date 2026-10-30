@@ -24,6 +24,10 @@ Scope: homepage rendering, public catalogue/banner data, banner image API, anima
 
 ## API and authorization checks
 
+### 2026-10-30 image-loading follow-up
+
+The banner LCP warning exposed a timing gap in the earlier lazy-to-eager viewport policy. Mounted banner images now always use eager loading. The first slide is present in the initial server HTML; other slides mount once within a 300 px viewport margin, independent of the animation's ongoing visibility gate. This retains deferred off-screen mounting without changing an LCP candidate back to lazy. Shared loading intents now cover all Next Image call sites, with first-row shop, cart and dedicated Game Zone images considered for above-fold use. Shared hero/promo art reused by service cards also stays eager, avoiding contradictory policies for the same optimized URL. ESLint and page warning collection provide regression guardrails. Source/whitespace reviewed only for this follow-up; no browser timing, build, lint or tests were run, and no universal future-LCP guarantee or measured speed improvement is claimed.
+
 - The enquiry endpoint already avoids database calls, limits request size, applies rate limits, verifies origin and single-use tokens, and returns uncached responses. No need to add public response caching there.
 - Admin sessions, UID checks, email verification, TOTP verification, account status and revocation remain uncached.
 - Banner image visibility and draft authorization are still checked on every image endpoint request. Only the immutable file bytes are reused. Previously cached public images may remain in a browser or image optimizer cache after unpublishing, as documented in Firebase setup.

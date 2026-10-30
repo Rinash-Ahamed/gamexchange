@@ -5,11 +5,13 @@ import { useEffect, useRef, useState } from "react";
 import { useInView, useReducedMotion } from "motion/react";
 import { usePageVisible } from "@/lib/use-page-visible";
 import type { BannerSlide } from "@/data/banners";
+import { imageLoading } from "@/lib/image-loading";
 
 export function PromoSwitch({ slides }: { slides: BannerSlide[] }) {
   const [active, setActive] = useState(0);
   const section = useRef<HTMLElement>(null);
   const inView = useInView(section, { margin: "120px" });
+  const loadRemaining = useInView(section, { margin: "300px", once: true });
   const pageVisible = usePageVisible();
   const reduceMotion = useReducedMotion();
   const current = slides.length ? active % slides.length : 0;
@@ -46,15 +48,15 @@ export function PromoSwitch({ slides }: { slides: BannerSlide[] }) {
           <div className="promo-switch-screen">
             {slides.map((slide, index) => (
               <article key={slide.id} className="promo-switch-slide" data-active={index === current ? "true" : "false"} aria-hidden={index !== current}>
-                <Image
+                {(index === current || loadRemaining) && <Image
                   src={slide.image}
                   alt={slide.alt}
                   fill
                   sizes="(min-width: 1280px) 1120px, (min-width: 768px) 82vw, 88vw"
                   className="object-cover"
                   quality={85}
-                  loading={inView && (index === current || index === (current + 1) % slides.length) ? "eager" : "lazy"}
-                />
+                  {...imageLoading("visible")}
+                />}
                 {(slide.headline || slide.description) && <>
                   <div className="promo-switch-shade" />
                   <div className="promo-switch-copy">

@@ -1,3 +1,5 @@
+import type { ShopSection } from "@/data/catalog";
+
 export const inventoryStatuses = ["active", "draft", "out-of-stock"] as const;
 export type InventoryStatus = (typeof inventoryStatuses)[number];
 
@@ -7,7 +9,6 @@ export const inventoryCategories = [
   "Controller",
   "Game",
   "Accessory",
-  "Gaming PC",
   "VR & Sim",
   "Collectible",
 ] as const;
@@ -32,6 +33,17 @@ export type InventoryItem = {
   platform: string;
   category: string;
   categoryId?: string;
+  shopSection?: ShopSection;
+  genre?: string;
+  brand?: string;
+  playModes?: string[];
+  ageRating?: string;
+  releaseYear?: number;
+  format?: string;
+  edition?: string;
+  description?: string;
+  originalPrice?: number;
+  discountPercent?: number;
   condition: string;
   stock: number;
   price: number;

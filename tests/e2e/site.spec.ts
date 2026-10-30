@@ -27,13 +27,14 @@ test("navigation reaches every page and marks the current one", async ({ page, i
   }
 });
 
-test("shop: filter and sort update the product list", async ({ page }) => {
+test("shop: platform filtering and sorting update the themed product grid", async ({ page, isMobile }) => {
   await page.goto("/products");
-  await expect(page.getByRole("status").filter({ hasText: "Showing 4 products" })).toBeVisible();
-  await page.getByRole("radio", { name: "PlayStation 2" }).click();
-  await expect(page.getByRole("status").filter({ hasText: "Showing 1 product" })).toBeVisible();
-  await page.getByRole("radio", { name: "All" }).click();
-  await page.getByLabel("Sort").selectOption("price-asc");
+  await expect(page.getByRole("status").filter({ hasText: "Showing 1 to 4 of 4 products" })).toBeVisible();
+  await page.getByRole("button", { name: "PlayStation 2", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Showing 1 to 1 of 1 product" })).toBeVisible();
+  await page.getByRole("button", { name: "All", exact: true }).click();
+  if (isMobile) await page.getByRole("button", { name: "Filters and sorting" }).click();
+  await page.getByLabel("Sort results").selectOption("price-asc");
   await expect(page.locator("article h3").first()).toHaveText(/PlayStation 2 Slimline/i);
 });
 

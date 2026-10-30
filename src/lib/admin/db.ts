@@ -11,6 +11,7 @@ import {
   type QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
 import { products, type Product } from "@/data/products";
+import { isPcComponentCategory, normalizeCondition, normalizePlatform } from "@/data/catalog";
 import { inventoryCategories, type InventoryCategory, type DashboardStats, type InventoryItem, type ServiceRecord, type ServiceStatus } from "./types";
 
 const INVENTORY_COLLECTION = "inventory";
@@ -33,7 +34,7 @@ let seedCheck: Promise<void> | undefined;
 let categoryCheck: Promise<void> | undefined;
 
 export class CategoryError extends Error {
-  constructor(public readonly code: "category-missing" | "category-duplicate" | "category-used" | "category-limit") { super(code); }
+  constructor(public readonly code: "category-missing" | "category-duplicate" | "category-used" | "category-limit" | "category-unsupported") { super(code); }
 }
 
 export function normalizeCategoryName(name: string) {
@@ -84,6 +85,7 @@ export async function saveInventoryCategory(name: string, id?: string) {
   const cleaned = normalizeCategoryName(name);
   const key = categoryKey(cleaned);
   if (!cleaned || cleaned.length > 160) throw new CategoryError("category-missing");
+  if (isPcComponentCategory(cleaned)) throw new CategoryError("category-unsupported");
   await database().runTransaction(async (transaction) => {
     const ref = categoryRegistry();
     const categories = storedCategories((await transaction.get(ref)).data());
@@ -94,7 +96,9 @@ export async function saveInventoryCategory(name: string, id?: string) {
     if (id) {
       // Keep original aliases so legacy product records follow renames without a bulk rewrite.
       const index = categories.findIndex((category) => category.id === id);
-      categories[index] = { ...categories[index], name: cleaned };
+      const existing = categories[index];
+      if (!existing) throw new CategoryError("category-missing");
+      categories[index] = { ...existing, name: cleaned };
     } else {
       if (categories.length >= 100) throw new CategoryError("category-limit");
       categories.push({ id: randomUUID(), name: cleaned, aliases: [key] });
@@ -187,7 +191,7 @@ export async function listPublicInventory() {
   ]);
   return snapshot.docs
     .map((doc) => resolveInventoryCategory(inventoryFromDocument(doc), categories))
-    .filter((item) => item.status === "active" && item.stock > 0)
+    .filter((item) => item.status === "active" && item.stock > 0 && !isPcComponentCategory(item.category))
     .toSorted((a, b) => Number(b.featured) - Number(a.featured) || b.updatedAt.localeCompare(a.updatedAt));
 }
 
@@ -204,10 +208,23 @@ async function readPublicProducts(): Promise<Product[]> {
   return (await listPublicInventory()).map((item) => ({
     id: item.id,
     name: item.name,
-    platform: item.platform,
+    platform: normalizePlatform(item.platform),
     category: item.category,
-    condition: item.condition,
+    condition: normalizeCondition(item.condition),
+    shopSection: item.shopSection,
+    genre: item.genre,
+    brand: item.brand,
+    playModes: item.playModes,
+    ageRating: item.ageRating,
+    releaseYear: item.releaseYear,
+    format: item.format,
+    edition: item.edition,
+    description: item.description,
+    originalPrice: item.originalPrice,
+    discountPercent: item.discountPercent,
+    createdAt: item.createdAt,
     price: item.price,
+    stock: item.stock,
     tradeInVoucher: item.tradeInVoucher,
     tradeInCash: item.tradeInCash,
     image: { src: item.imageSrc, width: item.imageWidth, height: item.imageHeight },
@@ -216,7 +233,7 @@ async function readPublicProducts(): Promise<Product[]> {
 }
 
 export const listPublicProducts = unstable_cache(readPublicProducts,
-  ["public-products-v1", process.env.FIREBASE_PROJECT_ID ?? "demo", process.env.FIREBASE_DATABASE_ID ?? "(default)"],
+  ["public-products-v4", process.env.FIREBASE_PROJECT_ID ?? "demo", process.env.FIREBASE_DATABASE_ID ?? "(default)"],
   { revalidate: 60, tags: [PUBLIC_PRODUCTS_TAG] });
 
 export async function createInventoryItem(input: InventoryInput) {
@@ -231,6 +248,7 @@ export async function createInventoryItem(input: InventoryInput) {
     const categories = storedCategories((await transaction.get(categoryRegistry())).data());
     const category = categories.find((entry) => entry.id === input.categoryId);
     if (!category) throw new CategoryError("category-missing");
+    if (isPcComponentCategory(category.name)) throw new CategoryError("category-missing");
     if ((await transaction.get(skuRef)).exists) throw duplicateSkuError();
     transaction.set(itemRef, { ...input, category: category.name, ...inventoryImageSource(id, input), createdAt: now, updatedAt: now } satisfies StoredInventoryItem);
     transaction.set(skuRef, { inventoryId: id, sku: input.sku });
@@ -250,6 +268,7 @@ export async function updateInventoryItem(
     const categories = storedCategories((await transaction.get(categoryRegistry())).data());
     const category = categories.find((entry) => entry.id === input.categoryId);
     if (!category) throw new CategoryError("category-missing");
+    if (isPcComponentCategory(category.name)) throw new CategoryError("category-missing");
     const current = await transaction.get(itemRef);
     if (!current.exists) throw new Error("Inventory item not found.");
 
