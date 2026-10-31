@@ -89,6 +89,30 @@ This is historical context. Later entries and the Current State section supersed
 
 ## Recent Updates
 
+### 2026-10-30: Preserve-design performance and navigation pass
+
+- Retained all visual features, footer video, hero art, carousel and smooth scrolling. Shortened Lenis wheel easing, dynamically load it for eligible public desktop pointers only and reset its inertia across route navigation. Admin/touch/reduced motion stay native. Added shared off-screen/hidden-tab gradient and footer-logo animation scheduling, per-frame LightCard pointer batching and threshold-only Nav/shelf state updates.
+- Added route loading shells and intent-based public-link prefetch with bounded deduplication and Save-Data/2G exclusions. No private/admin/API/payment mutations are prefetched; existing server data cache, stock checks and authorization remain intact. Loading shells improve pending feedback, not actual database latency.
+- Replaced hero/service PNG references with a roughly 25% smaller lossless WebP, preserving source PNG. Verified dimensions and decoded visible pixels, with zero visible-pixel differences. No quality setting or illustration change. See PERFORMANCE_AUDIT.md for exact sizes and limits.
+- Added browser regression source, reviewed source and whitespace, and consulted official Next navigation/prefetch guidance. Build, lint, typecheck, browser tests, live Firebase/Vercel and performance measurements were not run because checks were not explicitly requested. Earlier deployment 500 is not resolved by these optimizations and still requires runtime logs. Do not describe the site as measured instant or universally lag-free.
+
+### 2026-10-30: Five-second admin success notices
+
+- Replaced persistent success paragraphs with shared client AdminNotice in inventory, categories, services, FAQs, banner deletion and banner saves. Notices dismiss after five seconds; timers clean up on unmount. Successful redirect operations carry a save token to restart the notice for repeated identical actions.
+- Redirect notices remove notice/ticket URL parameters after dismissal using history replacement, preserving filters, hash, form-reset tokens and Next history state. This avoids replay on refresh without a navigation or database request. Banner action-state notices use the same timeout without altering URL state. Errors, confirmation dialogs and authentication instructions remain visible.
+- Source and whitespace reviewed only. Build, lint, tests, browser timing/repeated-save and live admin checks were not run, per the batched-check convention.
+
+### 2026-10-30: Clean grouped footer
+
+- Reorganized the footer using the supplied reference's hierarchy: Legal & Policies, Need Help and Contact Us columns, consistent link typography/touch targets, support icons and centered copyright. Kept GamexChange blue styling, background video, logo heartbeat and social icons, with a separated brand row and responsive stacked/two/three-column layouts.
+- Reused supplied business support email/phone/entity and existing routes. Replaced repeated branch blocks with Contact/Find a store links. No fabricated customer accounts, order history or wallet UI links. Privacy remains an unapproved private draft, so no public privacy link was added.
+- Source and whitespace reviewed only. Build, lint, tests and browser/theme/responsive checks were not run, per the batched-check convention.
+
+### 2026-10-30: Remove shop card enquiry links
+
+- Removed Enquire from compact public inventory cards, including More to explore cards using the same component. Removed unused message/icon imports. Product-detail links and Add to cart remain; product-detail enquiries and homepage showcase actions are unchanged.
+- Source and whitespace reviewed only. Build, lint and tests were not run, following the batched-check convention.
+
 ### 2026-10-30: Dedicated franchise page with supplied store photos
 
 - Added static `/franchise` in the existing theme with an introduction, six-photo responsive gallery, locations overview, readable location lists and franchise-specific WhatsApp draft enquiries. Homepage franchise card now navigates internally rather than directly to WhatsApp; added a footer link, canonical metadata and sitemap entry. Kept main navigation unchanged.

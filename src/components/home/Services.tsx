@@ -9,7 +9,7 @@ import { imageLoading } from "@/lib/image-loading";
 const offerings = [
   { title: "Consoles & game discs", action: "Explore the shop", href: "/products", icon: Gamepad2, image: "/promos/console-arrivals.png" },
   { title: "Controllers & accessories", action: "Explore gear", href: "/products?section=accessories", icon: Headphones, image: "/promos/setup-upgrades.png" },
-  { title: "Sell or trade in", action: "Get a trade-in quote", href: "/exchange", icon: Repeat, image: "/hero/gamexchange-hardware-stage.png" },
+  { title: "Sell or trade in", action: "Get a trade-in quote", href: "/exchange", icon: Repeat, image: "/hero/gamexchange-hardware-stage.webp" },
   { title: "Console & controller repairs", action: "Book a repair", href: "/repair-service", icon: Wrench, image: "/images/game-zone/controller-station.png" },
   { title: "Play at the game zone", action: "See the game zone", href: "/game-zone", icon: Joystick, image: "/images/game-zone/multiplayer-station.png" },
   { title: "Franchise enquiry", action: "Partner with us", href: "/franchise", icon: Store, image: "/franchise/kovai-pudur.webp" },

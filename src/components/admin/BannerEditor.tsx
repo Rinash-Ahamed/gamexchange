@@ -1,5 +1,6 @@
 "use client";
 
+import { AdminNotice } from "@/components/admin/AdminNotice";
 import Image from "next/image";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { saveBannerAction, type BannerSaveState } from "@/app/admin/banner-actions";
@@ -100,7 +101,7 @@ export function BannerEditor({ banner, nextPosition = 1, storageConfigured }: { 
         <button type="submit" disabled={Boolean(fileError) || (!banner && !storageConfigured)} className={`${adminButtonClass} w-full disabled:cursor-not-allowed disabled:opacity-50`}>{pending ? "Uploading and saving..." : banner ? "Save changes" : "Save banner"}</button>
       </fieldset>
       {state.error && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">{state.error} If you were uploading an image, select it again before retrying. Your text and visibility selections are kept.</p>}
-      {state.message && <p role="status" className="rounded-xl border border-ok/30 bg-ok/10 p-3 text-sm text-ok">{state.message}</p>}
+{state.message && <AdminNotice key={state.saved} clearQuery={false}>{state.message}</AdminNotice>}
     </ConfirmSubmit>
   );
 }

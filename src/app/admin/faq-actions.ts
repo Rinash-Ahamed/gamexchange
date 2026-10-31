@@ -30,5 +30,5 @@ export async function deleteFaqAction(data: FormData) {
     throw error;
   }
   refreshAdminData("faqs");
-  redirect("/admin/faqs?notice=deleted");
+  redirect(`/admin/faqs?notice=deleted&saved=${Date.now()}`);
 }

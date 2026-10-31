@@ -36,5 +36,5 @@ export async function deleteCategoryAction(formData: FormData) {
     throw error;
   }
   refreshAdminData("categories");
-  redirect("/admin/categories?notice=deleted");
+  redirect(`/admin/categories?notice=deleted&saved=${Date.now()}`);
 }

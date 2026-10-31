@@ -139,7 +139,7 @@ export async function deleteInventoryAction(formData: FormData) {
   const previousPath = await deleteInventoryItem(id);
   await removeInventoryImage(previousPath);
   refreshAdminData("inventory");
-  redirect("/admin/inventory?notice=deleted");
+  redirect(`/admin/inventory?notice=deleted&saved=${Date.now()}`);
 }
 
 export async function createServiceAction(formData: FormData) {
@@ -149,7 +149,7 @@ export async function createServiceAction(formData: FormData) {
   if (!parsed.success) redirect("/admin/services?error=invalid");
   const ticket = await createServiceRecord(parsed.data);
   refreshAdminData("services");
-  redirect(`/admin/services?notice=created&ticket=${encodeURIComponent(ticket)}`);
+  redirect(`/admin/services?notice=created&ticket=${encodeURIComponent(ticket)}&saved=${Date.now()}`);
 }
 
 export async function updateServiceAction(formData: FormData) {
@@ -158,5 +158,5 @@ export async function updateServiceAction(formData: FormData) {
   if (!parsed.success) redirect("/admin/services?error=invalid");
   await updateServiceRecord(parsed.data.id, parsed.data);
   refreshAdminData("services");
-  redirect("/admin/services?notice=updated");
+  redirect(`/admin/services?notice=updated&saved=${Date.now()}`);
 }

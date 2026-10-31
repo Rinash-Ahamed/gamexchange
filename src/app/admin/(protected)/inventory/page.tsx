@@ -12,6 +12,7 @@ import { ProductPrice } from "@/components/shop/ProductPrice";
 import { ConditionBadge } from "@/components/shop/ConditionBadge";
 import { filterInventory, groupInventory, queryValue, stockFilters, type InventoryFilters as Filters, type InventorySearchParams } from "@/lib/admin/inventory-filters";
 import { createInventoryAction, deleteInventoryAction, updateInventoryAction } from "../../actions";
+import { AdminNotice } from "@/components/admin/AdminNotice";
 
 export const metadata: Metadata = { title: "Inventory management", robots: { index: false, follow: false } };
 
@@ -43,7 +44,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
     <div className="mx-auto max-w-7xl">
       <h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Inventory</h1>
       <p className="mt-2 text-muted">Browse by category. Open Edit only when you need to make a change. Active products with stock appear in the public shop.</p>
-      {notice && notices[notice] && <p role="status" className="mt-6 rounded-xl border border-ok/30 bg-ok/10 px-4 py-3 text-sm text-ok">{notices[notice]}</p>}
+{notice && notices[notice] && <AdminNotice key={`${notice}-${queryValue(query.saved)}`} className="mt-6">{notices[notice]}</AdminNotice>}
       {error && errors[error] && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">{errors[error]}</p>}
 
       <details key={queryValue(query.saved) || "new-item"} className="metal group mt-6 rounded-2xl p-4 sm:p-5">

@@ -8,10 +8,11 @@ import { requireAdmin } from "@/lib/admin/auth";
 import { formatAdminDate, titleCaseStatus } from "@/lib/admin/format";
 import { serviceStatuses } from "@/lib/admin/types";
 import { createServiceAction, updateServiceAction } from "../../actions";
+import { AdminNotice } from "@/components/admin/AdminNotice";
 
 export const metadata: Metadata = { title: "Customer service records", robots: { index: false, follow: false } };
 
-export default async function ServicesPage({ searchParams }: { searchParams: Promise<{ notice?: string; error?: string; ticket?: string }> }) {
+export default async function ServicesPage({ searchParams }: { searchParams: Promise<{ notice?: string; error?: string; ticket?: string; saved?: string }> }) {
   await requireAdmin();
   const [records, query] = await Promise.all([listServiceRecords(), searchParams]);
 
@@ -22,8 +23,8 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
         <p className="mt-2 text-muted">Track every customer device from intake through collection.</p>
       </div>
 
-      {query.notice === "created" && <p role="status" className="mt-6 rounded-xl border border-ok/30 bg-ok/10 px-4 py-3 text-sm text-ok">Service record created. Ticket: <strong>{query.ticket}</strong></p>}
-      {query.notice === "updated" && <p role="status" className="mt-6 rounded-xl border border-ok/30 bg-ok/10 px-4 py-3 text-sm text-ok">Service record updated.</p>}
+{query.notice === "created" && <AdminNotice key={`created-${query.saved}`} className="mt-6">Service record created. Ticket: <strong>{query.ticket}</strong></AdminNotice>}
+{query.notice === "updated" && <AdminNotice key={`updated-${query.saved}`} className="mt-6">Service record updated.</AdminNotice>}
       {query.error && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">Check the submitted values and try again.</p>}
 
       <details className="metal group mt-6 rounded-2xl p-4 sm:p-5">

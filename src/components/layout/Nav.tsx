@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { m, useMotionValueEvent, useScroll } from "motion/react";
 import { House, ShoppingBag, Repeat, Wrench, Gamepad2, Phone, type LucideIcon } from "lucide-react";
 import { navItems, whatsappUrl, type NavItem } from "@/data/site";
@@ -25,8 +25,14 @@ const isActive = (pathname: string, href: string) => (href === "/" ? pathname ==
 export function Nav() {
   const pathname = usePathname();
   const [compact, setCompact] = useState(false);
+  const compactRef = useRef(false);
   const { scrollY } = useScroll();
-  useMotionValueEvent(scrollY, "change", (y) => setCompact((c) => (c === y > 40 ? c : y > 40)));
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const next = y > 40;
+    if (compactRef.current === next) return;
+    compactRef.current = next;
+    setCompact(next);
+  });
 
   return (
     <>

@@ -23,12 +23,16 @@ export function ShelfShowcase({ products }: { products: readonly Product[] }) {
   const n = products.length;
   const runway = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const activeRef = useRef(0);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: runway, offset: ["start start", "end end"] });
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
+    if (!n) return;
     const i = Math.min(n - 1, Math.max(0, Math.floor(v * n * 0.999)));
-    setActive((cur) => (cur === i ? cur : i));
+    if (activeRef.current === i) return;
+    activeRef.current = i;
+    setActive(i);
   });
 
   const goTo = (i: number) => {

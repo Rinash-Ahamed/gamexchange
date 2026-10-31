@@ -144,7 +144,7 @@ export function Hero() {
               <div className="anim-emerge absolute inset-0" style={d("0.3s")}>
                 <div className="hero-product-float absolute">
                   <Image
-                    src="/hero/gamexchange-hardware-stage.png"
+                    src="/hero/gamexchange-hardware-stage.webp"
                     alt="Gaming console, controller, VR headset and handheld system on an illuminated display platform"
                     fill
                     {...imageLoading("critical")}

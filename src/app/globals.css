@@ -1261,6 +1261,12 @@ html.theme-anim-fallback .metal {
 /* Pause every looping animation while the hero is off-screen. */
 [data-live="false"] *, [data-live="false"] *::before { animation-play-state: paused !important; }
 
+/* No visual simplification: resume the same loops when their content is visible. */
+[data-motion-visible="false"],
+html[data-effects-paused="true"] .text-gradient,
+html[data-effects-paused="true"] .text-gradient-motion,
+html[data-effects-paused="true"] .footer-logo-heartbeat { animation-play-state: paused !important; }
+
 @media (max-width: 1023px) {
   .ctl-tilt, .pl { transition: none; }
   .hero-architecture-left { left: -40%; }

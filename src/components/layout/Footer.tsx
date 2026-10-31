@@ -1,65 +1,67 @@
 import Link from "next/link";
-import { branches, mapsUrl, navItems, site, whatsappUrl } from "@/data/site";
+import { Mail, MapPin, Phone } from "lucide-react";
+import { site, whatsappUrl } from "@/data/site";
+import { businessDetails } from "@/data/legal";
 import { Wordmark } from "./Wordmark";
 import { FooterVideo } from "./FooterVideo";
 import { SocialIcon } from "@/components/ui/SocialIcon";
 
+const legalLinks = [
+  { href: "/terms", label: "Terms and conditions" },
+  { href: "/policies/returns-and-refunds", label: "Cancellation & refunds" },
+  { href: "/policies/shipping-and-delivery", label: "Shipping policy" },
+  { href: "/policies/trade-in", label: "Sell & exchange policy" },
+  { href: "/policies", label: "All store policies" },
+];
+const helpLinks = [
+  { href: "/#faq-h", label: "FAQs" },
+  { href: "/contact", label: "Customer support" },
+  { href: "/repair-service", label: "Repairs & servicing" },
+  { href: "/franchise", label: "Franchise opportunities" },
+  { href: "/contact", label: "Find a store" },
+];
+const linkClass = "inline-flex min-h-11 items-center text-sm leading-6 text-white/75 transition-colors hover:text-white focus-visible:outline-offset-4";
+const headingClass = "font-display text-base font-semibold text-[#a9bfff]";
+
 export function Footer() {
   return (
-    <footer className="relative isolate mt-20 overflow-hidden border-t border-white/15 bg-[#050711] pb-24 pt-12 text-white lg:pb-10">
+    <footer className="relative isolate mt-16 overflow-hidden border-t border-white/15 bg-[#050711] pb-24 pt-9 text-white lg:pb-7">
       <FooterVideo />
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,5,14,0.92)_0%,rgba(3,5,14,0.78)_48%,rgba(3,5,14,0.9)_100%)]" />
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(3,5,14,0.34)_0%,rgba(3,5,14,0.72)_100%)]" />
-
-      <div className="relative z-10 mx-auto grid max-w-7xl gap-8 px-5 sm:px-8 lg:grid-cols-[1.4fr_1fr_1.4fr]">
-        <div>
-          <Wordmark className="footer-logo-heartbeat" />
-          <p className="mt-4 max-w-sm text-white/75">Premium repairs, seamless upgrades and an immersive gaming zone in Coimbatore.</p>
-          <nav aria-label="Social media" className="mt-4 flex flex-wrap gap-2">
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,5,14,0.95),rgba(3,5,14,0.88),rgba(3,5,14,0.95))]" />
+      <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
+        <div className="flex flex-col gap-5 border-b border-white/15 pb-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0"><Wordmark className="footer-logo-heartbeat" /><p className="mt-3 max-w-md text-sm leading-6 text-white/65">Gaming gear, expert repairs and a place to play.</p></div>
+          <nav aria-label="Social media" className="flex flex-wrap gap-2">
             {([
               { network: "instagram", label: "Instagram", href: site.social.instagram },
               { network: "facebook", label: "Facebook", href: site.social.facebook },
               { network: "whatsapp", label: "WhatsApp", href: whatsappUrl() },
-            ] as const).map((social) => <a key={social.network} href={social.href} aria-label={`${social.label} (opens in a new tab)`} title={social.label} target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-full border border-white/20 bg-white/5 text-white/80 transition-colors hover:border-[#a9bfff] hover:bg-white/10 hover:text-[#a9bfff]">
+            ] as const).map((social) => <a key={social.network} href={social.href} aria-label={`${social.label} (opens in a new tab)`} title={social.label} target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-[#a9bfff] hover:text-[#a9bfff]">
               <SocialIcon network={social.network} />
             </a>)}
           </nav>
         </div>
 
-        <nav aria-label="Footer">
-          <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-[#a9bfff]">Explore</p>
-          <ul className="mt-4 space-y-1">
-            {navItems.map((i) => (
-              <li key={i.href}>
-                <Link href={i.href} className="inline-block py-1.5 text-white/75 transition-colors hover:text-white">{i.label}</Link>
-              </li>
-            ))}
-            <li><Link href="/franchise" className="inline-block py-1.5 text-white/75 transition-colors hover:text-white">Franchise opportunities</Link></li>
-          </ul>
-        </nav>
-
-        <div>
-          <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-[#a9bfff]">Visit</p>
-          <ul className="mt-4 space-y-5">
-            {branches.map((b) => (
-              <li key={b.id}>
-                <p className="font-semibold">{b.name} · {b.area}</p>
-                <p className="text-sm text-white/70">{site.hours.display} · {site.hours.closedDay} closed</p>
-                <p className="mt-1 flex gap-4 text-sm">
-                  <a className="inline-flex min-h-11 items-center px-2 underline-offset-4 transition-colors hover:text-white/75 hover:underline" href={`tel:${b.phone}`}>{b.phoneDisplay}</a>
-                  <a className="inline-flex min-h-11 items-center px-2 underline-offset-4 transition-colors hover:text-white/75 hover:underline" href={mapsUrl(b)} target="_blank" rel="noopener noreferrer">Directions</a>
-                </p>
-              </li>
-            ))}
-          </ul>
+        <div className="grid gap-8 py-8 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1.2fr] lg:gap-12">
+          <nav aria-labelledby="footer-legal-heading" className="min-w-0">
+            <h2 id="footer-legal-heading" className={headingClass}>Legal &amp; Policies</h2>
+            <ul className="mt-3">{legalLinks.map(({ href, label }) => <li key={href}><Link href={href} className={linkClass}>{label}</Link></li>)}</ul>
+          </nav>
+          <nav aria-labelledby="footer-help-heading" className="min-w-0">
+            <h2 id="footer-help-heading" className={headingClass}>Need Help</h2>
+            <ul className="mt-3">{helpLinks.map(({ href, label }) => <li key={label}><Link href={href} className={linkClass}>{label}</Link></li>)}</ul>
+          </nav>
+          <section aria-labelledby="footer-contact-heading" className="min-w-0 sm:col-span-2 lg:col-span-1">
+            <h2 id="footer-contact-heading" className={headingClass}>Contact Us</h2>
+            <address className="mt-3 not-italic">
+              <a href={`mailto:${businessDetails.email}`} className={`${linkClass} w-full gap-3`}><Mail className="size-4 shrink-0 text-[#a9bfff]" aria-hidden /><span className="min-w-0 break-all">{businessDetails.email}</span></a>
+              <a href={`tel:${businessDetails.phone}`} className={`${linkClass} w-full gap-3`}><Phone className="size-4 shrink-0 text-[#a9bfff]" aria-hidden />{businessDetails.phoneDisplay}</a>
+              <Link href="/contact" className={`${linkClass} w-full gap-3`}><MapPin className="size-4 shrink-0 text-[#a9bfff]" aria-hidden />Coimbatore, Tamil Nadu</Link>
+            </address>
+            <p className="mt-3 text-xs leading-6 text-white/60">{site.hours.display}<br />Closed on {site.hours.closedDay}s</p>
+          </section>
         </div>
-      </div>
-      <div className="relative z-10 mx-auto mt-10 flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 text-xs text-white/60 sm:px-8">
-        <p>© {new Date().getFullYear()} GamexChange. All rights reserved.</p>
-        <nav aria-label="Legal" className="flex flex-wrap gap-x-5">
-          <Link href="/terms" className="py-3 transition-colors hover:text-white">Terms and conditions</Link>
-          <Link href="/policies" className="py-3 transition-colors hover:text-white">Policies and support</Link>
-        </nav>
+        <p className="border-t border-white/15 pt-5 text-center text-xs leading-6 text-white/55">© {new Date().getFullYear()} GamexChange, operated by {businessDetails.entity}. All rights reserved.</p>
       </div>
     </footer>
   );

@@ -6,6 +6,7 @@ import { adminButtonClass, adminGhostButtonClass, adminInputClass, adminLabelCla
 import { requireAdmin } from "@/lib/admin/auth";
 import { listInventory, listInventoryCategories } from "@/lib/admin/db";
 import { deleteCategoryAction, saveCategoryAction } from "../../category-actions";
+import { AdminNotice } from "@/components/admin/AdminNotice";
 
 export const metadata: Metadata = { title: "Categories", robots: { index: false, follow: false } };
 
@@ -32,7 +33,7 @@ export default async function CategoriesPage({ searchParams }: { searchParams: P
         <div><h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Categories</h1><p className="mt-2 text-sm text-muted">Keep your shop organised. Categories appear in the shop when they have available stock.</p></div>
         <Link href="/admin/inventory" className={adminGhostButtonClass}>Back to inventory</Link>
       </div>
-      {query.notice && notices[query.notice] && <p role="status" className="mt-5 rounded-xl border border-ok/30 bg-ok/10 p-3 text-sm text-ok">{notices[query.notice]}</p>}
+{query.notice && notices[query.notice] && <AdminNotice key={`${query.notice}-${query.saved}`} className="mt-5">{notices[query.notice]}</AdminNotice>}
       {query.error && errors[query.error] && <p role="alert" className="mt-5 rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">{errors[query.error]}</p>}
       <section className="metal mt-6 rounded-xl p-4" aria-labelledby="add-category-heading">
         <h2 id="add-category-heading" className="font-display text-base font-bold uppercase">Add category</h2>

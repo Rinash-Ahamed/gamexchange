@@ -32,5 +32,5 @@ export async function deleteBannerAction(data: FormData) {
   try { await deleteBanner(id.data); }
   catch { redirect("/admin/banners?error=delete"); }
   refreshAdminData("banners");
-  redirect("/admin/banners?notice=deleted");
+  redirect(`/admin/banners?notice=deleted&saved=${Date.now()}`);
 }

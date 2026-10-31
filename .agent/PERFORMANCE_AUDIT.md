@@ -35,6 +35,15 @@ The banner LCP warning exposed a timing gap in the earlier lazy-to-eager viewpor
 
 ## Verification and limits
 
+### 2026-10-30: Preserve-design interaction and navigation pass
+
+- Retained smooth scrolling but shortened its wheel easing from 0.9 to 0.22 seconds with a normal 1x wheel multiplier. Load Lenis only for eligible fine-pointer, non-reduced-motion public routes. Reinitialize on route changes to cancel stale inertia; admin uses native scrolling. Optional chunk-load failure leaves native scrolling intact.
+- Added one shared IntersectionObserver for gradient headings and footer heartbeat. Off-screen loops pause without hiding content; streamed sections/new headline nodes are observed, disconnected nodes are released, and hidden tabs pause these effects. Existing hero/banner/review visibility gates remain.
+- Coalesced pointer-following LightCard layout reads and style writes to one animation frame. Nav/shelf React state now updates only when compact mode or active product actually changes, not on every scroll event. All visible treatments remain.
+- Added route loading shells for immediate pending feedback and partial prefetch boundaries, plus delegated hover/focus/touch public-route prefetch. Intent requests are deduplicated, bounded and skipped for Save-Data/2G connections, external URLs and admin routes. Checkout/auth actions are not prefetched. Existing catalogue visibility, 60-second data caching and mutation invalidation remain unchanged.
+- Converted the hero source from 1,864,141-byte PNG to 1,405,332-byte lossless WebP (about 25% smaller), retaining dimensions and transparency. Decoded comparison found zero visible-pixel differences; only RGB values of fully transparent pixels differ. Kept the original PNG. Both hero and reused service art use the new source; Next's existing optimized image policy is retained. This source-size reduction is not a measured browser transfer/LCP improvement.
+- Added browser regression source for decorative pause/resume and navigation. Reviewed source, asset pixels and whitespace only. Build, lint, tests, live Vercel/Firebase, browser layouts, FPS, route latency and Core Web Vitals have not been verified in this pass. No instant-navigation or FPS guarantee is claimed. The Vercel runtime 500 still requires sanitized logs.
+
 - TypeScript check passed after implementation.
 - Diff whitespace checks passed.
 - There was no HTTP server listening on localhost:3000 during the audit, so no page timings, API latency percentiles, FPS, Lighthouse scores or Core Web Vitals improvements are claimed.

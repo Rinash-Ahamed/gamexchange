@@ -7,10 +7,11 @@ import { adminGhostButtonClass } from "@/components/admin/styles";
 import { bannerStorageConfigured, listAdminBanners } from "@/lib/admin/banners";
 import { requireAdmin } from "@/lib/admin/auth";
 import { deleteBannerAction } from "../../banner-actions";
+import { AdminNotice } from "@/components/admin/AdminNotice";
 
 export const metadata: Metadata = { title: "Homepage banners", robots: { index: false, follow: false } };
 
-export default async function BannersPage({ searchParams }: { searchParams: Promise<{ notice?: string; error?: string }> }) {
+export default async function BannersPage({ searchParams }: { searchParams: Promise<{ notice?: string; error?: string; saved?: string }> }) {
   await requireAdmin();
   const [banners, query] = await Promise.all([listAdminBanners(), searchParams]);
   const storageConfigured = bannerStorageConfigured();
@@ -22,7 +23,7 @@ export default async function BannersPage({ searchParams }: { searchParams: Prom
         <Link href="/#promo-switch-heading" target="_blank" rel="noopener noreferrer" className={adminGhostButtonClass}>View on website</Link>
       </div>
       {!storageConfigured && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">Image uploads need Firebase Storage. Create or open your Storage bucket and add FIREBASE_STORAGE_BUCKET to your environment, then restart the server.</p>}
-      {query.notice === "deleted" && <p role="status" className="mt-6 rounded-xl border border-ok/30 bg-ok/10 p-3 text-sm text-ok">Banner deleted.</p>}
+{query.notice === "deleted" && <AdminNotice key={query.saved} className="mt-6">Banner deleted.</AdminNotice>}
       {query.error && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">The banner could not be deleted. Refresh and try again.</p>}
       <aside className="metal mt-6 rounded-xl p-4 text-sm">
         <p id="banner-size-requirements"><strong>1920 × 840 px</strong><span className="text-muted"> · JPG, PNG or WebP · Max 5 MB</span></p>
