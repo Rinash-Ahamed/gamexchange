@@ -89,6 +89,8 @@ The server verifies Firebase tokens, checks the UID allowlist, verified email, c
 
 If an authenticator is lost, the Firebase project owner must verify the administrator's identity, revoke their refresh tokens, and remove the lost TOTP factor using trusted Firebase Admin tooling. The user can then repeat enrollment. There is no password-only recovery bypass in the website. Removing a UID from the allowlist, disabling/deleting the account, revoking its tokens, or removing its TOTP factor blocks dashboard access.
 
+Admin login includes Forgot password. Enter the admin email and choose Send reset link to use Firebase's hosted password-reset flow. Configure the Password reset email under Firebase Authentication > Templates, including sender/branding and the hosted action handler as needed. No new environment variables or public signup are introduced. The app shows a generic response to avoid revealing account existence, uses a 60-second UI resend cooldown and relies on Firebase's provider quotas/abuse controls; the cooldown is not a server rate limit. Keep email enumeration protection enabled in Identity Platform. No reset request signs in a user or issues a dashboard cookie. A changed password still requires the existing verified email, approved UID and TOTP checks. Lost-authenticator recovery remains owner-managed.
+
 Reference: [Firebase TOTP MFA](https://firebase.google.com/docs/auth/web/totp-mfa) and [Firebase session cookies](https://firebase.google.com/docs/auth/admin/manage-cookies).
 
 ## 5. Start the app

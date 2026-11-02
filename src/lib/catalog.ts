@@ -11,28 +11,31 @@ export type CatalogFacet = { key: CatalogFacetKey; title: string; options: { val
 export const emptyCatalogFilters: CatalogFilters = { section: "all", q: "", platforms: [], categories: [], conditions: [], brands: [], genres: [], formats: [], editions: [], playModes: [], ageRatings: [], years: [], min: "", max: "", sale: false, minDiscount: 0, sort: "featured" };
 export function hasDiscount(product: Product) { return productDiscount(product) !== null; }
 export function availableCatalog(products: readonly Product[]) { return products.filter((product) => !isPcComponentCategory(product.category)); }
-function matchesCatalog(product: Product, filters: CatalogFilters) {
+function catalogMatcher(filters: CatalogFilters) {
   const terms = filters.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
   const min = filters.min.trim() === "" ? 0 : Math.max(0, Number(filters.min) || 0);
   const max = filters.max.trim() === "" ? Infinity : Math.max(0, Number(filters.max) || 0);
-  if (filters.section !== "all" && productSection(product) !== filters.section) return false;
-  if (filters.platforms.length && !filters.platforms.includes(normalizePlatform(product.platform))) return false;
-  if (filters.categories.length && !filters.categories.includes(product.category)) return false;
-  if (filters.conditions.length && !filters.conditions.includes(normalizeCondition(product.condition))) return false;
-  if (filters.brands.length && !filters.brands.includes(product.brand ?? "")) return false;
-  if (filters.genres.length && !filters.genres.includes(product.genre ?? "")) return false;
-  if (filters.formats.length && !filters.formats.includes(product.format ?? "")) return false;
-  if (filters.editions.length && !filters.editions.includes(product.edition ?? "")) return false;
-  if (filters.playModes.length && !filters.playModes.some((mode) => product.playModes?.includes(mode))) return false;
-  if (filters.ageRatings.length && !filters.ageRatings.includes(product.ageRating ?? "")) return false;
-  if (filters.years.length && !filters.years.includes(String(product.releaseYear || ""))) return false;
-  if (product.price < min || product.price > max || (filters.sale && !hasDiscount(product))) return false;
-  if (filters.minDiscount > 0 && (productDiscount(product)?.percent ?? 0) < filters.minDiscount) return false;
-  const text = [product.name, product.platform, normalizePlatform(product.platform).replace("PlayStation ", "PS"), product.category, product.genre, product.edition, product.brand].join(" ").toLowerCase();
-  return terms.every((term) => text.includes(term));
+  return (product: Product) => {
+    if (filters.section !== "all" && productSection(product) !== filters.section) return false;
+    if (filters.platforms.length && !filters.platforms.includes(normalizePlatform(product.platform))) return false;
+    if (filters.categories.length && !filters.categories.includes(product.category)) return false;
+    if (filters.conditions.length && !filters.conditions.includes(normalizeCondition(product.condition))) return false;
+    if (filters.brands.length && !filters.brands.includes(product.brand ?? "")) return false;
+    if (filters.genres.length && !filters.genres.includes(product.genre ?? "")) return false;
+    if (filters.formats.length && !filters.formats.includes(product.format ?? "")) return false;
+    if (filters.editions.length && !filters.editions.includes(product.edition ?? "")) return false;
+    if (filters.playModes.length && !filters.playModes.some((mode) => product.playModes?.includes(mode))) return false;
+    if (filters.ageRatings.length && !filters.ageRatings.includes(product.ageRating ?? "")) return false;
+    if (filters.years.length && !filters.years.includes(String(product.releaseYear || ""))) return false;
+    if (product.price < min || product.price > max || (filters.sale && !hasDiscount(product))) return false;
+    if (filters.minDiscount > 0 && (productDiscount(product)?.percent ?? 0) < filters.minDiscount) return false;
+    if (!terms.length) return true;
+    const text = [product.name, product.platform, normalizePlatform(product.platform).replace("PlayStation ", "PS"), product.category, product.genre, product.edition, product.brand].join(" ").toLowerCase();
+    return terms.every((term) => text.includes(term));
+  };
 }
 export function filterCatalog(products: readonly Product[], filters: CatalogFilters) {
-  const visible = products.filter((product) => matchesCatalog(product, filters));
+  const visible = products.filter(catalogMatcher(filters));
   return visible.toSorted((a, b) => {
     switch (filters.sort) {
       case "latest": return (b.createdAt ?? "").localeCompare(a.createdAt ?? "");
@@ -71,7 +74,8 @@ export function catalogFacets(products: readonly Product[], filters: CatalogFilt
   return catalogFacetKeys.filter((key) => filters.section === "all" || filters.section === "games" || !gameKeys.includes(key)).map((key) => {
     const counts = new Map<string, number>();
     const otherFilters = { ...filters, [key]: [] };
-    for (const product of scoped) if (matchesCatalog(product, otherFilters)) {
+    const matches = catalogMatcher(otherFilters);
+    for (const product of scoped) if (matches(product)) {
       for (const value of new Set(facetValues(product, key))) if (value) counts.set(value, (counts.get(value) ?? 0) + 1);
     }
     const values = [...new Set([...(defaults[key] ?? []), ...scoped.flatMap((product) => facetValues(product, key)), ...filters[key]])].filter(Boolean).sort((a, b) => key === "years" ? Number(b) - Number(a) : a.localeCompare(b));

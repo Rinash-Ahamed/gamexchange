@@ -4,6 +4,7 @@ import { useEffect, useRef, type ElementType, type ReactNode, type PointerEvent 
 
 /** Surface with a soft pointer-following light. One handler and CSS variables only; no re-renders. */
 export function LightCard({ children, className = "", as: Tag = "div" }: { children: ReactNode; className?: string; as?: ElementType }) {
+  const light = useRef<HTMLSpanElement>(null);
   const frame = useRef<number | undefined>(undefined);
   const pointer = useRef<{ element: HTMLElement; x: number; y: number } | undefined>(undefined);
   useEffect(() => () => { if (frame.current !== undefined) cancelAnimationFrame(frame.current); }, []);
@@ -16,13 +17,14 @@ export function LightCard({ children, className = "", as: Tag = "div" }: { child
       const point = pointer.current;
       if (!point?.element.isConnected) return;
       const rect = point.element.getBoundingClientRect();
-      point.element.style.setProperty("--mx", `${point.x - rect.left}px`);
-      point.element.style.setProperty("--my", `${point.y - rect.top}px`);
+      // Keep invalidation on the decorative layer, not inherited by every card child.
+      light.current?.style.setProperty("--mx", `${point.x - rect.left}px`);
+      light.current?.style.setProperty("--my", `${point.y - rect.top}px`);
     });
   };
   return (
     <Tag onPointerMove={onMove} className={`cursor-light-host group relative overflow-hidden ${className}`}>
-      <span aria-hidden className="cursor-light pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <span ref={light} aria-hidden className="cursor-light pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <div className="relative h-full">{children}</div>
     </Tag>
   );

@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { FirebaseError } from "firebase/app";
 import {
-  getMultiFactorResolver, multiFactor, sendEmailVerification, signInWithEmailAndPassword, signOut,
+  getMultiFactorResolver, multiFactor, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signOut,
   TotpMultiFactorGenerator, type MultiFactorError, type MultiFactorResolver, type TotpSecret, type User,
 } from "firebase/auth";
 import { firebaseClientAuth, firebaseClientConfigured } from "@/lib/firebase/client";
@@ -27,6 +27,7 @@ function errorMessage(error: unknown) {
   if (error instanceof FirebaseError) {
     const messages: Record<string, string> = {
       "auth/invalid-credential": "The email or password is incorrect.",
+      "auth/invalid-email": "Enter a valid email address.",
       "auth/wrong-password": "The email or password is incorrect.",
       "auth/user-not-found": "The email or password is incorrect.",
       "auth/invalid-verification-code": "That code is incorrect or expired. Try the current code from your authenticator.",
@@ -48,7 +49,8 @@ function errorMessage(error: unknown) {
 
 export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boolean }) {
   const [email, setEmail] = useState("");
-  const [stage, setStage] = useState<"password" | "enroll" | "code">("password");
+  const [stage, setStage] = useState<"password" | "reset" | "enroll" | "code">("password");
+  const [resetCooldown, setResetCooldown] = useState(false);
   const [resolver, setResolver] = useState<MultiFactorResolver | null>(null);
   const [factorUid, setFactorUid] = useState("");
   const [secret, setSecret] = useState<TotpSecret | null>(null);
@@ -57,6 +59,13 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const configured = serverConfigured && firebaseClientConfigured;
+  useEffect(() => {
+    if (!resetCooldown) return;
+    const timer = window.setTimeout(() => setResetCooldown(false), 60000);
+    return () => window.clearTimeout(timer);
+  }, [resetCooldown]);
+
+  const resetNotice = "If this email belongs to an eligible account, a password-reset link will be sent. Check your inbox and spam folder, then return here to sign in. Your authenticator is still required.";
 
   const startAgain = async () => {
     setBusy(true);
@@ -91,7 +100,16 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
     setBusy(true);
     try {
       const auth = firebaseClientAuth();
-      if (stage === "password") {
+      if (stage === "reset") {
+        if (resetCooldown) return;
+        setResetCooldown(true);
+        try { await sendPasswordResetEmail(auth, email.trim()); }
+        catch (caught) {
+          // Do not reveal whether an account exists, even if enumeration protection is disabled.
+          if (!(caught instanceof FirebaseError) || !["auth/user-not-found", "auth/user-disabled"].includes(caught.code)) throw caught;
+        }
+        setNotice(resetNotice);
+      } else if (stage === "password") {
         const password = String(data.get("password") ?? "");
         const passwordInput = form.elements.namedItem("password");
         if (passwordInput instanceof HTMLInputElement) passwordInput.value = "";
@@ -153,16 +171,17 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
       {notice && <p role="status" className="rounded-xl border border-line bg-surface p-4 text-sm text-ink">{notice}</p>}
       <form onSubmit={submit} className="space-y-4" aria-busy={busy}>
         <fieldset disabled={busy || !configured} className="min-w-0 space-y-4 disabled:opacity-60">
-          {stage === "password" ? (
+          {stage === "password" || stage === "reset" ? (
             <>
+              {stage === "reset" && <div><h2 className="font-display text-xl font-semibold uppercase">Reset your password</h2><p className="mt-2 text-sm leading-6 text-muted">Enter your admin email to request a secure reset link from Firebase. This does not reset your authenticator.</p></div>}
               <div>
                 <label htmlFor="admin-email" className={adminLabelClass}>Email</label>
                 <input id="admin-email" name="email" type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} className={adminInputClass} />
               </div>
-              <div>
+              {stage === "password" && <div>
                 <label htmlFor="admin-password" className={adminLabelClass}>Password</label>
                 <input id="admin-password" name="password" type="password" autoComplete="current-password" required className={adminInputClass} />
-              </div>
+              </div>}
             </>
           ) : (
             <>
@@ -190,10 +209,11 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
               </div>
             </>
           )}
-          <button type="submit" className={`${adminButtonClass} w-full`}>{busy ? "Please wait..." : stage === "password" ? "Continue" : stage === "enroll" ? "Connect authenticator" : "Verify and sign in"}</button>
+          <button type="submit" disabled={stage === "reset" && resetCooldown} className={`${adminButtonClass} w-full disabled:cursor-not-allowed disabled:opacity-60`}>{busy ? "Please wait..." : stage === "reset" ? resetCooldown ? "Wait before requesting again" : "Send reset link" : stage === "password" ? "Continue" : stage === "enroll" ? "Connect authenticator" : "Verify and sign in"}</button>
         </fieldset>
       </form>
-      {stage !== "password" && <button type="button" disabled={busy} onClick={() => void startAgain()} className={`${adminGhostButtonClass} w-full`}>Start again</button>}
+      {stage === "password" && <button type="button" disabled={busy || !configured} onClick={() => { setError(""); setNotice(""); setStage("reset"); }} className="inline-flex min-h-11 items-center text-sm font-semibold text-accent-text hover:underline disabled:opacity-50">Forgot password?</button>}
+      {stage !== "password" && <button type="button" disabled={busy} onClick={() => void startAgain()} className={`${adminGhostButtonClass} w-full`}>{stage === "reset" ? "Back to sign in" : "Start again"}</button>}
       <p className="text-xs text-muted">Admin access requires a verified email and an authenticator code. For a lost authenticator, contact the project owner.</p>
     </div>
   );

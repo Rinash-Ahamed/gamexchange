@@ -26,7 +26,7 @@ test("compact cards open details while cart actions stay separate", async ({ pag
 
 test("missing products have a helpful unavailable page", async ({ page }) => {
   await page.goto("/products/nonexistent-product-for-test");
-  await expect(page.getByRole("heading", { name: "This gear is unavailable." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "This product is unavailable." })).toBeVisible();
   await expect(page.getByRole("link", { name: "Back to the shop" })).toHaveAttribute("href", "/products");
 });
 

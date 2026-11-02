@@ -35,6 +35,14 @@ The banner LCP warning exposed a timing gap in the earlier lazy-to-eager viewpor
 
 ## Verification and limits
 
+### 2026-11-02: Native scrolling and bounded rendering work
+
+- Replaced the remaining Lenis wheel interception/always-running RAF loop with native browser scrolling on all routes. Browser CSS smooth anchor/programmatic scrolling, fixed-header offsets and reduced-motion overrides remain. No content, graphics, video, carousel controls or visible animation were removed. Lenis remains an unused dependency pending a separate dependency cleanup; it is no longer imported into the runtime or CSS.
+- Nav compact mode now uses one IntersectionObserver marker at the existing scroll threshold rather than a Motion scroll-value callback on every frame. Its width transition/active pills remain. Pointer-following card custom properties are written to the decorative overlay rather than the ancestor, reducing inherited-style invalidation across card content.
+- Promo slides use paint containment and delayed visibility hiding after the existing 520 ms crossfade. Invisible slides stop participating in paint while their loaded images stay mounted. Rotation interval, image quality, dimensions and motion remain. Hero filtered artwork is promoted separately from its animated wrapper to allow cached compositing; actual layer/raster performance still needs profiling.
+- Catalogue matching now prepares search terms/min/max once per pass instead of once per product for every facet, and does not construct searchable product text when the query is empty. Filtering/count/sort semantics remain unchanged. Added native-anchor regression source.
+- Source/whitespace reviewed only. Browser inventory reported that its access host was unavailable, so no DevTools trace, frame timing or visual/browser QA was obtained. Build, lint and tests were not run because they were not requested in this turn. 120 fps is a target for capable hardware, not a measured or guaranteed outcome; a 120 Hz display and approximately 8.3 ms frame budget are necessary. Network/database/server latency remains a separate measurement.
+
 ### 2026-10-30: Preserve-design interaction and navigation pass
 
 - Retained smooth scrolling but shortened its wheel easing from 0.9 to 0.22 seconds with a normal 1x wheel multiplier. Load Lenis only for eligible fine-pointer, non-reduced-motion public routes. Reinitialize on route changes to cancel stale inertia; admin uses native scrolling. Optional chunk-load failure leaves native scrolling intact.

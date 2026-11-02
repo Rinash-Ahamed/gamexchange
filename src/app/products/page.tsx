@@ -10,7 +10,7 @@ import { availableCatalog, type CatalogFilters } from "@/lib/catalog";
 import { productConditionSchema, productHref } from "@/lib/product-links";
 
 export const metadata: Metadata = {
-  title: "Shop consoles & gaming gear",
+  title: "Shop games, consoles & accessories",
   description: "Browse available games, consoles, controllers and accessories. Filter by platform, condition and price, then enquire with GamexChange.",
   alternates: { canonical: "/products" },
 };
@@ -44,8 +44,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
   return (
     <main>
-      <PageHero title={<>Choose<br /><span className="text-gradient">your gear.</span></>}>
-        Games, consoles and accessories, organised around the way you play. Find your platform, refine your options and ask us about the gear you want.
+      <PageHero title={<>Browse<br /><span className="text-gradient">products.</span></>}>
+        Browse games, consoles and accessories. Choose your platform and filter by price, condition and category.
       </PageHero>
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8"><ProductBrowser key={JSON.stringify(initialFilters)} products={products} initialFilters={initialFilters} /></div>
       <Script

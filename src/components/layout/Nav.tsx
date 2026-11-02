@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
-import { m, useMotionValueEvent, useScroll } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { m } from "motion/react";
 import { House, ShoppingBag, Repeat, Wrench, Gamepad2, Phone, type LucideIcon } from "lucide-react";
 import { navItems, whatsappUrl, type NavItem } from "@/data/site";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -25,17 +25,20 @@ const isActive = (pathname: string, href: string) => (href === "/" ? pathname ==
 export function Nav() {
   const pathname = usePathname();
   const [compact, setCompact] = useState(false);
-  const compactRef = useRef(false);
-  const { scrollY } = useScroll();
-  useMotionValueEvent(scrollY, "change", (y) => {
-    const next = y > 40;
-    if (compactRef.current === next) return;
-    compactRef.current = next;
-    setCompact(next);
-  });
+  const scrollMarker = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const marker = scrollMarker.current;
+    if (!marker) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry) setCompact(entry.boundingClientRect.bottom <= 0);
+    });
+    observer.observe(marker);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
+      <span ref={scrollMarker} aria-hidden className="pointer-events-none absolute left-0 top-10 h-px w-px" />
       {/* Top bar: floating glass pill on desktop, slim brand bar on mobile */}
       <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 sm:px-5 sm:pt-4">
         <div className={`glass-nav pointer-events-auto flex w-full items-center justify-between gap-3 rounded-full py-1.5 pl-5 pr-1.5 transition-[max-width,box-shadow] duration-500 ease-out [box-shadow:var(--shadow-card)] ${compact ? "max-w-[62rem]" : "max-w-6xl"}`}>

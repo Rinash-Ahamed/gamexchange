@@ -6,7 +6,7 @@ export function CatalogFilters({ filters, groups, priceCeiling, update, clear }:
   const ceiling = Math.max(1, priceCeiling, Number(filters.min) || 0, Number(filters.max) || 0);
   const inputClass = "min-h-11 w-full min-w-0 rounded-lg border border-line-strong bg-surface px-3 text-base text-ink sm:text-sm";
   return <div className="overflow-hidden rounded-2xl border border-line-strong bg-surface">
-    <div className="flex items-center justify-between border-b border-line p-4"><h2 className="font-display text-lg font-bold">Refine your gear</h2><button type="button" onClick={clear} className="min-h-11 px-1 text-xs font-semibold text-accent-text hover:underline">Reset</button></div>
+    <div className="flex items-center justify-between border-b border-line p-4"><h2 className="font-display text-lg font-bold">Filters</h2><button type="button" onClick={clear} className="min-h-11 px-1 text-xs font-semibold text-accent-text hover:underline">Reset</button></div>
     <div className="space-y-5 p-4">
       <label className="block"><span className="mb-2 block text-sm font-semibold">Sort results</span><select value={filters.sort} onChange={(event) => update({ sort: event.target.value as Filters["sort"] })} className={inputClass}>{Object.entries(catalogSorts).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
       <fieldset className="border-t border-line pt-4"><legend className="pr-2 text-sm font-semibold">Price range</legend><div className="grid grid-cols-2 gap-2">

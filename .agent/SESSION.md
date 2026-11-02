@@ -89,6 +89,24 @@ This is historical context. Later entries and the Current State section supersed
 
 ## Recent Updates
 
+### 2026-11-02: Plain-language shop and right-side filters
+
+- Replaced shop/product-detail gear wording with products, including the page heading/title, All products tab, Filters heading, sell/exchange link, empty/unavailable states and related-product browse link. Updated matching regression text.
+- Moved the desktop filter sidebar to the right and right-aligned the horizontal platform row. Mobile retains the filter toggle before results and wrapping platform chips. Removed counts from top department/platform badges while retaining exact result totals, sidebar facet counts, multi-select behavior and zero-stock disabling.
+- Changed the internal sell/exchange CTA to Next Link for client navigation. Source/whitespace reviewed only; build, lint, tests and browser layouts not run.
+
+### 2026-11-02: Second responsiveness pass after production configuration errors
+
+- Replaced Lenis wheel interception/idle RAF with native browser scrolling, keeping CSS smooth anchors/programmatic navigation, offsets and reduced motion. No visual assets, content, footer video, animated gradients, hero or carousel features removed.
+- Switched nav compact detection to an IntersectionObserver threshold marker, scoped pointer-light style writes to their overlay, isolated hero artwork for compositing and stopped invisible promo slides painting after their existing crossfade. Prepared catalogue match inputs once per pass and skipped unnecessary search-text construction for empty queries.
+- Consulted official rendering performance guidance; added native-anchor regression source. Source/whitespace reviewed only. Browser discovery failed with browser access host unavailable; no frame trace/120 fps or visual verification. Build/lint/tests not run in this turn. Earlier successful validation predates recent image management, auth recovery, module override and these optimizations; none should be described as covered by that earlier build.
+
+### 2026-11-02: Admin forgot password
+
+- Added Forgot password to the Firebase admin password stage, with an email-only reset form, Firebase sendPasswordResetEmail, generic account-existence-neutral confirmation, provider-error handling, 60-second UI resend cooldown and Back to sign in. Reused shared admin controls and kept authentication instructions visible.
+- Reset links use Firebase's hosted email/action flow and existing browser configuration. No custom reset tokens, public signup, passwords stored by the app or server-session changes. UID allowlist, verified email, TOTP enrollment/sign-in and revocation checks remain intact. Lost authenticator is not reset by this feature. Documented email template/provider abuse settings.
+- Consulted official Firebase password-reset and Identity Platform MFA guidance. Source/whitespace reviewed only; no emails sent, live authentication changes, build, lint or browser tests performed. Provider mail delivery and hosted reset completion remain unverified.
+
 ### 2026-11-02: Firebase Admin external-module production crash
 
 - User supplied Vercel ERR_REQUIRE_ESM stack: firebase-admin/auth loads jwks-rsa, whose CommonJS require('jose') resolves the ESM-only jose 6 entry point. Confirmed installed chain firebase-admin 14.5.0 > jwks-rsa 4.1.0 > jose 6.2.12 and the synchronous import in dependency source. This establishes the cause of the reported startup failure, not a missing Firebase variable.

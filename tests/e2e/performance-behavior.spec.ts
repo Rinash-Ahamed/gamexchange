@@ -25,3 +25,13 @@ test("public navigation keeps the shared shell and product destination", async (
   await expect(page.getByRole("searchbox", { name: "Search the shop" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Legal & Policies", exact: true })).toHaveCount(1);
 });
+
+test("native scrolling retains anchor navigation without a JavaScript wheel engine", async ({ page }) => {
+  await stubImages(page);
+  await page.goto("/franchise");
+  await page.keyboard.press("Escape");
+  await expect(page.locator("html")).not.toHaveClass(/\blenis\b/);
+  await page.getByRole("link", { name: "Explore our spaces", exact: true }).click();
+  await expect(page).toHaveURL(/#our-spaces$/);
+  await expect(page.getByRole("heading", { name: "Inside GamexChange.", exact: true })).toBeInViewport();
+});

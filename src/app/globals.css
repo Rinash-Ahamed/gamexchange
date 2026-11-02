@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "lenis/dist/lenis.css";
 
 /* ------------------------------------------------------------------
    DESIGN TOKENS
@@ -713,6 +712,9 @@ html.theme-anim-fallback .metal {
   animation: hero-product-showcase 5.6s ease-in-out 0.4s infinite both;
 }
 .hero-product-art {
+  /* Cache the filtered artwork separately from its moving showcase parent. */
+  transform: translateZ(0);
+  backface-visibility: hidden;
   filter: var(--img-filter) drop-shadow(0 24px 42px rgb(18 39 124 / 0.36)) drop-shadow(0 0 36px var(--hero-aura));
   user-select: none;
 }
@@ -773,6 +775,8 @@ html.theme-anim-fallback .metal {
   touch-action: pan-y;
 }
 .promo-switch-slide {
+  contain: paint;
+  visibility: hidden;
   position: relative;
   grid-area: 1 / 1;
   display: flex;
@@ -782,10 +786,12 @@ html.theme-anim-fallback .metal {
   opacity: 0;
   transform: scale(1.035);
   /* Continue moving through the 2.5s slide interval and its crossfade. */
-  transition: opacity 520ms ease, transform 3.1s linear;
+  transition: opacity 520ms ease, transform 3.1s linear, visibility 0s linear 520ms;
   pointer-events: none;
 }
 .promo-switch-slide[data-active="true"] {
+  visibility: visible;
+  transition-delay: 0s;
   z-index: 1;
   opacity: 1;
   transform: scale(1);
