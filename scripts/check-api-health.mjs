@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
 import { createServer } from "node:net";
 import { fileURLToPath } from "node:url";
@@ -33,6 +33,13 @@ async function check(name, run) {
 }
 
 try {
+  await check("Firebase Admin loads without CommonJS-to-ESM bridging", async () => {
+    const result = spawnSync(process.execPath, ["--no-experimental-require-module", "-e",
+      "require('firebase-admin/auth'); require('firebase-admin/firestore'); require('firebase-admin/storage'); import('firebase-admin/auth').catch(error => { console.error(error.message); process.exitCode = 1; });"], {
+      cwd: fileURLToPath(new URL("../", import.meta.url)), encoding: "utf8", timeout: 15000, windowsHide: true,
+    });
+    assert.equal(result.status, 0, `Firebase Admin module import failed: ${result.error?.message ?? result.stderr}`);
+  });
   const deadline = Date.now() + 60000;
   let ready = false;
   while (Date.now() < deadline) {

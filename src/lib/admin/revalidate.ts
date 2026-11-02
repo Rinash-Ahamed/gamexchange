@@ -10,7 +10,7 @@ const adminData = {
   banners: { tag: PUBLIC_BANNERS_TAG, paths: ["/", "/admin/banners"] },
   faqs: { tag: PUBLIC_FAQS_TAG, paths: ["/", "/admin/faqs"] },
   services: { tag: null, paths: ["/admin", "/admin/services"] },
-  homepageImages: { tag: HOMEPAGE_IMAGES_TAG, paths: ["/", "/admin/homepage-services", "/admin/homepage-gamezone"] },
+  homepageImages: { tag: HOMEPAGE_IMAGES_TAG, paths: ["/", "/game-zone", "/admin/homepage-services", "/admin/homepage-gamezone"] },
 } as const;
 
 /** Call only after a successful authorized admin mutation. */

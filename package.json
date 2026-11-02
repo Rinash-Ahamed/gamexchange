@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "private": true,
   "engines": {
-    "node": ">=22.5.0"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "next dev",
@@ -31,6 +31,11 @@
     "zod": "4.6.7"
   },
   "overrides": {
+    "firebase-admin": {
+      "jwks-rsa": {
+        "jose": "5.10.0"
+      }
+    },
     "@firebase/firestore": {
       "@grpc/grpc-js": "1.14.6"
     }

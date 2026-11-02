@@ -109,4 +109,6 @@ Image loading is explicit through `src/lib/image-loading.ts`: critical = eager/h
 
 Use `npm run build` in CI/hosting. Its postbuild step starts an isolated loopback production server and runs 12 non-mutating API smoke checks, including checkout guards. A health-check failure fails the command. `/api/health` reports process liveness only, not Firebase/Auth/Storage/Razorpay connectivity. Direct `next build` does not run npm lifecycle hooks. See `ARCHITECTURE_REVIEW.md` and `RAZORPAY_SETUP.md` for scope and limits.
 
+Node is pinned to 24.x. Deploy both package.json and package-lock.json. A scoped Firebase Admin > jwks-rsa > jose 5.10.0 override avoids the upstream CommonJS require of ESM-only jose 6 during server startup; do not edit node_modules manually. The next postbuild run adds a credential-free Firebase Admin import check with require(ESM) disabled, bringing the gate to 13 checks. This import gate does not verify remote credentials, MFA or Firestore/Storage access. Revisit the compatibility override when upstream resolves the module-loading issue.
+
 `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:e2e` (set `PW_CHROMIUM_PATH` to use a system Chromium). Specs: site, theme, cta, security, a11y (axe).

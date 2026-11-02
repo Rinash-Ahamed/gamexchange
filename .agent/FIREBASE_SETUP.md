@@ -163,7 +163,7 @@ There is no PC-components shop department. New PC-component categories and inven
 
 ## 12. Homepage service and Game Zone artwork
 
-Admin > Homepage > Service images manages the six existing service-card backgrounds. Game Zone images manages the PS5, PS4 and Logitech G29 homepage rate-card backgrounds. These are fixed image slots, not additional service/pricing records. Existing card titles, destinations and rates are unchanged; the separate Game Zone page keeps its existing imagery.
+Admin > Homepage > Service images manages the six existing service-card backgrounds. Game Zone images manages the PS5, PS4 and Logitech G29 rate-card backgrounds on both the homepage and /game-zone. Both use the same saved references and bundled defaults; one publish or restore updates both destinations. These are fixed image slots, not additional service/pricing records. Existing card titles, destinations and rates are unchanged.
 
 Use the same FIREBASE_STORAGE_BUCKET and server credentials as banners. No new environment variables, client write rules or indexes are needed. Recommended images are 1200 x 900 px (4:3); static JPG, PNG or WebP up to 5 MB, each side 300 to 4096 px. Images are validated, oriented, stripped of metadata and fitted within 1600 x 1600 px as WebP. Card backgrounds crop to fit, so keep important content centred.
 

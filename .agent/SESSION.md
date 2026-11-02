@@ -89,6 +89,18 @@ This is historical context. Later entries and the Current State section supersed
 
 ## Recent Updates
 
+### 2026-11-02: Firebase Admin external-module production crash
+
+- User supplied Vercel ERR_REQUIRE_ESM stack: firebase-admin/auth loads jwks-rsa, whose CommonJS require('jose') resolves the ESM-only jose 6 entry point. Confirmed installed chain firebase-admin 14.5.0 > jwks-rsa 4.1.0 > jose 6.2.12 and the synchronous import in dependency source. This establishes the cause of the reported startup failure, not a missing Firebase variable.
+- Added narrowly nested npm override for firebase-admin > jwks-rsa > jose 5.10.0, which exports a CommonJS entry point, and updated package-lock through npm install. Kept Firebase Admin/current auth logic and other dependencies unchanged. Pinned Node to 24.x to match local 24.15.0 instead of an unbounded >=22.5.0 range. This is a compatibility workaround to revisit after upstream CommonJS/ESM resolution is fixed.
+- Verified npm dependency tree and loaded Auth, Firestore and Storage through CommonJS plus Auth through ESM with Node's require(ESM) bridge explicitly disabled. No credentials, network authentication or customer data accessed. Added the same credential-free import gate to postbuild health checks, increasing the next run from 12 to 13 checks. That full gate/build/lint was not run in this turn.
+- Deployment not performed or verified. Deploy both package files, select Node 24.x in Vercel, and redeploy without the old build cache. If another error remains, inspect its new runtime log separately. No claim of live Firebase/MFA/Storage connectivity.
+
+### 2026-11-02: Shared managed Game Zone artwork
+
+- Connected /game-zone to the same publicHomepageImages cache and zone image keys already used on the homepage. Admin > Homepage > Game Zone images now publishes/restores the same PS5, PS4 and G29 backgrounds in both places. Added /game-zone invalidation and clarified admin guidance.
+- Game Zone data streams behind a station-height loading boundary without blocking its hero; route is dynamic so runtime images are not baked into build output. Titles, prices, default assets, imageLoading policy and enquiry form remain unchanged. Source/whitespace reviewed only; build, lint, browser tests and live uploads were not run.
+
 ### 2026-11-02: Streamed-section animation hydration mismatch
 
 - User trace identified data-motion-visible added to the streamed PromoSwitch heading before its selective hydration. The global MutationObserver/IntersectionObserver scheduler was mutating React-owned DOM from outside that boundary; this was not stale assets or Firebase content.
