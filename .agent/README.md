@@ -42,6 +42,8 @@ Visitors can collect multiple products at `/cart`, change quantities and send on
 
 Homepage promotions are managed at `/admin/banners`. Set `FIREBASE_STORAGE_BUCKET` for image uploads. Admins can preview, reorder, save drafts, publish up to five slides and replace or delete images. Upload requirements are shown in the editor. See the banner upload section of `FIREBASE_SETUP.md` for Storage setup and artwork sizes.
 
+Homepage also has Service images at `/admin/homepage-services` and Game Zone images at `/admin/homepage-gamezone`. These manage backgrounds for the six existing service cards and three homepage rate cards, with upload previews, confirmed publication and restoration of bundled originals. They use the existing Storage bucket and `settings/homepageImages`. Requirements: 1200 x 900 px recommended, static JPG/PNG/WebP up to 5 MB, 300 to 4096 px per side. Titles, links and rates are not edited here.
+
 The admin navigation groups **Banners** and **FAQs** under **Homepage**. Use `/admin/faqs` to manage question text, answers, display order and draft/published visibility. Existing FAQ content is copied into Firestore on the first admin visit; later edits are saved there and published questions appear on subsequent homepage visits or refreshes.
 
 Copy `.env.example` to `.env.local` and replace every placeholder before production:

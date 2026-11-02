@@ -1,10 +1,18 @@
 import type { BannerSlide } from "@/data/banners";
-import type { Product } from "@/data/products";
 import { PromoSwitch } from "./PromoSwitch";
-import { ShelfShowcase } from "./ShelfShowcase";
 import { Accordion } from "@/components/ui/Accordion";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import type { PublicFaq } from "@/lib/admin/faqs";
+import type { HomepageImages } from "@/data/homepage-images";
+import { Services } from "./Services";
+import { GameZoneCards } from "@/components/zone/GameZoneCards";
+
+export async function HomeServices({ data }: { data: Promise<HomepageImages> }) {
+  return <Services images={await data} />;
+}
+export async function HomeGameZone({ data }: { data: Promise<HomepageImages> }) {
+  return <GameZoneCards images={await data} />;
+}
 
 export async function HomeFaqs({ data }: { data: Promise<PublicFaq[]> }) {
   const faqs = await data;
@@ -27,11 +35,4 @@ export function BannerPlaceholder() {
       <div className="promo-switch-console"><div className="promo-joycon promo-joycon-left" /><div className="promo-switch-body"><div className="promo-switch-screen" /></div><div className="promo-joycon promo-joycon-right" /></div>
     </div>
   );
-}
-
-export async function HomeShelf({ data }: { data: Promise<Product[]> }) {
-  const products = await data;
-  const featured = products.filter((product) => product.featured);
-  const showcase = (featured.length ? featured : products).slice(0, 6);
-  return showcase.length ? <ShelfShowcase products={showcase} /> : <p className="text-muted">No consoles are listed right now. Contact the shop for current availability.</p>;
 }

@@ -160,3 +160,13 @@ There is no PC-components shop department. New PC-component categories and inven
 ## 11. Cart and sandbox orders
 
 `checkoutTestOrders` stores Razorpay sandbox order snapshots and verified payment references through the Admin SDK. No client Firestore write rules or new indexes are required. Admin > Test orders is a protected, read-only list of the latest 50 records. These are simulations, not fulfilment orders: real inventory is neither reserved nor decremented. See `RAZORPAY_SETUP.md` for the required server-only test keys, signed webhook setup and live-payment prerequisites. No retention cleanup or data migration has been enabled.
+
+## 12. Homepage service and Game Zone artwork
+
+Admin > Homepage > Service images manages the six existing service-card backgrounds. Game Zone images manages the PS5, PS4 and Logitech G29 homepage rate-card backgrounds. These are fixed image slots, not additional service/pricing records. Existing card titles, destinations and rates are unchanged; the separate Game Zone page keeps its existing imagery.
+
+Use the same FIREBASE_STORAGE_BUCKET and server credentials as banners. No new environment variables, client write rules or indexes are needed. Recommended images are 1200 x 900 px (4:3); static JPG, PNG or WebP up to 5 MB, each side 300 to 4096 px. Images are validated, oriented, stripped of metadata and fitted within 1600 x 1600 px as WebP. Card backgrounds crop to fit, so keep important content centred.
+
+Choose a file, inspect the preview and confirm Publish image. Restore original removes the override after confirmation. There is no draft state for these fixed slots. Uploaded objects use homepage-images/; references are stored in settings/homepageImages. Concurrent saves use a transaction. Replacement/restoration cleans up the previous uploaded object where possible; failed cleanup is logged. Bundled originals are never deleted. Public reads do not seed or mutate Firestore.
+
+Public references use a 60-second cache with immediate tag/homepage invalidation after admin changes, and versioned image endpoints check the currently saved reference before serving bytes. A bounded byte cache coalesces downloads. Open pages need a refresh; browser/image caches may briefly retain old public images. Do not upload private customer information.

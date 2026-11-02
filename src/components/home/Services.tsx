@@ -5,6 +5,7 @@ import { LightCard } from "@/components/ui/LightCard";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { imageLoading } from "@/lib/image-loading";
+import { serviceImages, type HomepageImages } from "@/data/homepage-images";
 
 const offerings = [
   { title: "Consoles & game discs", action: "Explore the shop", href: "/products", icon: Gamepad2, image: "/promos/console-arrivals.png" },
@@ -15,7 +16,7 @@ const offerings = [
   { title: "Franchise enquiry", action: "Partner with us", href: "/franchise", icon: Store, image: "/franchise/kovai-pudur.webp" },
 ] as const;
 
-export function Services() {
+export function Services({ images = {} }: { images?: HomepageImages }) {
   return (
     <section data-tone="blue" aria-labelledby="services-h" className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
       <SectionHeading title={<span id="services-h">Gear. Service.<br /><span className="text-gradient">Zero downtime.</span></span>}>
@@ -25,11 +26,12 @@ export function Services() {
       <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {offerings.map((s, i) => {
           const Icon = s.icon;
+          const image = images[serviceImages[i]!.id] || s.image;
           return (
             <Reveal as="li" key={s.title} delay={(i % 4) * 0.06}>
               <LightCard className="metal h-full rounded-3xl">
                 <Link href={s.href} target={s.href.startsWith("https://") ? "_blank" : undefined} rel={s.href.startsWith("https://") ? "noopener noreferrer" : undefined} className="service-offering relative isolate flex h-full min-h-72 flex-col overflow-hidden rounded-3xl p-6 text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-blue/60">
-                  <Image src={s.image} alt="" fill sizes="(min-width: 1280px) 400px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" {...imageLoading(s.image.startsWith("/hero/") || s.image.startsWith("/promos/") ? "visible" : "deferred")} className="service-offering-image -z-20 object-cover" />
+                  <Image src={image} alt="" fill sizes="(min-width: 1280px) 400px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" {...imageLoading(image.startsWith("/hero/") || image.startsWith("/promos/") ? "visible" : "deferred")} className="service-offering-image -z-20 object-cover" />
                   <span aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(4,8,18,0.28)_0%,rgba(4,8,18,0.65)_38%,rgba(4,8,18,0.97)_100%)]" />
                   <span className="flex items-start justify-between gap-4">
                     <span className="grid size-11 place-items-center rounded-2xl border border-white/25 bg-black/35 text-white"><Icon className="size-5" aria-hidden /></span>

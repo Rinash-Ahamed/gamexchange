@@ -6,10 +6,10 @@ test("off-screen decorative loops pause and resume without hiding content", asyn
   await page.goto("/franchise");
   await page.keyboard.press("Escape");
   const logo = page.locator(".footer-logo-heartbeat");
-  await expect(logo).toHaveAttribute("data-motion-visible", "false");
-  await expect(logo).toHaveCSS("animation-play-state", /paused/);
+  await expect.poll(() => logo.evaluate((element) => element.getAnimations().every((animation) => animation.playbackRate === 0))).toBe(true);
+  await expect(logo).not.toHaveAttribute("data-motion-visible");
   await logo.scrollIntoViewIfNeeded();
-  await expect(logo).toHaveAttribute("data-motion-visible", "true");
+  await expect.poll(() => logo.evaluate((element) => element.getAnimations().every((animation) => animation.playbackRate !== 0))).toBe(true);
   await expect(logo).toBeVisible();
   await expect(page.getByRole("heading", { name: "Need Help", exact: true })).toBeVisible();
 });

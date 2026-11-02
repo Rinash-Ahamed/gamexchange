@@ -938,38 +938,6 @@ html.theme-anim-fallback .metal {
   content: "";
 }
 .promo-joycon-right .promo-stick { top: 58%; }
-.promo-switch-screen::after {
-  position: absolute;
-  z-index: 3;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  opacity: 0;
-  content: "";
-  transition: opacity 250ms ease;
-}
-.promo-switch-console:has(.promo-joycon-left:focus-visible) .promo-switch-screen::after {
-  background: radial-gradient(ellipse 38% 90% at 0% 50%, rgb(50 174 255 / 0.48), transparent 100%);
-  box-shadow: inset 12px 0 28px -12px rgb(50 174 255 / 0.8);
-  opacity: 1;
-}
-.promo-switch-console:has(.promo-joycon-right:focus-visible) .promo-switch-screen::after {
-  background: radial-gradient(ellipse 38% 90% at 100% 50%, rgb(255 58 87 / 0.48), transparent 100%);
-  box-shadow: inset -12px 0 28px -12px rgb(255 58 87 / 0.8);
-  opacity: 1;
-}
-@media (hover: hover) and (pointer: fine) {
-  .promo-switch-console:has(.promo-joycon-left:hover) .promo-switch-screen::after {
-    background: radial-gradient(ellipse 38% 90% at 0% 50%, rgb(50 174 255 / 0.48), transparent 100%);
-    box-shadow: inset 12px 0 28px -12px rgb(50 174 255 / 0.8);
-    opacity: 1;
-  }
-  .promo-switch-console:has(.promo-joycon-right:hover) .promo-switch-screen::after {
-    background: radial-gradient(ellipse 38% 90% at 100% 50%, rgb(255 58 87 / 0.48), transparent 100%);
-    box-shadow: inset -12px 0 28px -12px rgb(255 58 87 / 0.8);
-    opacity: 1;
-  }
-}
 .promo-dpad,
 .promo-face-buttons {
   position: absolute;
@@ -1260,12 +1228,6 @@ html.theme-anim-fallback .metal {
 
 /* Pause every looping animation while the hero is off-screen. */
 [data-live="false"] *, [data-live="false"] *::before { animation-play-state: paused !important; }
-
-/* No visual simplification: resume the same loops when their content is visible. */
-[data-motion-visible="false"],
-html[data-effects-paused="true"] .text-gradient,
-html[data-effects-paused="true"] .text-gradient-motion,
-html[data-effects-paused="true"] .footer-logo-heartbeat { animation-play-state: paused !important; }
 
 @media (max-width: 1023px) {
   .ctl-tilt, .pl { transition: none; }

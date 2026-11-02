@@ -14,6 +14,8 @@ const items = [
 ] as const;
 
 const homepageItems = [
+  { href: "/admin/homepage-services", label: "Service images", icon: Images },
+  { href: "/admin/homepage-gamezone", label: "Game Zone images", icon: Images },
   { href: "/admin/banners", label: "Banners", icon: Images },
   { href: "/admin/faqs", label: "FAQs", icon: MessageCircleQuestion },
 ] as const;

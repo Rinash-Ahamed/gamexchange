@@ -10,7 +10,7 @@ This file stores durable context between development sessions. Keep entries conc
 
 ## Current State
 
-- Shop now uses compact responsive cards, public product-detail pages, 20-product numbered client-side pagination and a curated consumer sidebar. These latest changes are source/whitespace reviewed only; they are newer than the successful build/lint run recorded below.
+- Shop now uses compact responsive cards, public product-detail pages, 20-product numbered client-side pagination and a curated consumer sidebar. Latest requested local lint and production build passed on 2026-11-02, including TypeScript, all 27 generated pages and all 12 automatic API smoke checks. Homepage shelf removal and the prefetch signature fix are included. Browser layouts, live Firebase and Vercel runtime remain unverified.
 
 - Cart and Razorpay sandbox checkout are implemented. See `RAZORPAY_SETUP.md` for the three server-only environment values, webhook setup, data handling and recovery limits. Live keys are blocked. Test orders do not reserve/decrement stock or create deliveries. Provider/dashboard configuration and an actual test payment are not verified.
 
@@ -88,6 +88,29 @@ This is historical context. Later entries and the Current State section supersed
 - Run typecheck, lint, build, and Playwright only when explicitly requested.
 
 ## Recent Updates
+
+### 2026-11-02: Streamed-section animation hydration mismatch
+
+- User trace identified data-motion-visible added to the streamed PromoSwitch heading before its selective hydration. The global MutationObserver/IntersectionObserver scheduler was mutating React-owned DOM from outside that boundary; this was not stale assets or Firebase content.
+- Replaced scheduler attributes with browser Web Animations playback-rate control. Off-screen/hidden-tab loops use a zero rate, restoring their original rate when visible and on cleanup. React markup/inline styles stay unchanged, existing CSS visibility gates and reduced-motion rules remain authoritative, and streamed/new headings still get observed.
+- Removed obsolete attribute CSS and updated regression source to check animation playback rates and absence of injected attributes. No suppression, hydration delay, SSR removal or visual feature removal. Source/whitespace reviewed only; build, lint, browser hydration/performance and tests were not run in this update. Earlier successful checks predate this and homepage-image management.
+
+### 2026-11-02: Homepage artwork controls and Joy-Con light removal
+
+- Removed red/blue light-spill hover/focus effects from the Nintendo-style banner screen. Kept coloured Joy-Con bodies, controls, focus accessibility and rotation interval.
+- Added Admin > Homepage > Service images and Game Zone images for the six service backgrounds and three homepage rate-card backgrounds. Fixed slots have current/selected previews, shared file-button styles, concise requirements, confirmation before publishing/restoring and five-second success notices. Service links/titles, zone pricing and separate Game Zone route remain unchanged.
+- Added authenticated server actions, static-image decode/size checks and WebP processing, homepage-images Storage objects and transactional settings/homepageImages references. Versioned public endpoint validates slot/current version, with bounded download cache; public references cache for 60 seconds and admin actions invalidate homepage/routes immediately. Original bundled art remains the fallback; no public-read initialization writes or new environment variables.
+- Streamed managed images into existing sections without holding up hero rendering. Existing imageLoading intents, responsive layouts and overlays remain. No live uploads, Firebase changes or deployment performed. Source/whitespace reviewed; build, lint, typecheck and tests not run because this request did not ask for checks. See FIREBASE_SETUP.md for upload requirements and caching limits.
+
+### 2026-11-02: Requested lint and production build
+
+- Ran npm.cmd run lint successfully with no warnings/errors. Ran npm.cmd run build successfully: compilation, TypeScript, 27 generated pages, route optimization and all 12 automatic postbuild API smoke checks passed. The reported NavigationPrefetch type error did not recur; no additional source fixes were required in this run.
+- These are local workspace results, not a deployed Vercel check. API smoke checks deliberately do not verify Firebase/Auth/Storage connectivity, live payments or customer workflows. Browser tests and performance measurements were not run. Earlier Vercel runtime failure still requires sanitized runtime logs if it persists after deploying this revision.
+
+### 2026-11-02: Remove homepage shelf section
+
+- Interpreted the user's "self section" as the From our shelf product showcase. Removed it and its loading placeholder from the homepage, plus the now-unused HomeShelf wrapper and homepage catalogue request. Connected Services directly to Trade-in and renumbered remaining level transitions.
+- Shop, inventory, product details, cart, managed data and reusable showcase source remain intact. This removes the homepage's inventory read and showcase rendering, without deleting stock. Source and whitespace reviewed; build, lint, tests and browser checks were not run.
 
 ### 2026-11-02: Navigation prefetch build type mismatch
 
