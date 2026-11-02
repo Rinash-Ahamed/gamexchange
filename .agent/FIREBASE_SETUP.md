@@ -172,3 +172,15 @@ Use the same FIREBASE_STORAGE_BUCKET and server credentials as banners. No new e
 Choose a file, inspect the preview and confirm Publish image. Restore original removes the override after confirmation. There is no draft state for these fixed slots. Uploaded objects use homepage-images/; references are stored in settings/homepageImages. Concurrent saves use a transaction. Replacement/restoration cleans up the previous uploaded object where possible; failed cleanup is logged. Bundled originals are never deleted. Public reads do not seed or mutate Firestore.
 
 Public references use a 60-second cache with immediate tag/homepage invalidation after admin changes, and versioned image endpoints check the currently saved reference before serving bytes. A bounded byte cache coalesces downloads. Open pages need a refresh; browser/image caches may briefly retain old public images. Do not upload private customer information.
+
+## 13. Franchise gallery and locations
+
+Admin > Homepage > Franchise photos opens /admin/franchise. Add a store image with city, state, location/locality, an image description, display order and Draft/Published status. Editing can replace the photo or just update its location. All mutations require the approved MFA session and confirmation. Up to 50 photos can be saved. No new environment variables or client write rules are required; use the existing Storage bucket.
+
+Images accept static JPG, PNG or WebP up to 5 MB with sides from 300 to 4096 px; 1200 x 900 px is recommended. Portraits retain their aspect ratio. The server checks decoded content, rotates, strips metadata and fits within 1600 x 1600 px as WebP. Objects live under franchise-images/ and records in franchisePhotos. settings/franchisePhotos is a persistent initialization marker.
+
+The first admin visit imports the original six gallery records only when the collection and marker are absent. Original photo captions are preserved, without guessing structured addresses; complete city/state/locality when editing them. Deleted photos never auto-reseed, and bundled source files are not deleted. Before initialization, the public gallery uses those originals. Public reads do not write.
+
+Only published records appear publicly. Draft upload previews require admin authorization. Versioned image endpoints check current publication/version; byte downloads have a bounded cache. Public gallery reads cache for 60 seconds and admin saves invalidate /franchise immediately; already open pages need a refresh. Old public images may briefly remain in browser/image caches. Replaced/deleted uploaded files are cleaned up when possible; cleanup failures are logged for manual review.
+
+The gallery location captions update from admin. The supplied illustrated map and its historical location list remain separate static content; adding a photo does not invent a map pin or alter contact-page branches. The top-section franchise video is the bundled public/video/franchise-video.mp4 with a poster, native controls, no autoplay/preload and off-screen/hidden-tab pausing. It is not uploaded through the photo editor.

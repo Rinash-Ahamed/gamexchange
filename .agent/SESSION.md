@@ -89,6 +89,20 @@ This is historical context. Later entries and the Current State section supersed
 
 ## Recent Updates
 
+### 2026-11-02: Native themed scrollbars
+
+- Interpreted confirmation as accepting themed scrollbars, not a sideways whole-page redesign. Added shared blue/violet native scrollbar styling for the page and horizontal overflow containers, with theme-token tracks, rounded thumbs, standard browser fallback and forced-colour support. No scrolling JavaScript, new overflow or animation loop added.
+- Replaced hidden-scrollbar styling in the reusable shelf swipe list with visible themed styling and keyboard focus. The shelf remains removed from the homepage; no removed section was restored. Actual scrollbar visibility still follows real overflow and OS overlay-scrollbar settings.
+- Source/whitespace reviewed only. Build, lint, tests and browser/OS/theme visual checks were not run.
+
+### 2026-11-02: Franchise video and managed gallery
+
+- Added supplied 4,584,886-byte franchise-video.mp4 to the franchise introduction with native controls, contained responsive frame and existing photo poster. No autoplay/preloading; pause off-screen/hidden. Original top photo remains in gallery. Video was not re-encoded or deleted.
+- Added Admin > Homepage > Franchise photos, with create, collapsed edit, optional image replacement, city/state/locality, accessible description, display order, Draft/Published and confirmed deletion. Used shared controls, confirmation dialogs and timed notices. Original six captions preserved; missing structured location fields are explicitly left blank until admin confirms them.
+- Added authenticated actions, transactional gallery writes/cap of 50, private draft-image access, validated WebP uploads and cleanup in franchise-images/, records in franchisePhotos and persistent settings/franchisePhotos marker. First admin initialization imports bundled photos only into an empty uninitialized collection. Public reads never seed; intentionally empty galleries stay empty.
+- Public gallery streams separately from the static hero/video, caches published records for 60 seconds and invalidates on admin saves. Versioned image route validates current version/visibility, and byte downloads are bounded/coalesced. Static map/list and contact branches remain unchanged; new captions are not invented map pins. No remote writes, uploads, emails or deployment performed.
+- Source/whitespace reviewed only; build, lint, typecheck, tests, video playback/audio/captions and live Firebase workflows remain unverified. No provided caption transcript exists. See FIREBASE_SETUP.md for workflows and limits.
+
 ### 2026-11-02: Plain-language shop and right-side filters
 
 - Replaced shop/product-detail gear wording with products, including the page heading/title, All products tab, Filters heading, sell/exchange link, empty/unavailable states and related-product browse link. Updated matching regression text.

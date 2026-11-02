@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { MapPin, Store } from "lucide-react";
+import { Store } from "lucide-react";
+import { Suspense } from "react";
+import { FranchiseVideo } from "@/components/franchise/FranchiseVideo";
+import { FranchiseGallery } from "@/components/franchise/FranchiseGallery";
 import { PageHero } from "@/components/ui/PageHero";
 import { ControllerButton } from "@/components/ui/ControllerButton";
-import { franchiseLocations, franchisePhotos } from "@/data/franchise";
+import { franchiseLocations } from "@/data/franchise";
 import { whatsappUrl } from "@/data/site";
 import { imageLoading } from "@/lib/image-loading";
 
@@ -12,6 +15,8 @@ export const metadata: Metadata = {
   description: "Bring GamexChange to your city. Explore our store spaces and locations, and speak to the team about a franchise opportunity.",
   alternates: { canonical: "/franchise" },
 };
+
+export const dynamic = "force-dynamic";
 
 const enquiry = whatsappUrl("Hi GamexChange, I would like to enquire about a franchise. My preferred city / area is: \nDo I have a premises in mind? \nPlease share the requirements, investment details and next steps.");
 
@@ -32,20 +37,12 @@ export default function FranchisePage() {
           </div>
           <p className="mt-4 text-xs leading-5 text-muted">Investment, space requirements, availability and partnership terms are confirmed directly by the team.</p>
         </div>
-        <figure className="min-w-0 overflow-hidden rounded-3xl border border-line-strong bg-surface">
-          <Image src="/franchise/kovai-pudur.webp" alt="Inside the GamexChange Kovai Pudur store, with its branded counter, neon lighting and gaming hardware displays" width={1181} height={1280} sizes="(min-width: 1280px) 580px, (min-width: 1024px) 46vw, 100vw" {...imageLoading("critical")} className="mx-auto h-auto max-h-[34rem] w-full object-contain" />
-          <figcaption className="border-t border-line px-5 py-3 text-sm text-muted">Kovai Pudur, Coimbatore</figcaption>
-        </figure>
+        <FranchiseVideo />
       </section>
 
       <section id="our-spaces" aria-labelledby="spaces-heading" className="scroll-mt-28">
         <div className="mb-6 max-w-2xl"><h2 id="spaces-heading" className="font-display text-3xl font-bold uppercase">Inside <span className="text-gradient">GamexChange.</span></h2><p className="mt-3 leading-7 text-muted">A look at our stores and gaming lounges. Layouts and facilities vary by location.</p></div>
-        <div className="grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {franchisePhotos.map((photo) => <figure key={photo.src} className="min-w-0 overflow-hidden rounded-2xl border border-line-strong bg-surface">
-            <Image src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} sizes="(min-width: 1280px) 390px, (min-width: 1024px) 30vw, (min-width: 640px) 46vw, 100vw" {...imageLoading(photo.src === "/franchise/kovai-pudur.webp" ? "visible" : "deferred")} className="h-auto w-full" />
-            <figcaption className="flex min-h-16 items-center gap-2 border-t border-line px-4 py-3 text-sm font-semibold"><MapPin className="size-4 shrink-0 text-accent-text" aria-hidden />{photo.title}</figcaption>
-          </figure>)}
-        </div>
+        <Suspense fallback={<div role="status" className="min-h-64 rounded-2xl border border-line bg-surface p-6 text-sm text-muted">Loading store photos...</div>}><FranchiseGallery /></Suspense>
       </section>
 
       <section aria-labelledby="locations-heading" className="grid items-start gap-7 lg:grid-cols-2 lg:gap-12">

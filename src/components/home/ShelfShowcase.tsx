@@ -50,7 +50,7 @@ export function ShelfShowcase({ products }: { products: readonly Product[] }) {
   return (
     <>
       {/* swipe carousel: touch, small screens, reduced motion */}
-      <ul className="hide-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 pinned:hidden sm:-mx-8 sm:px-8" aria-label="Pre-owned consoles">
+      <ul tabIndex={0} className="themed-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)] pinned:hidden sm:-mx-8 sm:px-8" aria-label="Pre-owned consoles">
         {products.map((x, i) => (
           <li key={x.id} className="w-[82vw] max-w-sm shrink-0 snap-start sm:w-80">
             <ProductCard product={x} index={i} total={n} />

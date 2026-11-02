@@ -327,8 +327,46 @@ html.theme-anim-fallback .metal {
   animation: gradient-flow 4.5s linear infinite;
 }
 
-.hide-scrollbar { scrollbar-width: none; }
-.hide-scrollbar::-webkit-scrollbar { display: none; }
+/* Native scrollbars: no JavaScript wheel interception or artificial page overflow. */
+html,
+.themed-scrollbar,
+.overflow-x-auto,
+.overflow-x-scroll {
+  scrollbar-color: var(--accent) var(--surface-2);
+  scrollbar-width: auto;
+}
+@supports selector(::-webkit-scrollbar) {
+  html, .themed-scrollbar, .overflow-x-auto, .overflow-x-scroll { scrollbar-color: auto; }
+  html::-webkit-scrollbar,
+  .themed-scrollbar::-webkit-scrollbar,
+  .overflow-x-auto::-webkit-scrollbar,
+  .overflow-x-scroll::-webkit-scrollbar { width: 12px; height: 12px; }
+  html::-webkit-scrollbar-track,
+  .themed-scrollbar::-webkit-scrollbar-track,
+  .overflow-x-auto::-webkit-scrollbar-track,
+  .overflow-x-scroll::-webkit-scrollbar-track { background: var(--surface-2); border-radius: 999px; }
+  html::-webkit-scrollbar-thumb,
+  .themed-scrollbar::-webkit-scrollbar-thumb,
+  .overflow-x-auto::-webkit-scrollbar-thumb,
+  .overflow-x-scroll::-webkit-scrollbar-thumb {
+    min-width: 44px;
+    min-height: 44px;
+    border: 3px solid var(--surface-2);
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  }
+  html::-webkit-scrollbar-corner,
+  .themed-scrollbar::-webkit-scrollbar-corner,
+  .overflow-x-auto::-webkit-scrollbar-corner,
+  .overflow-x-scroll::-webkit-scrollbar-corner { background: var(--surface-2); }
+}
+@media (forced-colors: active) {
+  html, .themed-scrollbar, .overflow-x-auto, .overflow-x-scroll { scrollbar-color: auto; }
+  html::-webkit-scrollbar-thumb, .themed-scrollbar::-webkit-scrollbar-thumb,
+  .overflow-x-auto::-webkit-scrollbar-thumb, .overflow-x-scroll::-webkit-scrollbar-thumb { background: ButtonText; border-color: Canvas; }
+  html::-webkit-scrollbar-track, .themed-scrollbar::-webkit-scrollbar-track,
+  .overflow-x-auto::-webkit-scrollbar-track, .overflow-x-scroll::-webkit-scrollbar-track { background: Canvas; }
+}
 
 /* ---------- First-session game boot ---------- */
 .boot-screen {

@@ -77,7 +77,7 @@ The default theme follows the visitor's local time: light from 6:00 AM through 5
 
 ## Notes
 
-- `/franchise` is a dedicated public franchise page, linked from the homepage service card and footer. Supplied store photos and a cropped locations-only map are optimized under `public/franchise/`; captions and accessible location text live in `src/data/franchise.ts`. Enquiry opens a draft WhatsApp message without automatic submission. Fees, profitability, territory availability and support packages are not invented. This page does not change the separate contact branch registry.
+- `/franchise` has a top-section click-to-play video and a streamed managed photo gallery. Admin > Homepage > Franchise photos manages photos with city, state, locality, description, order and draft/published status using the existing Firebase bucket. Defaults remain under `public/franchise/` and `src/data/franchise.ts`; the supplied illustrated map/location list stays separate and static. Enquiry opens a WhatsApp draft. See FIREBASE_SETUP.md for initialization, upload and caching limits. Contact branches, financial terms and map coordinates are not inferred from photo entries.
 
 - Forms never claim a booking. Success means "ready to send on WhatsApp".
 - Product images load from the existing site's CDN (`framerusercontent.com`); self-host them before decommissioning the old site.
