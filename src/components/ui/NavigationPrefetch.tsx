@@ -23,7 +23,10 @@ export function NavigationPrefetch() {
       if ((warmed.get(href) ?? 0) > Date.now()) return;
       warmed.set(href, Date.now() + 30000);
       if (warmed.size > 64) warmed.delete(warmed.keys().next().value!);
-      router.prefetch(href, { onInvalidate: () => warmed.delete(href) });
+      // Use the public one-argument API. This Next version requires an internal
+      // PrefetchKind enum whenever an options object is supplied.
+      // The bounded warm-up map expires independently after 30 seconds.
+      router.prefetch(href);
     };
     const hover = (event: PointerEvent) => {
       window.clearTimeout(timer);

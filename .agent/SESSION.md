@@ -89,6 +89,12 @@ This is historical context. Later entries and the Current State section supersed
 
 ## Recent Updates
 
+### 2026-11-02: Navigation prefetch build type mismatch
+
+- User supplied a production build failure at NavigationPrefetch: installed Next.js 16.4.3 declares a required internal PrefetchKind in any supplied options object. The previously added onInvalidate-only options object did not satisfy that signature. This was an implementation mismatch, not a Firebase/environment problem.
+- Switched to the supported public one-argument router.prefetch(href) call, retaining intent gates and bounded 30-second warm-up deduplication. No internal Next enum import, type cast, dependency upgrade or feature removal. Next still manages its own route cache; local deduplication now expires by time rather than an invalidation callback.
+- Checked installed declarations and source/whitespace only. Build, lint, typecheck, tests and deployment were not run in this update because the user asked why the reported build failed, not to execute checks. The supplied failed build is not a verified successful build after the fix.
+
 ### 2026-10-30: Preserve-design performance and navigation pass
 
 - Retained all visual features, footer video, hero art, carousel and smooth scrolling. Shortened Lenis wheel easing, dynamically load it for eligible public desktop pointers only and reset its inertia across route navigation. Admin/touch/reduced motion stay native. Added shared off-screen/hidden-tab gradient and footer-logo animation scheduling, per-frame LightCard pointer batching and threshold-only Nav/shelf state updates.
