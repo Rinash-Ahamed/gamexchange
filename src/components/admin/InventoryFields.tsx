@@ -12,6 +12,7 @@ export function InventoryFields({ item, categories }: { item?: InventoryItem; ca
   return (
     <>
       {item && <input type="hidden" name="id" value={item.id} />}
+      {item && <input type="hidden" name="expectedUpdatedAt" value={item.updatedAt} />}
       <label><span className={adminLabelClass}>SKU</span><input name="sku" required maxLength={160} defaultValue={item?.sku} placeholder="PS5-SLIM-001" className={adminInputClass} /></label>
       <label className="sm:col-span-2"><span className={adminLabelClass}>Product name</span><input name="name" required maxLength={160} defaultValue={item?.name} className={adminInputClass} /></label>
       <InventoryCatalogFields item={item} />

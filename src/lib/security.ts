@@ -1,17 +1,17 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import type { NextRequest } from "next/server";
+import { signingSecret, consumeSharedToken, sharedSecurityStore } from "@/lib/security-store";
 
 /**
  * Secret for signing form tokens. Set ENQUIRY_SECRET in production (required when more than one
- * server instance runs, so every instance can verify tokens issued by another). Without it we
- * fall back to a per-process random secret: safe, but tokens die on restart / are instance-local.
+ * server instance runs, so every instance can verify tokens issued by another). Configured
+ * Firebase deployments require a strong secret; only unconfigured local fixtures use a fallback.
  */
-const secret = process.env.ENQUIRY_SECRET ? Buffer.from(process.env.ENQUIRY_SECRET) : randomBytes(32);
 
 const MIN_AGE_MS = 2_000; // people can't fill a form faster than this
 const MAX_AGE_MS = 2 * 60 * 60 * 1000;
 
-const sign = (payload: string) => createHmac("sha256", secret).update(payload).digest("base64url");
+const sign = (payload: string) => createHmac("sha256", signingSecret()).update(payload).digest("base64url");
 
 /** Single-use form token: `<issuedAt>.<nonce>.<hmac>`. */
 export function issueToken(now = Date.now()) {
@@ -21,14 +21,16 @@ export function issueToken(now = Date.now()) {
 
 const used = new Map<string, number>();
 
-export type TokenResult = "ok" | "missing" | "invalid" | "too-fast" | "expired" | "replayed";
+export type TokenResult = "ok" | "missing" | "invalid" | "too-fast" | "expired" | "replayed" | "unavailable";
 
-export function verifyToken(token: unknown, now = Date.now()): TokenResult {
+export async function verifyToken(token: unknown, now = Date.now()): Promise<TokenResult> {
   if (typeof token !== "string" || token.length === 0) return "missing";
   const parts = token.split(".");
   if (parts.length !== 3) return "invalid";
   const [issued, nonce, mac] = parts as [string, string, string];
-  const expected = sign(`${issued}.${nonce}`);
+  let expected: string;
+  try { expected = sign(`${issued}.${nonce}`); }
+  catch { return "unavailable"; }
   const a = Buffer.from(mac);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return "invalid";
@@ -37,6 +39,14 @@ export function verifyToken(token: unknown, now = Date.now()): TokenResult {
   if (!Number.isFinite(age) || age < 0) return "invalid";
   if (age < MIN_AGE_MS) return "too-fast";
   if (age > MAX_AGE_MS) return "expired";
+
+  if (sharedSecurityStore()) {
+    try { return await consumeSharedToken(nonce, Number(issued) + MAX_AGE_MS) ? "ok" : "replayed"; }
+    catch {
+      console.error("[security-store] Token protection unavailable");
+      return "unavailable";
+    }
+  }
 
   for (const [k, t] of used) if (now - t > MAX_AGE_MS) used.delete(k);
   if (used.has(nonce)) return "replayed";

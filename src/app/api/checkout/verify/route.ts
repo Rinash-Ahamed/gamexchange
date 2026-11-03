@@ -4,7 +4,7 @@ import { checkoutBody, checkoutFailure, checkoutGuard, checkoutJson } from "@/li
 
 export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
-  const denied = checkoutGuard(request, "checkout-verify", 30);
+  const denied = await checkoutGuard(request, "checkout-verify", 30);
   if (denied) return denied;
   try {
     const input = verifySchema.safeParse(await checkoutBody(request));

@@ -22,9 +22,12 @@ export async function POST(req: NextRequest) {
 
   // Cheap guards first: per-client, then a global valve so a botnet can't spam the pipeline.
   const ip = clientKey(req);
-  const perIp = rateLimit(`enquiry:${ip}`, ip === "unknown" ? 40 : 6, 10 * 60 * 1000);
+  const perIp = await rateLimit(`enquiry:${ip}`, ip === "unknown" ? 40 : 6, 10 * 60 * 1000);
+  if (perIp.unavailable) return fail("Enquiries are temporarily unavailable. Please try again shortly.", 503);
   if (!perIp.ok) return fail("Too many enquiries. Please wait a few minutes and try again.", 429, {}, { "Retry-After": String(perIp.retryAfter) });
-  if (!rateLimit("enquiry:global", 300, 10 * 60 * 1000).ok) return fail("We’re busy right now. Please try again shortly.", 429, {}, { "Retry-After": "120" });
+  const global = await rateLimit("enquiry:global", 300, 10 * 60 * 1000);
+  if (global.unavailable) return fail("Enquiries are temporarily unavailable. Please try again shortly.", 503);
+  if (!global.ok) return fail("We’re busy right now. Please try again shortly.", 429, {}, { "Retry-After": "120" });
 
   let json: unknown;
   try {
@@ -36,7 +39,8 @@ export async function POST(req: NextRequest) {
   if (typeof json !== "object" || json === null || Array.isArray(json)) return fail("Invalid request.", 400);
 
   const { _t: token, ...body } = json as Record<string, unknown>;
-  const tokenState = verifyToken(token);
+  const tokenState = await verifyToken(token);
+  if (tokenState === "unavailable") return fail("Enquiries are temporarily unavailable. Please try again shortly.", 503);
   if (tokenState !== "ok") {
     const msg = tokenState === "too-fast" ? "That was quick. Please review your details and send again." : "Your session expired. Please reload the page and try again.";
     return fail(msg, tokenState === "too-fast" ? 429 : 400, { retry: true });
@@ -49,7 +53,9 @@ export async function POST(req: NextRequest) {
   if (parsed.data.website) return NextResponse.json({ ok: true, whatsappUrl: whatsappUrl() }, { headers: { "Cache-Control": "no-store" } });
 
   // One phone number can't flood the shop even from many IPs.
-  if (!rateLimit(`phone:${parsed.data.phone}`, 3, 60 * 60 * 1000).ok) {
+  const phoneLimit = await rateLimit(`phone:${parsed.data.phone}`, 3, 60 * 60 * 1000);
+  if (phoneLimit.unavailable) return fail("Enquiries are temporarily unavailable. Please try again shortly.", 503);
+  if (!phoneLimit.ok) {
     return fail("We already have several enquiries from this number. Please message the shop on WhatsApp directly.", 429);
   }
 

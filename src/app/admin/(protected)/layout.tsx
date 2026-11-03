@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { LogOut, Store } from "lucide-react";
 import { AdminNav } from "@/components/admin/AdminNav";
+import { AdminIdleSession } from "@/components/admin/AdminIdleSession";
 import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
 import { Wordmark } from "@/components/layout/Wordmark";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -17,6 +18,7 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
 
   return (
     <div className="min-h-dvh bg-void lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
+      <AdminIdleSession idleExpiresAt={session.idleExpiresAt} />
       <aside data-native-scroll className="border-b border-line bg-surface/80 p-3 backdrop-blur lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:overflow-y-auto lg:border-b-0 lg:border-r lg:p-4">
         <div className="flex items-center justify-between gap-3">
           <Wordmark />

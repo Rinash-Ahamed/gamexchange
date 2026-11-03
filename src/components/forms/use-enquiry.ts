@@ -12,21 +12,54 @@ export type EnquiryState =
   | { status: "success"; whatsappUrl: string }
   | { status: "error"; message: string };
 
+type EnquiryResponse = { ok: boolean; token?: string; error?: string; fieldErrors?: Errors; whatsappUrl?: string; retry?: boolean };
+
+async function requestEnquiry(url: string, init: RequestInit, requests: Set<AbortController>) {
+  const controller = new AbortController();
+  requests.add(controller);
+  const timer = window.setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch(url, { ...init, signal: controller.signal });
+    const data: EnquiryResponse = await response.json();
+    return { ok: response.ok, data };
+  } finally {
+    window.clearTimeout(timer);
+    requests.delete(controller);
+  }
+}
+
 /** Shared submit flow: validate on the client, then on the server, with explicit success/error states. */
 export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
   const [state, setState] = useState<EnquiryState>({ status: "idle" });
   const [errors, setErrors] = useState<Errors>({});
   const token = useRef<string | null>(null);
+  const tokenRequest = useRef<Promise<void> | null>(null);
+  const requests = useRef(new Set<AbortController>());
+  const mounted = useRef(true);
+  const submitting = useRef(false);
+
+  useEffect(() => {
+    mounted.current = true;
+    const pending = requests.current;
+    return () => {
+      mounted.current = false;
+      pending.forEach((request) => request.abort());
+      pending.clear();
+    };
+  }, []);
 
   /** Signed, single-use token proving the form was loaded (and not instantly bot-posted). */
-  const fetchToken = useCallback(async () => {
-    try {
-      const res = await fetch("/api/enquiry/token", { cache: "no-store" });
-      const data: { ok: boolean; token?: string } = await res.json();
-      token.current = data.ok && data.token ? data.token : null;
-    } catch {
-      token.current = null;
-    }
+  const fetchToken = useCallback(() => {
+    if (tokenRequest.current) return tokenRequest.current;
+    tokenRequest.current = (async () => {
+      try {
+        const { ok, data } = await requestEnquiry("/api/enquiry/token", { cache: "no-store" }, requests.current);
+        if (mounted.current) token.current = ok && data.ok && data.token ? data.token : null;
+      } catch {
+        token.current = null;
+      }
+    })().finally(() => { tokenRequest.current = null; });
+    return tokenRequest.current;
   }, []);
 
   // Fetch lazily when the person first touches the form. Page views alone never hit the endpoint.
@@ -41,6 +74,7 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
   const focusFirstInvalid = () => formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
 
   const fail = (fieldErrors: Errors, message: string) => {
+    if (!mounted.current) return;
     flushSync(() => {
       setErrors(fieldErrors);
       setState({ status: "error", message });
@@ -49,12 +83,14 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
   };
 
   async function submit(payload: Record<string, unknown>) {
+    if (submitting.current) return;
     const parsed = enquirySchema.safeParse(payload);
     if (!parsed.success) {
       fail(z.flattenError(parsed.error).fieldErrors, "Please fix the highlighted fields.");
       return;
     }
 
+    submitting.current = true;
     setErrors({});
     setState({ status: "submitting" });
 
@@ -62,13 +98,15 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
       for (let attempt = 0; attempt < 2; attempt++) {
         if (!token.current) {
           await fetchToken();
+          if (!token.current) throw new Error("Could not start enquiry session.");
           if (attempt > 0) await new Promise((r) => setTimeout(r, 2100)); // a fresh token must age past the human-speed floor
         }
-        const res = await fetch("/api/enquiry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, _t: token.current }) });
+        if (!mounted.current) return;
+        const { ok, data } = await requestEnquiry("/api/enquiry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, _t: token.current }) }, requests.current);
         token.current = null; // Single use; a fresh one is fetched before any retry.
-        const data: { ok: boolean; error?: string; fieldErrors?: Errors; whatsappUrl?: string; retry?: boolean } = await res.json();
+        if (!mounted.current) return;
 
-        if (res.ok && data.ok && data.whatsappUrl) {
+        if (ok && data.ok && data.whatsappUrl) {
           setState({ status: "success", whatsappUrl: data.whatsappUrl });
           return;
         }
@@ -78,7 +116,10 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
         return;
       }
     } catch {
+      token.current = null;
       fail({}, "We couldn’t reach the server. Check your connection and try again.");
+    } finally {
+      submitting.current = false;
     }
   }
 

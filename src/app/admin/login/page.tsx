@@ -9,8 +9,9 @@ import { adminAuthConfigured, getAdminSession } from "@/lib/admin/auth";
 export const metadata: Metadata = { title: "Admin login", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-export default async function AdminLoginPage() {
+export default async function AdminLoginPage({ searchParams }: { searchParams: Promise<{ reason?: string }> }) {
   if (await getAdminSession()) redirect("/admin");
+  const timedOut = (await searchParams).reason === "idle";
 
   return (
     <main className="relative grid min-h-dvh place-items-center overflow-hidden px-5 py-12">
@@ -24,6 +25,7 @@ export default async function AdminLoginPage() {
         </div>
         <h1 id="login-title" className="mt-6 font-display text-2xl font-bold uppercase">Admin access</h1>
         <p className="mt-2 text-sm text-muted">Manage inventory and customer service records.</p>
+        {timedOut && <p role="status" className="mt-4 rounded-lg border border-line-strong bg-surface p-3 text-sm text-ink">Your session ended after inactivity. Please sign in again.</p>}
 
         <FirebaseAdminLogin serverConfigured={adminAuthConfigured()} />
       </section>

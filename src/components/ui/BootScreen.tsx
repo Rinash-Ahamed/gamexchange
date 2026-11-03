@@ -34,10 +34,14 @@ export function BootScreen() {
     shell?.setAttribute("inert", "");
     skipLink?.setAttribute("inert", "");
     document.body.style.overflow = "hidden";
+    let finished = false;
     let focusFrame = 0;
     const showFrame = window.requestAnimationFrame(() => {
+      if (finished || document.hidden) return;
       setPhase("booting");
-      focusFrame = window.requestAnimationFrame(() => screen.current?.focus({ preventScroll: true }));
+      focusFrame = window.requestAnimationFrame(() => {
+        if (!finished) screen.current?.focus({ preventScroll: true });
+      });
     });
     let unlocked = false;
     const unlockSite = () => {
@@ -52,27 +56,42 @@ export function BootScreen() {
     const leaveAfter = reducedMotion ? 350 : 1400;
     const hideAfter = reducedMotion ? 450 : 1800;
 
-    const leaveTimer = window.setTimeout(() => setPhase("leaving"), leaveAfter);
-    const hideTimer = window.setTimeout(() => {
-      unlockSite();
-      setPhase("hidden");
-    }, hideAfter);
-
-    const skip = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
+    const cancelFrames = () => {
+      finished = true;
+      window.cancelAnimationFrame(showFrame);
+      window.cancelAnimationFrame(focusFrame);
+    };
+    const leaveTimer = window.setTimeout(() => {
+      cancelFrames();
+      setPhase("leaving");
+    }, leaveAfter);
+    const finish = () => {
+      cancelFrames();
       window.clearTimeout(leaveTimer);
-      window.clearTimeout(hideTimer);
       unlockSite();
       setPhase("hidden");
     };
+    const hideTimer = window.setTimeout(finish, hideAfter);
+
+    const skip = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      window.clearTimeout(hideTimer);
+      finish();
+    };
+    const hideWhenBackgrounded = () => {
+      if (!document.hidden) return;
+      window.clearTimeout(hideTimer);
+      finish();
+    };
     window.addEventListener("keydown", skip);
+    document.addEventListener("visibilitychange", hideWhenBackgrounded);
 
     return () => {
-      window.cancelAnimationFrame(showFrame);
-      window.cancelAnimationFrame(focusFrame);
+      cancelFrames();
       window.clearTimeout(leaveTimer);
       window.clearTimeout(hideTimer);
       window.removeEventListener("keydown", skip);
+      document.removeEventListener("visibilitychange", hideWhenBackgrounded);
       unlockSite();
     };
   }, []);

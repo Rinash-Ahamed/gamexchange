@@ -14,13 +14,14 @@ import { ControllerButton } from "@/components/ui/ControllerButton";
 import { listPublicBanners } from "@/lib/admin/banners";
 import { listPublicFaqs } from "@/lib/admin/faqs";
 import { publicHomepageImages } from "@/lib/admin/homepage-images";
+import { optionalPublicContent } from "@/lib/public-content";
 
 export const dynamic = "force-dynamic";
 
 export default function Home() {
-  const banners = listPublicBanners();
-  const faqs = listPublicFaqs();
-  const images = publicHomepageImages();
+  const banners = optionalPublicContent("homepage banners", listPublicBanners);
+  const faqs = optionalPublicContent("homepage FAQs", listPublicFaqs);
+  const images = optionalPublicContent("homepage images", publicHomepageImages);
   return (
     <main>
       <AmbientLight />

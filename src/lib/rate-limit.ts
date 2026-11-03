@@ -1,13 +1,22 @@
+import { sharedLimit, sharedSecurityStore } from "@/lib/security-store";
+
 type Bucket = { count: number; resetAt: number };
 
 const buckets = new Map<string, Bucket>();
 const MAX_BUCKETS = 10_000;
 
 /**
- * Fixed-window limiter held in server memory. Good for a single Node process; on serverless or
- * multi-instance hosting, back this with a shared store (e.g. Redis/Upstash) behind the same API.
+ * Atomic Firestore limits when configured; bounded memory only for unconfigured local fixtures.
+ * Provider/configuration failures fail closed, never silently fall back to per-instance limits.
  */
-export function rateLimit(key: string, limit: number, windowMs: number) {
+export async function rateLimit(key: string, limit: number, windowMs: number): Promise<{ ok: boolean; retryAfter: number; unavailable?: boolean }> {
+  if (sharedSecurityStore()) {
+    try { return await sharedLimit(key, limit, windowMs); }
+    catch {
+      console.error("[security-store] Rate protection unavailable");
+      return { ok: false, retryAfter: 30, unavailable: true };
+    }
+  }
   const now = Date.now();
 
   if (buckets.size >= MAX_BUCKETS) {

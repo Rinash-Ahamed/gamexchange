@@ -12,8 +12,8 @@ const json = (body: object, status = 200) => NextResponse.json(body, { status, h
 
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) return json({ error: "Request not allowed." }, 403);
-  const limit = rateLimit(`admin-session:${clientKey(request)}`, 20, 15 * 60 * 1000);
-  if (!limit.ok) return NextResponse.json({ error: "Too many attempts. Please try again later." }, { status: 429, headers: { "Cache-Control": "no-store", "Retry-After": String(limit.retryAfter) } });
+  const limit = await rateLimit(`admin-session:${clientKey(request)}`, 20, 15 * 60 * 1000);
+  if (!limit.ok) return NextResponse.json({ error: limit.unavailable ? "Sign-in is temporarily unavailable. Please try again shortly." : "Too many attempts. Please try again later." }, { status: limit.unavailable ? 503 : 429, headers: { "Cache-Control": "no-store", "Retry-After": String(limit.retryAfter) } });
   if (!adminAuthConfigured()) return json({ error: "Admin authentication is not configured. Contact the site owner." }, 503);
   if (Number(request.headers.get("content-length")) > 20000) return json({ error: "Request too large." }, 413);
   let parsed;

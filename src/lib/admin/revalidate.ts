@@ -20,5 +20,6 @@ export function refreshAdminData(resource: keyof typeof adminData) {
   const { tag, paths } = adminData[resource];
   if (tag) updateTag(tag);
   if (resource === "inventory" || resource === "categories") revalidatePath("/products/[id]", "page");
+  if (resource === "inventory" || resource === "categories" || resource === "services") revalidatePath("/admin/activity");
   for (const path of paths) revalidatePath(path);
 }

@@ -6,7 +6,7 @@ export const faqs = [
   },
   {
     "q": "How does the buying process work?",
-    "a": "1. Browse the Shop and choose the product you are interested in.\n2. Select Enquire to prepare a WhatsApp message, then send it to our team.\n3. Confirm availability, product condition, included accessories, price and warranty with the team.\n4. Agree on an available payment method and collection or delivery arrangements before completing the purchase.\n\nOnce your order is confirmed, it will be processed according to our shipping policy. Tracking details will be shared after dispatch, where available. This website currently handles enquiries rather than online checkout."
+    "a": "1. Browse the Shop and open a product to view its details.\n2. Add the products you want to your cart, then use the cart's WhatsApp option to send one enquiry to our team.\n3. Confirm availability, product condition, included accessories, price and warranty with the team.\n4. Agree on an available payment method and collection or delivery arrangements before completing the purchase.\n\nOnce your order is confirmed, it will be processed according to our shipping policy. Tracking details will be shared after dispatch, where available. Website payments are currently test-mode simulations, not real purchases."
   },
   {
     "q": "When will my products arrive?",

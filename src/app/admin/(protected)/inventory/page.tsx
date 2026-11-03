@@ -18,6 +18,7 @@ export const metadata: Metadata = { title: "Inventory management", robots: { ind
 
 const notices: Record<string, string> = { created: "Inventory item created.", updated: "Inventory item updated.", deleted: "Inventory item deleted." };
 const errors: Record<string, string> = {
+  conflict: "This item was changed in another editor. Your changes were not saved. Reopen Edit item, review the latest values and try again.",
   invalid: "Check the submitted values. Enter a whole-rupee price and a discount from 0 to 100%. A discount must reduce the final price by at least one rupee.", duplicate: "That SKU is already in use.",
   category: "That category has changed or been deleted. Reopen the form and select an available category.",
   image: "Choose a static JPG, PNG or WebP under 5 MB, between 300 and 4096 pixels on each side.",

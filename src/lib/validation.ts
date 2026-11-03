@@ -15,7 +15,8 @@ const name = z.string({ error: "Enter your name" }).transform(oneLine).pipe(z.st
 const phone = z
   .string({ error: "Enter your mobile number" })
   .transform((v) => v.replace(/[\s-]/g, ""))
-  .pipe(z.string().regex(/^(\+?91)?[6-9]\d{9}$/, "Enter a valid 10-digit Indian mobile number"));
+  .pipe(z.string().regex(/^(\+?91)?[6-9]\d{9}$/, "Enter a valid 10-digit Indian mobile number"))
+  .transform((value) => value.slice(-10));
 const contactMethod = z.enum(contactMethods, { error: "Choose how we should reach you" });
 const branch = z.enum(branchChoices).default("No preference");
 const honeypot = z.string().max(200).optional();

@@ -4,7 +4,7 @@ import { checkoutBody, checkoutFailure, checkoutGuard, checkoutJson } from "@/li
 
 export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
-  const denied = checkoutGuard(request, "checkout-create");
+  const denied = await checkoutGuard(request, "checkout-create");
   if (denied) return denied;
   try {
     const input = checkoutSchema.safeParse(await checkoutBody(request));

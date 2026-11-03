@@ -6,6 +6,7 @@ import { requireAdmin, clearAdminSession } from "@/lib/admin/auth";
 import {
   createInventoryItem,
   CategoryError,
+  InventoryConflictError,
   createServiceRecord,
   deleteInventoryItem,
   isDuplicateSkuError,
@@ -52,7 +53,7 @@ function sellingPrice<T extends { basePrice: number; discountPercent: number }>(
   return { ...fields, price: discountedPrice(basePrice, input.discountPercent), originalPrice: input.discountPercent > 0 ? basePrice : 0 };
 }
 const inventoryCreateSchema = inventoryFieldsSchema.refine(validPricing, { message: "Discount must reduce the selling price.", path: ["discountPercent"] }).transform(sellingPrice);
-const inventoryUpdateSchema = inventoryFieldsSchema.extend({ id: documentId }).refine(validPricing, { path: ["discountPercent"] }).transform(sellingPrice);
+const inventoryUpdateSchema = inventoryFieldsSchema.extend({ id: documentId, expectedUpdatedAt: z.iso.datetime() }).refine(validPricing, { path: ["discountPercent"] }).transform(sellingPrice);
 
 const serviceCreateSchema = z.object({
   customerName: requiredText,
@@ -80,6 +81,7 @@ function inventoryFields(formData: FormData) {
 }
 
 function handleInventoryError(error: unknown): never {
+  if (error instanceof InventoryConflictError) redirect("/admin/inventory?error=conflict");
   if (error instanceof CategoryError) redirect("/admin/inventory?error=category");
   if (error instanceof InventoryImageError) redirect(`/admin/inventory?error=${error.code}`);
   if (isDuplicateSkuError(error)) redirect("/admin/inventory?error=duplicate");
@@ -92,7 +94,7 @@ export async function logoutAction() {
 }
 
 export async function createInventoryAction(formData: FormData) {
-  await requireAdmin();
+  const actor = await requireAdmin();
   const parsed = inventoryCreateSchema.safeParse(inventoryFields(formData));
   if (!parsed.success) redirect("/admin/inventory?error=invalid");
 
@@ -101,7 +103,7 @@ export async function createInventoryAction(formData: FormData) {
   let uploaded: Awaited<ReturnType<typeof uploadInventoryImage>> | undefined;
   try {
     uploaded = await uploadInventoryImage(file);
-    await createInventoryItem({ ...parsed.data, ...uploaded, tradeInVoucher: 0, tradeInCash: 0 });
+    await createInventoryItem({ ...parsed.data, ...uploaded, tradeInVoucher: 0, tradeInCash: 0 }, actor);
   } catch (error) {
     await removeInventoryImage(uploaded?.imageStoragePath);
     handleInventoryError(error);
@@ -111,18 +113,19 @@ export async function createInventoryAction(formData: FormData) {
 }
 
 export async function updateInventoryAction(formData: FormData) {
-  await requireAdmin();
+  const actor = await requireAdmin();
   const parsed = inventoryUpdateSchema.safeParse({
     ...inventoryFields(formData),
     id: formText(formData, "id"),
+    expectedUpdatedAt: formText(formData, "expectedUpdatedAt"),
   });
   if (!parsed.success) redirect("/admin/inventory?error=invalid");
   const file = formFile(formData, "image");
   let uploaded: Awaited<ReturnType<typeof uploadInventoryImage>> | undefined;
   try {
     if (file) uploaded = await uploadInventoryImage(file);
-    const { id, ...fields } = parsed.data;
-    const previousPath = await updateInventoryItem(id, { ...fields, ...uploaded });
+    const { id, expectedUpdatedAt, ...fields } = parsed.data;
+    const previousPath = await updateInventoryItem(id, { ...fields, ...uploaded }, expectedUpdatedAt, actor);
     await removeInventoryImage(previousPath);
   } catch (error) {
     await removeInventoryImage(uploaded?.imageStoragePath);
@@ -133,30 +136,30 @@ export async function updateInventoryAction(formData: FormData) {
 }
 
 export async function deleteInventoryAction(formData: FormData) {
-  await requireAdmin();
+  const actor = await requireAdmin();
   const id = formText(formData, "id");
   if (!documentId.safeParse(id).success) redirect("/admin/inventory?error=invalid");
-  const previousPath = await deleteInventoryItem(id);
+  const previousPath = await deleteInventoryItem(id, actor);
   await removeInventoryImage(previousPath);
   refreshAdminData("inventory");
   redirect(`/admin/inventory?notice=deleted&saved=${Date.now()}`);
 }
 
 export async function createServiceAction(formData: FormData) {
-  await requireAdmin();
+  const actor = await requireAdmin();
   const parsed = serviceCreateSchema.safeParse(formTextFields(formData,
     ["customerName", "phone", "device", "issue", "status", "estimatedCost", "notes"]));
   if (!parsed.success) redirect("/admin/services?error=invalid");
-  const ticket = await createServiceRecord(parsed.data);
+  const ticket = await createServiceRecord(parsed.data, actor);
   refreshAdminData("services");
   redirect(`/admin/services?notice=created&ticket=${encodeURIComponent(ticket)}&saved=${Date.now()}`);
 }
 
 export async function updateServiceAction(formData: FormData) {
-  await requireAdmin();
+  const actor = await requireAdmin();
   const parsed = serviceUpdateSchema.safeParse(formTextFields(formData, ["id", "status", "estimatedCost", "notes"]));
   if (!parsed.success) redirect("/admin/services?error=invalid");
-  await updateServiceRecord(parsed.data.id, parsed.data);
+  await updateServiceRecord(parsed.data.id, parsed.data, actor);
   refreshAdminData("services");
   redirect(`/admin/services?notice=updated&saved=${Date.now()}`);
 }

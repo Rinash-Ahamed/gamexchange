@@ -3,7 +3,10 @@ import { collectErrors, stubImages } from "./helpers";
 
 const routes = ["/", "/products", "/exchange", "/repair-service", "/game-zone", "/contact"];
 
-test.beforeEach(async ({ page }) => { await stubImages(page); });
+test.beforeEach(async ({ page }) => {
+  await stubImages(page);
+  await page.addInitScript(() => sessionStorage.setItem("gx-boot-seen", "1"));
+});
 
 for (const route of routes) {
   test(`${route}: renders, no console errors, no horizontal overflow`, async ({ page }) => {
@@ -40,6 +43,7 @@ test("shop: platform filtering and sorting update the themed product grid", asyn
 
 test("repair form: validates, then reaches an honest 'ready to send' state", async ({ page }) => {
   await page.goto("/repair-service");
+  await expect(page.locator('[data-theme-ready="true"]').first()).toBeAttached();
   await page.getByRole("button", { name: "Prepare enquiry" }).click();
   await expect(page.getByText("Enter your name")).toBeVisible();
   await expect(page.locator("form [role=alert]")).toContainText("fix the highlighted fields");
@@ -49,7 +53,7 @@ test("repair form: validates, then reaches an honest 'ready to send' state", asy
   await page.getByRole("button", { name: "HDMI port" }).click();
   await page.getByLabel("Describe the issue").fill("No picture on the TV, HDMI cable already replaced.");
   await page.getByLabel("Your name").fill("Test User");
-  await page.getByLabel("Mobile number").fill("98765 43210");
+  await page.getByLabel("Mobile number").fill("9" + String(Math.floor(Math.random() * 1e9)).padStart(9, "0"));
   await page.getByRole("button", { name: "Prepare enquiry" }).click();
 
   const status = page.getByRole("status").filter({ hasText: "Repair enquiry ready" });
@@ -63,6 +67,7 @@ test("repair form: validates, then reaches an honest 'ready to send' state", asy
 
 test("exchange wizard: gates each step and submits", async ({ page }) => {
   await page.goto("/exchange");
+  await expect(page.locator('[data-theme-ready="true"]').first()).toBeAttached();
   await page.getByRole("button", { name: "Next" }).click();
   await expect(page.getByText("Choose your console")).toBeVisible();
 
@@ -98,9 +103,10 @@ test("game zone: three static image-backed cards show every hourly package", asy
 
 test("FAQ accordion toggles", async ({ page }) => {
   await page.goto("/");
-  const q = page.getByRole("button", { name: "How long do repairs take?" });
-  await q.click();
+  const q = page.getByRole("button", { name: "What is the difference between new and pre-owned games?", exact: true });
   await expect(q).toHaveAttribute("aria-expanded", "true");
   await q.click();
   await expect(q).toHaveAttribute("aria-expanded", "false");
+  await q.click();
+  await expect(q).toHaveAttribute("aria-expanded", "true");
 });

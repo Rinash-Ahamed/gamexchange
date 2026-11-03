@@ -35,6 +35,23 @@ The banner LCP warning exposed a timing gap in the earlier lazy-to-eager viewpor
 
 ## Verification and limits
 
+### 2026-11-03: Hero fibers and platform motion
+
+- Reworked decorative fibers as a coordinated sweeping bundle with shared theme-aware gradients, static wide-stroke bloom and staggered short highlights. Removed per-pulse drop-shadow filters and ineffective will-change hints for stroke painting. Stroke-dashoffset still requires painting; this is not described as compositor-only motion. Smaller screens omit the third track, and existing hidden/off-screen and reduced-motion gates remain.
+- Platform raster artwork uses one 5 to 9 px, eight-second 2D float instead of combined 24 px bounce, rotateY/rotateZ and scroll-driven vertical displacement. The entrance no longer applies an animated brightness filter to this large subtree. The asset, scale, sizing, responsive reservation, static artwork styling and scroll fade are unchanged.
+- Source and whitespace checked only. No build, lint, tests, live browser recording, high-refresh-rate measurement or mobile/theme visual verification performed. Expected reduction in projection/filter work is a source-level assessment, not a measured FPS improvement.
+
+### 2026-11-03: Theme/browser validation stability
+
+- The scheduled theme callback rechecks manual preference when it fires. Bootstrap readiness has a non-DOM completion signal; no new script tag, layout change or rendering loop is added. Website appearance and animation quality remain unchanged.
+- Default browser acceptance checks now use one worker. A repeated two-worker diagnostic had seven execution failures in 12 cases; concurrent clock/paint/axe behavior remains a separate stress condition, not a production frame-rate measurement. Accessibility checks wait for fonts and finite entrance transitions but leave infinite decoration active and retain contrast assertions.
+- Final source passed lint and production build/TypeScript with all 14 isolated API checks. All 88 repeated desktop/mobile theme/accessibility cases passed with one worker and no retries/skips; details are in the QA audit. These checks use image fixtures and do not establish parallel stress stability, real-image LCP or physical-device FPS.
+
+### 2026-11-03: Security protection tradeoffs
+
+- Configured Firebase deployments now use shared Firestore rate/replay transactions rather than per-instance maps. This intentionally adds database operations to API requests, not to animation frames or ordinary public page views. SDK loading is deferred until the shared path is used. Staging latency/cost and contention remain unmeasured; do not claim these security changes improve API latency.
+- Health gates remain contract checks, not performance benchmarks. SDK import and HTTP allowances are now 30 and 15 seconds to accommodate dependency cold-loading/slow local filesystem; final build/API gate passed. Separate protected read-only readiness probes do not verify writes or payments. No production FPS/LCP/latency guarantee is made.
+
 ### 2026-11-02: Native scrolling and bounded rendering work
 
 - Replaced the remaining Lenis wheel interception/always-running RAF loop with native browser scrolling on all routes. Browser CSS smooth anchor/programmatic scrolling, fixed-header offsets and reduced-motion overrides remain. No content, graphics, video, carousel controls or visible animation were removed. Lenis remains an unused dependency pending a separate dependency cleanup; it is no longer imported into the runtime or CSS.

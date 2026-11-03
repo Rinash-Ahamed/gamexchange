@@ -4,12 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, m, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { ControllerButton } from "@/components/ui/ControllerButton";
-import { useMedia } from "@/lib/use-media";
 import { usePageVisible } from "@/lib/use-page-visible";
 import { site } from "@/data/site";
 import { imageLoading } from "@/lib/image-loading";
 
 const d = (s: string) => ({ ["--d" as string]: s });
+
+const fiberTracks = [
+  { color: "cyan", path: "M240-60C220 130 565 118 650 242S790 534 1110 584S1510 558 1720 710" },
+  { color: "magenta", path: "M290-60C272 120 604 128 688 258S836 566 1140 612S1520 598 1720 748" },
+  { color: "violet", path: "M340-60C326 112 642 138 728 274S886 600 1170 640S1530 638 1720 786" },
+] as const;
 
 const headlines = [
   { top: "Your game.", bottom: "Your rules." },
@@ -21,15 +26,14 @@ const headlines = [
 /**
  * Cinematic hero. Entry sequence is pure CSS (plays before hydration, never blocks LCP):
  * light rises → controller emerges → blue light travels across the shell → headline → buttons.
- * Afterwards: pointer parallax (desktop, CSS variables only) and a scroll-linked "exploded view"
- * (transform/opacity only and motion values, with no React re-renders).
+ * Afterwards: a small compositor-driven float and scroll-linked opacity, without
+ * stacking scroll movement or perspective rocking on the raster artwork.
  */
 export function Hero() {
   const section = useRef<HTMLElement>(null);
   const [headline, setHeadline] = useState(0);
 
   const live = useInView(section, { margin: "120px" });
-  const wide = useMedia("(min-width: 1024px)");
   const reduce = useReducedMotion();
   const pageVisible = usePageVisible();
 
@@ -45,7 +49,6 @@ export function Hero() {
 
   const { scrollYProgress } = useScroll({ target: section, offset: ["start start", "end start"] });
   const fade = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, reduce ? 1 : 0.1]);
-  const lift = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : wide ? -40 : -18]);
 
   return (
     <section
@@ -66,12 +69,21 @@ export function Hero() {
         <div className="hero-energy-trail hero-energy-trail-b" />
       </div>
       <svg aria-hidden className="hero-fibers absolute inset-0 z-0 size-full" viewBox="0 0 1600 900" preserveAspectRatio="none">
-        <path className="hero-fiber hero-fiber-cyan" pathLength="1" d="M120-20C145 118 500 74 432 250S1040 468 1420 530S1660 580 1760 430" />
-        <path className="hero-fiber hero-fiber-magenta" pathLength="1" d="M314-20C276 146 620 137 538 320S1110 580 1420 530S1660 420 1760 500" />
-        <path className="hero-fiber hero-fiber-violet" pathLength="1" d="M530-20C484 198 754 170 684 305S1170 408 1420 530S1660 680 1760 610" />
-        <path className="hero-fiber-pulse hero-fiber-pulse-cyan" pathLength="1" d="M120-20C145 118 500 74 432 250S1040 468 1420 530S1660 580 1760 430" />
-        <path className="hero-fiber-pulse hero-fiber-pulse-magenta" pathLength="1" d="M314-20C276 146 620 137 538 320S1110 580 1420 530S1660 420 1760 500" />
-        <path className="hero-fiber-pulse hero-fiber-pulse-violet" pathLength="1" d="M530-20C484 198 754 170 684 305S1170 408 1420 530S1660 680 1760 610" />
+        <defs>
+          <linearGradient id="hero-fiber-spectrum" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="var(--hero-fiber-violet)" />
+            <stop offset="0.38" stopColor="var(--hero-fiber-cyan)" stopOpacity="0.3" />
+            <stop offset="0.66" stopColor="var(--hero-fiber-cyan)" />
+            <stop offset="1" stopColor="var(--hero-fiber-magenta)" />
+          </linearGradient>
+        </defs>
+        {fiberTracks.map(({ color, path }) => (
+          <g key={color} className={`hero-fiber-track hero-fiber-track-${color}`}>
+            <path className="hero-fiber-bloom" d={path} />
+            <path className="hero-fiber" d={path} />
+            <path className={`hero-fiber-pulse hero-fiber-pulse-${color}`} pathLength="1" d={path} />
+          </g>
+        ))}
       </svg>
 
       <div className="mx-auto grid w-full max-w-7xl items-center gap-2 px-5 sm:px-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7.2fr)] lg:gap-4">
@@ -140,8 +152,8 @@ export function Hero() {
               <div className="stage-ring stage-ring-dash absolute inset-x-[16%] inset-y-[14%] opacity-60" />
             </div>
 
-            <m.div style={{ opacity: fade, y: lift }} className="absolute inset-0">
-              <div className="anim-emerge absolute inset-0" style={d("0.3s")}>
+            <m.div style={{ opacity: fade }} className="absolute inset-0">
+              <div className="anim-emerge hero-product-enter absolute inset-0" style={d("0.3s")}>
                 <div className="hero-product-float absolute">
                   <Image
                     src="/hero/gamexchange-hardware-stage.webp"

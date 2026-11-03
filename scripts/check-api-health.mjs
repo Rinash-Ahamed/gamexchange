@@ -15,14 +15,17 @@ const origin = `http://127.0.0.1:${port}`;
 const next = fileURLToPath(new URL("../node_modules/next/dist/bin/next", import.meta.url));
 const server = spawn(process.execPath, [next, "start", "--hostname", "127.0.0.1", "--port", String(port)], {
   cwd: fileURLToPath(new URL("../", import.meta.url)),
-  env: { ...process.env, NODE_ENV: "production" },
+  // These are contract checks, never connectivity checks against a deployment's real data.
+  // Whitespace survives dotenv loading, then application guards trim it to unconfigured.
+  env: { ...process.env, NODE_ENV: "production", FIREBASE_PROJECT_ID: " ", RAZORPAY_KEY_ID: " ", FIRESTORE_EMULATOR_HOST: "127.0.0.1:9" },
   stdio: "ignore",
   windowsHide: true,
 });
 let launchError;
 server.on("error", (error) => { launchError = error; });
 const request = (path, options = {}) => fetch(`${origin}${path}`, {
-  ...options, redirect: "manual", signal: AbortSignal.timeout(5000),
+  // Contract correctness, not a latency SLO; allow dependency cold-load on slow filesystems.
+  ...options, redirect: "manual", signal: AbortSignal.timeout(15000),
 });
 const noStore = (response) => assert.match(response.headers.get("cache-control") ?? "", /no-store/);
 let passed = 0;
@@ -36,7 +39,7 @@ try {
   await check("Firebase Admin loads without CommonJS-to-ESM bridging", async () => {
     const result = spawnSync(process.execPath, ["--no-experimental-require-module", "-e",
       "require('firebase-admin/auth'); require('firebase-admin/firestore'); require('firebase-admin/storage'); import('firebase-admin/auth').catch(error => { console.error(error.message); process.exitCode = 1; });"], {
-      cwd: fileURLToPath(new URL("../", import.meta.url)), encoding: "utf8", timeout: 15000, windowsHide: true,
+      cwd: fileURLToPath(new URL("../", import.meta.url)), encoding: "utf8", timeout: 30000, windowsHide: true,
     });
     assert.equal(result.status, 0, `Firebase Admin module import failed: ${result.error?.message ?? result.stderr}`);
   });
@@ -61,6 +64,11 @@ try {
   await check("Token endpoint rejects missing origin", async () => {
     const response = await request("/api/enquiry/token");
     assert.equal(response.status, 403);
+    noStore(response);
+  });
+  await check("Dependency readiness requires an admin session", async () => {
+    const response = await request("/api/admin/readiness");
+    assert.equal(response.status, 401);
     noStore(response);
   });
   await check("Same-origin token issuance", async () => {

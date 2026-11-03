@@ -13,6 +13,7 @@ import {
 import { products, type Product } from "@/data/products";
 import { isPcComponentCategory, normalizeCondition, normalizePlatform } from "@/data/catalog";
 import { inventoryCategories, type InventoryCategory, type DashboardStats, type InventoryItem, type ServiceRecord, type ServiceStatus } from "./types";
+import { appendAudit, type AuditActor } from "./audit";
 
 const INVENTORY_COLLECTION = "inventory";
 const INVENTORY_SKUS_COLLECTION = "inventorySkus";
@@ -30,11 +31,14 @@ function inventoryImageSource(id: string, input: Partial<InventoryImageFields>) 
 type StoredServiceRecord = Omit<ServiceRecord, "id">;
 
 let warnedAboutLocalProductFallback = false;
-let seedCheck: Promise<void> | undefined;
 let categoryCheck: Promise<void> | undefined;
 
 export class CategoryError extends Error {
   constructor(public readonly code: "category-missing" | "category-duplicate" | "category-used" | "category-limit" | "category-unsupported") { super(code); }
+}
+
+export class InventoryConflictError extends Error {
+  constructor() { super("Inventory changed since this editor was opened."); }
 }
 
 export function normalizeCategoryName(name: string) {
@@ -52,7 +56,6 @@ function categoryMatches(category: InventoryCategory, item: Pick<InventoryItem, 
 }
 
 async function ensureCategoriesInitialized() {
-  await ensureInventorySeeded();
   categoryCheck ??= database().runTransaction(async (transaction) => {
     const ref = categoryRegistry();
     if ((await transaction.get(ref)).exists) return;
@@ -80,7 +83,7 @@ function resolveInventoryCategory(item: InventoryItem, categories: InventoryCate
   return category ? { ...item, categoryId: category.id, category: category.name } : item;
 }
 
-export async function saveInventoryCategory(name: string, id?: string) {
+export async function saveInventoryCategory(name: string, actor: AuditActor, id?: string) {
   await ensureCategoriesInitialized();
   const cleaned = normalizeCategoryName(name);
   const key = categoryKey(cleaned);
@@ -104,10 +107,11 @@ export async function saveInventoryCategory(name: string, id?: string) {
       categories.push({ id: randomUUID(), name: cleaned, aliases: [key] });
     }
     transaction.set(ref, { categories, updatedAt: new Date().toISOString() });
+    appendAudit(transaction, actor, id ? "updated" : "created", "categories", id ?? categories[categories.length - 1]!.id, {}, { name: cleaned });
   });
 }
 
-export async function deleteInventoryCategory(id: string) {
+export async function deleteInventoryCategory(id: string, actor: AuditActor) {
   await ensureCategoriesInitialized();
   await database().runTransaction(async (transaction) => {
     const ref = categoryRegistry();
@@ -117,6 +121,7 @@ export async function deleteInventoryCategory(id: string) {
     const inventory = await transaction.get(database().collection(INVENTORY_COLLECTION));
     if (inventory.docs.some((doc) => categoryMatches(category, doc.data() as StoredInventoryItem))) throw new CategoryError("category-used");
     transaction.set(ref, { categories: categories.filter((entry) => entry.id !== id), updatedAt: new Date().toISOString() });
+    appendAudit(transaction, actor, "deleted", "categories", id, { name: category.name }, {});
   });
 }
 
@@ -140,38 +145,7 @@ export function isDuplicateSkuError(error: unknown) {
   return typeof error === "object" && error !== null && "code" in error && error.code === DUPLICATE_SKU_CODE;
 }
 
-async function ensureInventorySeeded() {
-  seedCheck ??= initializeInventory().catch((error) => { seedCheck = undefined; throw error; });
-  await seedCheck;
-}
-
-async function initializeInventory() {
-  const db = database();
-  const inventory = db.collection(INVENTORY_COLLECTION);
-  const marker = db.collection("settings").doc("inventoryInitialized");
-  await db.runTransaction(async (transaction) => {
-    if ((await transaction.get(marker)).exists) return;
-    const existing = await transaction.get(inventory.limit(1));
-    const now = new Date().toISOString();
-    if (existing.empty) {
-      for (const product of products) {
-        const item: StoredInventoryItem = {
-          sku: product.id.toUpperCase(), name: product.name, platform: product.platform,
-          category: product.category, condition: product.condition, stock: 1,
-          price: product.price, tradeInVoucher: product.tradeInVoucher, tradeInCash: product.tradeInCash,
-          imageSrc: product.image.src, imageWidth: product.image.width, imageHeight: product.image.height,
-          featured: product.featured ?? false, status: "active", createdAt: now, updatedAt: now,
-        };
-        transaction.set(inventory.doc(product.id), item);
-        transaction.set(db.collection(INVENTORY_SKUS_COLLECTION).doc(skuDocumentId(item.sku)), { inventoryId: product.id, sku: item.sku });
-      }
-    }
-    transaction.set(marker, { initialized: true, createdAt: now });
-  });
-}
-
 export async function listInventory() {
-  await ensureInventorySeeded();
   const [snapshot, categories] = await Promise.all([
     database().collection(INVENTORY_COLLECTION).orderBy("updatedAt", "desc").get(), listInventoryCategories(),
   ]);
@@ -185,9 +159,9 @@ export async function getInventoryItem(id: string): Promise<InventoryItem | null
 }
 
 export async function listPublicInventory() {
-  await ensureInventorySeeded();
   const [snapshot, categories] = await Promise.all([
-    database().collection(INVENTORY_COLLECTION).where("status", "==", "active").get(), listInventoryCategories(),
+    database().collection(INVENTORY_COLLECTION).where("status", "==", "active").get(),
+    categoryRegistry().get().then((document) => storedCategories(document.data())),
   ]);
   return snapshot.docs
     .map((doc) => resolveInventoryCategory(inventoryFromDocument(doc), categories))
@@ -233,10 +207,10 @@ async function readPublicProducts(): Promise<Product[]> {
 }
 
 export const listPublicProducts = unstable_cache(readPublicProducts,
-  ["public-products-v4", process.env.FIREBASE_PROJECT_ID ?? "demo", process.env.FIREBASE_DATABASE_ID ?? "(default)"],
+  ["public-products-v5", process.env.FIREBASE_PROJECT_ID ?? "demo", process.env.FIREBASE_DATABASE_ID ?? "(default)"],
   { revalidate: 60, tags: [PUBLIC_PRODUCTS_TAG] });
 
-export async function createInventoryItem(input: InventoryInput) {
+export async function createInventoryItem(input: InventoryInput, actor: AuditActor) {
   await ensureCategoriesInitialized();
   const db = database();
   const id = randomUUID();
@@ -252,6 +226,7 @@ export async function createInventoryItem(input: InventoryInput) {
     if ((await transaction.get(skuRef)).exists) throw duplicateSkuError();
     transaction.set(itemRef, { ...input, category: category.name, ...inventoryImageSource(id, input), createdAt: now, updatedAt: now } satisfies StoredInventoryItem);
     transaction.set(skuRef, { inventoryId: id, sku: input.sku });
+    appendAudit(transaction, actor, "created", "inventory", id, {}, input);
   });
   return id;
 }
@@ -259,6 +234,8 @@ export async function createInventoryItem(input: InventoryInput) {
 export async function updateInventoryItem(
   id: string,
   input: Omit<InventoryInput, keyof InventoryImageFields | "tradeInVoucher" | "tradeInCash"> & Partial<InventoryImageFields>,
+  expectedUpdatedAt: string,
+  actor: AuditActor,
 ) {
   await ensureCategoriesInitialized();
   const db = database();
@@ -273,6 +250,7 @@ export async function updateInventoryItem(
     if (!current.exists) throw new Error("Inventory item not found.");
 
     const currentItem = current.data() as StoredInventoryItem;
+    if (currentItem.updatedAt !== expectedUpdatedAt) throw new InventoryConflictError();
     const previousSkuRef = db.collection(INVENTORY_SKUS_COLLECTION).doc(skuDocumentId(currentItem.sku));
     const nextSkuRef = db.collection(INVENTORY_SKUS_COLLECTION).doc(skuDocumentId(input.sku));
     if (previousSkuRef.id !== nextSkuRef.id) {
@@ -281,12 +259,14 @@ export async function updateInventoryItem(
       transaction.delete(previousSkuRef);
       transaction.set(nextSkuRef, { inventoryId: id, sku: input.sku });
     }
-    transaction.update(itemRef, { ...input, category: category.name, ...inventoryImageSource(id, input), updatedAt: new Date().toISOString() });
+    const updatedAt = new Date(Math.max(Date.now(), Date.parse(currentItem.updatedAt) + 1)).toISOString();
+    transaction.update(itemRef, { ...input, category: category.name, ...inventoryImageSource(id, input), updatedAt });
+    appendAudit(transaction, actor, "updated", "inventory", id, currentItem, { ...currentItem, ...input });
     return input.imageStoragePath && input.imageStoragePath !== currentItem.imageStoragePath ? currentItem.imageStoragePath : undefined;
   });
 }
 
-export async function deleteInventoryItem(id: string) {
+export async function deleteInventoryItem(id: string, actor: AuditActor) {
   const db = database();
   const itemRef = db.collection(INVENTORY_COLLECTION).doc(id);
   return db.runTransaction(async (transaction) => {
@@ -295,6 +275,7 @@ export async function deleteInventoryItem(id: string) {
     const item = current.data() as StoredInventoryItem;
     transaction.delete(itemRef);
     transaction.delete(db.collection(INVENTORY_SKUS_COLLECTION).doc(skuDocumentId(item.sku)));
+    appendAudit(transaction, actor, "deleted", "inventory", id, item, {});
     return item.imageStoragePath;
   });
 }
@@ -308,28 +289,36 @@ export async function listServiceRecords(limit?: number) {
 
 export async function createServiceRecord(
   input: Omit<ServiceRecord, "id" | "ticketNumber" | "createdAt" | "updatedAt">,
+  actor: AuditActor,
 ) {
   const id = randomUUID();
   const now = new Date().toISOString();
   const date = now.slice(2, 10).replaceAll("-", "");
   const ticketNumber = `GX-${date}-${id.slice(0, 8).toUpperCase()}`;
   const record: StoredServiceRecord = { ...input, ticketNumber, createdAt: now, updatedAt: now };
-  await database().collection(SERVICES_COLLECTION).doc(id).set(record);
+  await database().runTransaction(async (transaction) => {
+    transaction.create(database().collection(SERVICES_COLLECTION).doc(id), record);
+    appendAudit(transaction, actor, "created", "serviceRecords", id, {}, record);
+  });
   return ticketNumber;
 }
 
 export async function updateServiceRecord(
   id: string,
   input: { status: ServiceStatus; estimatedCost: number; notes: string },
+  actor: AuditActor,
 ) {
-  await database().collection(SERVICES_COLLECTION).doc(id).update({
-    ...input,
-    updatedAt: new Date().toISOString(),
+  const ref = database().collection(SERVICES_COLLECTION).doc(id);
+  await database().runTransaction(async (transaction) => {
+    const previous = await transaction.get(ref);
+    if (!previous.exists) throw new Error("Service record not found.");
+    const before = previous.data()!;
+    transaction.update(ref, { ...input, updatedAt: new Date().toISOString() });
+    appendAudit(transaction, actor, "updated", "serviceRecords", id, before, { ...before, ...input });
   });
 }
 
 export async function dashboardStats(): Promise<DashboardStats> {
-  await ensureInventorySeeded();
   const inventory = database().collection(INVENTORY_COLLECTION);
   const services = database().collection(SERVICES_COLLECTION);
   const [inventoryStats, lowStock, openServices, readyServices] = await Promise.all([

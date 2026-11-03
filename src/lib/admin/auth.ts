@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { firebaseAdminAuth } from "@/lib/firebase/admin";
+import { createIdleSession, deleteIdleSession, readIdleSession, touchIdleSession } from "./idle-store";
 
 // A new name deliberately invalidates all legacy password-only cookies.
 const COOKIE_NAME = "gamexchange_admin_mfa";
@@ -46,7 +47,9 @@ export async function createAdminSession(idToken: string) {
   const age = Date.now() / 1000 - token.auth_time;
   if (age < -60 || age > 300) throw new AdminAccessError("Please sign in again to continue.");
   await approvedUser(token, true);
+  const expiresAt = Date.now() + SESSION_SECONDS * 1000;
   const session = await auth.createSessionCookie(idToken, { expiresIn: SESSION_SECONDS * 1000 });
+  await createIdleSession(session, token.uid, expiresAt);
   (await cookies()).set(COOKIE_NAME, session, {
     httpOnly: true,
     sameSite: "strict",
@@ -62,7 +65,9 @@ export const getAdminSession = cache(async () => {
   try {
     const decoded = await firebaseAdminAuth().verifySessionCookie(token, true);
     const user = await approvedUser(decoded, true);
-    return { uid: user.uid, email: user.email!, expiresAt: decoded.exp * 1000 };
+    const idleExpiresAt = await readIdleSession(token, user.uid);
+    if (!idleExpiresAt) return null;
+    return { uid: user.uid, email: user.email!, expiresAt: decoded.exp * 1000, idleExpiresAt: Math.min(idleExpiresAt, decoded.exp * 1000) };
   } catch {
     return null;
   }
@@ -70,8 +75,17 @@ export const getAdminSession = cache(async () => {
 
 export async function clearAdminSession() {
   const store = await cookies();
+  const token = store.get(COOKIE_NAME)?.value;
   store.delete(COOKIE_NAME);
   store.delete("gamexchange_admin");
+  if (token) await deleteIdleSession(token);
+}
+
+export async function recordAdminActivity(idleForMs: number) {
+  const session = await getAdminSession();
+  const token = (await cookies()).get(COOKIE_NAME)?.value;
+  if (!session || !token) return null;
+  return touchIdleSession(token, session.uid, idleForMs);
 }
 
 export async function requireAdmin() {

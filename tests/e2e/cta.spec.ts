@@ -34,9 +34,11 @@ test("WhatsApp links are well-formed", async ({ page }) => {
 test("hero CTAs navigate", async ({ page }) => {
   await stubImages(page);
   await page.goto("/");
-  await page.getByRole("link", { name: /Enter game zone/i }).first().click();
+  await expect(page.locator('[data-theme-ready="true"]').first()).toBeAttached();
+  await expect(page.locator("[data-site-shell]")).not.toHaveAttribute("inert");
+  await page.getByRole("navigation", { name: "Quick actions" }).getByRole("link", { name: "Game Zone", exact: true }).click();
   await expect(page).toHaveURL(/\/game-zone/);
   await page.goto("/");
-  await page.getByRole("link", { name: /Explore gear/i }).first().click();
+  await page.getByRole("navigation", { name: "Quick actions" }).getByRole("link", { name: "Shop", exact: true }).click();
   await expect(page).toHaveURL(/\/products/);
 });

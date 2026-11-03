@@ -7,15 +7,16 @@ import type { HomepageImages } from "@/data/homepage-images";
 import { Services } from "./Services";
 import { GameZoneCards } from "@/components/zone/GameZoneCards";
 
-export async function HomeServices({ data }: { data: Promise<HomepageImages> }) {
-  return <Services images={await data} />;
+export async function HomeServices({ data }: { data: Promise<HomepageImages | null> }) {
+  return <Services images={(await data) ?? undefined} />;
 }
-export async function HomeGameZone({ data }: { data: Promise<HomepageImages> }) {
-  return <GameZoneCards images={await data} />;
+export async function HomeGameZone({ data }: { data: Promise<HomepageImages | null> }) {
+  return <GameZoneCards images={(await data) ?? undefined} />;
 }
 
-export async function HomeFaqs({ data }: { data: Promise<PublicFaq[]> }) {
+export async function HomeFaqs({ data }: { data: Promise<PublicFaq[] | null> }) {
   const faqs = await data;
+  if (!faqs) return <ContentUnavailable label="Frequently asked questions" />;
   if (!faqs.length) return null;
   return <section data-tone="blue" aria-labelledby="faq-h" className="mx-auto max-w-4xl px-5 py-16 sm:px-8">
     <SectionHeading title={<span id="faq-h">Quick answers</span>} align="center" />
@@ -23,9 +24,14 @@ export async function HomeFaqs({ data }: { data: Promise<PublicFaq[]> }) {
   </section>;
 }
 
-export async function HomeBanners({ data }: { data: Promise<BannerSlide[]> }) {
+export async function HomeBanners({ data }: { data: Promise<BannerSlide[] | null> }) {
   const banners = await data;
+  if (!banners) return <ContentUnavailable label="Promotions" />;
   return <PromoSwitch key={banners.map((banner) => `${banner.id}:${banner.image}`).join("|")} slides={banners} />;
+}
+
+function ContentUnavailable({ label }: { label: string }) {
+  return <p role="status" className="mx-auto max-w-7xl px-5 py-8 text-center text-sm text-muted">{label} are temporarily unavailable. Please try again later.</p>;
 }
 
 export function BannerPlaceholder() {

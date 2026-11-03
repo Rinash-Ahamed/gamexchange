@@ -32,14 +32,14 @@ function subscribe(onChange: () => void) {
     if (readStoredTheme()) return;
 
     timer = window.setTimeout(() => {
-      applyTheme(scheduledTheme(), true);
+      // A manual choice may have been made since this timer was armed.
+      applyTheme(readStoredTheme() ?? scheduledTheme(), true);
       schedule();
     }, millisecondsUntilThemeBoundary() + 50);
   };
 
   const syncAutomaticTheme = () => {
-    if (readStoredTheme()) return;
-    applyTheme(scheduledTheme(), true);
+    applyTheme(readStoredTheme() ?? scheduledTheme(), true);
     schedule();
   };
 
@@ -53,6 +53,8 @@ function subscribe(onChange: () => void) {
     if (document.visibilityState === "visible") syncAutomaticTheme();
   };
 
+  // Storage/time may have changed between instrumentation and hydration.
+  applyTheme(readStoredTheme() ?? scheduledTheme(), false);
   schedule();
   window.addEventListener("storage", syncStoredTheme);
   window.addEventListener("focus", syncAutomaticTheme);
@@ -95,6 +97,7 @@ function applyTheme(next: Theme, animate: boolean) {
 
 export function ThemeToggle({ className = "" }: { className?: string }) {
   const theme = useSyncExternalStore(subscribe, readTheme, () => "dark" as Theme);
+  const ready = useSyncExternalStore(subscribeReady, clientReady, serverReady);
   const reduce = useReducedMotion();
   const isLight = theme === "light";
 
@@ -109,6 +112,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   return (
     <m.button
       type="button"
+      data-theme-ready={ready ? "true" : "false"}
       onClick={toggle}
       aria-label={isLight ? "Switch to dark theme" : "Switch to light theme"}
       title={isLight ? "Dark mode" : "Light mode"}
@@ -129,3 +133,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
     </m.button>
   );
 }
+
+const subscribeReady = () => () => {};
+const clientReady = () => true;
+const serverReady = () => false;

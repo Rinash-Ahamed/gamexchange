@@ -11,12 +11,12 @@ const idSchema = z.string().regex(/^[a-zA-Z0-9-]{1,128}$/);
 const nameSchema = z.string().transform(normalizeCategoryName).pipe(z.string().min(1).max(160));
 
 export async function saveCategoryAction(formData: FormData) {
-  await requireAdmin();
+  const actor = await requireAdmin();
   const name = nameSchema.safeParse(formData.get("name"));
   const rawId = formText(formData, "id");
   if (!name.success || (rawId && !idSchema.safeParse(rawId).success)) redirect("/admin/categories?error=invalid");
   try {
-    await saveInventoryCategory(name.data, rawId || undefined);
+    await saveInventoryCategory(name.data, actor, rawId || undefined);
   } catch (error) {
     if (error instanceof CategoryError) redirect(`/admin/categories?error=${error.code}`);
     throw error;
@@ -26,11 +26,11 @@ export async function saveCategoryAction(formData: FormData) {
 }
 
 export async function deleteCategoryAction(formData: FormData) {
-  await requireAdmin();
+  const actor = await requireAdmin();
   const id = idSchema.safeParse(formData.get("id"));
   if (!id.success) redirect("/admin/categories?error=invalid");
   try {
-    await deleteInventoryCategory(id.data);
+    await deleteInventoryCategory(id.data, actor);
   } catch (error) {
     if (error instanceof CategoryError) redirect(`/admin/categories?error=${error.code}`);
     throw error;

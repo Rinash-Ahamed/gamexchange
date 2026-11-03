@@ -37,4 +37,6 @@ export function applyInitialTheme() {
   root.style.colorScheme = theme;
   document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
     ?.setAttribute("content", theme === "light" ? "#f3f6fc" : "#07090f");
+  // An out-of-DOM completion signal also works when browser clocks mock Performance entries.
+  Object.defineProperty(globalThis, Symbol.for("gamexchange.theme.initialized"), { value: true, configurable: true });
 }

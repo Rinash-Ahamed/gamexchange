@@ -3,8 +3,10 @@ import { test, expect, type APIRequestContext } from "@playwright/test";
 const ORIGIN = `http://localhost:${process.env.PW_PORT ?? 4173}`;
 
 let n = 0;
+// Each worker/project needs an independent rate-limit identity on the shared server.
+const runId = `${process.pid}-${Date.now()}`;
 const phone = () => "9" + String(Math.floor(Math.random() * 1e9)).padStart(9, "0");
-const ip = () => `203.0.113.${(++n % 250) + 1}`;
+const ip = () => `audit-${runId}-${++n}`;
 const good = { kind: "contact", contactTopic: "General enquiry", name: "Test User", phone: "9876543210", contactMethod: "WhatsApp", message: "Is the PS5 still available?", branch: "No preference" };
 
 async function token(request: APIRequestContext, xff: string, wait = true) {
