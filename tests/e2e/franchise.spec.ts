@@ -1,6 +1,18 @@
 import { test, expect } from "@playwright/test";
 import { stubImages } from "./helpers";
 
+test("Explore our spaces scrolls to the gallery, including repeated clicks", async ({ page }) => {
+  await stubImages(page);
+  await page.goto("/franchise");
+  const link = page.getByRole("link", { name: "Explore our spaces", exact: true });
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await link.click();
+    await expect(page).toHaveURL(/\/franchise#our-spaces$/);
+    await expect.poll(async () => page.locator("#our-spaces").evaluate((element) => Math.abs(element.getBoundingClientRect().top - parseFloat(getComputedStyle(element).scrollMarginTop)))).toBeLessThan(5);
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  }
+});
+
 test("franchise card opens its own page with gallery, map and enquiry", async ({ page }) => {
   await stubImages(page);
   await page.goto("/");

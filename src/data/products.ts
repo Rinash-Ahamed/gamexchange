@@ -13,6 +13,7 @@ export type Product = {
   tradeInVoucher: number;
   tradeInCash: number;
   image: { src: string; width: number; height: number };
+  images?: { src: string; width: number; height: number }[];
   featured?: boolean;
   shopSection?: ShopSection;
   genre?: string;

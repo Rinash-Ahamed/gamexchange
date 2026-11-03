@@ -1,6 +1,6 @@
 import { branches, site } from "@/data/site";
 
-const openDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Saturday", "Sunday"];
+const openDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 export function serializeJsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, "\\u003c");
@@ -13,12 +13,11 @@ export function localBusinessJsonLd() {
     "@graph": branches.map((b) => ({
       "@type": "Store",
       "@id": `${site.url}/#${b.id}`,
-      name: `${site.name}: ${b.area.split(",")[0]}`,
+      name: `${site.name}: ${b.name}`,
       url: site.url,
-      telephone: b.phone,
+      hasMap: b.mapsUrl,
       description: "Buy, sell and exchange gaming consoles and accessories. Console and controller repairs. Gaming zone.",
       address: { "@type": "PostalAddress", addressLocality: b.area, addressRegion: site.region, addressCountry: site.country },
-      geo: { "@type": "GeoCoordinates", latitude: b.lat, longitude: b.lng },
       openingHoursSpecification: [{ "@type": "OpeningHoursSpecification", dayOfWeek: openDays, opens: site.hours.open, closes: site.hours.close }],
       sameAs: [site.social.instagram, site.social.facebook],
     })),

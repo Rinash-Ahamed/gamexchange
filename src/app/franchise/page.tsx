@@ -32,7 +32,7 @@ export default function FranchisePage() {
           <p className="mt-4 max-w-xl text-base leading-7 text-muted">From gaming gear to shared gaming experiences, get a closer look at the GameXchange store environment. Interested in a location of your own? Tell us where you would like to bring the brand.</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <ControllerButton href={enquiry} external glyph="x" size="md" className="w-full min-w-0 text-xs tracking-normal sm:w-auto">Enquire about a franchise</ControllerButton>
-            <ControllerButton href="#our-spaces" variant="ghost" glyph="sq" size="md">Explore our spaces</ControllerButton>
+            <ControllerButton href="#our-spaces" variant="ghost" glyph="tri-down" size="md">Explore our spaces</ControllerButton>
           </div>
           <p className="mt-4 text-xs leading-5 text-muted">Investment, space requirements, availability and partnership terms are confirmed directly by the team.</p>
         </div>

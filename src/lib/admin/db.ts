@@ -14,6 +14,7 @@ import { products, type Product } from "@/data/products";
 import { isPcComponentCategory, normalizeCondition, normalizePlatform } from "@/data/catalog";
 import { inventoryCategories, type InventoryCategory, type DashboardStats, type InventoryItem, type ServiceRecord, type ServiceStatus } from "./types";
 import { appendAudit, type AuditActor } from "./audit";
+import { inventoryPhotos, inventoryPhotoSource } from "@/lib/inventory-photos";
 
 const INVENTORY_COLLECTION = "inventory";
 const INVENTORY_SKUS_COLLECTION = "inventorySkus";
@@ -22,11 +23,13 @@ const DUPLICATE_SKU_CODE = "inventory/duplicate-sku";
 
 type StoredInventoryItem = Omit<InventoryItem, "id">;
 type InventoryInput = Omit<InventoryItem, "id" | "createdAt" | "updatedAt" | "category" | "categoryId"> & { categoryId: string };
-type InventoryImageFields = Pick<InventoryItem, "imageSrc" | "imageWidth" | "imageHeight" | "imageStoragePath" | "imageVersion">;
+type InventoryImageFields = Pick<InventoryItem, "imageSrc" | "imageWidth" | "imageHeight" | "imageStoragePath" | "imageVersion" | "images">;
 
 function inventoryImageSource(id: string, input: Partial<InventoryImageFields>) {
-  return input.imageStoragePath && input.imageVersion
-    ? { imageSrc: `/api/inventory/${id}/image?v=${encodeURIComponent(input.imageVersion)}` } : {};
+  return {
+    ...(input.imageStoragePath && input.imageVersion ? { imageSrc: `/api/inventory/${id}/image?v=${encodeURIComponent(input.imageVersion)}` } : {}),
+    ...(input.images ? { images: input.images.map((photo) => ({ ...photo, imageSrc: inventoryPhotoSource(id, photo) })) } : {}),
+  };
 }
 type StoredServiceRecord = Omit<ServiceRecord, "id">;
 
@@ -202,12 +205,13 @@ async function readPublicProducts(): Promise<Product[]> {
     tradeInVoucher: item.tradeInVoucher,
     tradeInCash: item.tradeInCash,
     image: { src: item.imageSrc, width: item.imageWidth, height: item.imageHeight },
+    images: inventoryPhotos(item).map((photo) => ({ src: inventoryPhotoSource(item.id, photo), width: photo.imageWidth, height: photo.imageHeight })),
     featured: item.featured,
   }));
 }
 
 export const listPublicProducts = unstable_cache(readPublicProducts,
-  ["public-products-v5", process.env.FIREBASE_PROJECT_ID ?? "demo", process.env.FIREBASE_DATABASE_ID ?? "(default)"],
+  ["public-products-v6", process.env.FIREBASE_PROJECT_ID ?? "demo", process.env.FIREBASE_DATABASE_ID ?? "(default)"],
   { revalidate: 60, tags: [PUBLIC_PRODUCTS_TAG] });
 
 export async function createInventoryItem(input: InventoryInput, actor: AuditActor) {
@@ -262,7 +266,8 @@ export async function updateInventoryItem(
     const updatedAt = new Date(Math.max(Date.now(), Date.parse(currentItem.updatedAt) + 1)).toISOString();
     transaction.update(itemRef, { ...input, category: category.name, ...inventoryImageSource(id, input), updatedAt });
     appendAudit(transaction, actor, "updated", "inventory", id, currentItem, { ...currentItem, ...input });
-    return input.imageStoragePath && input.imageStoragePath !== currentItem.imageStoragePath ? currentItem.imageStoragePath : undefined;
+    const retained = new Set((input.images ?? inventoryPhotos(currentItem)).map((photo) => photo.imageStoragePath));
+    return inventoryPhotos(currentItem).flatMap((photo) => photo.imageStoragePath && !retained.has(photo.imageStoragePath) ? [photo.imageStoragePath] : []);
   });
 }
 
@@ -271,12 +276,12 @@ export async function deleteInventoryItem(id: string, actor: AuditActor) {
   const itemRef = db.collection(INVENTORY_COLLECTION).doc(id);
   return db.runTransaction(async (transaction) => {
     const current = await transaction.get(itemRef);
-    if (!current.exists) return;
+    if (!current.exists) return [];
     const item = current.data() as StoredInventoryItem;
     transaction.delete(itemRef);
     transaction.delete(db.collection(INVENTORY_SKUS_COLLECTION).doc(skuDocumentId(item.sku)));
     appendAudit(transaction, actor, "deleted", "inventory", id, item, {});
-    return item.imageStoragePath;
+    return inventoryPhotos(item).flatMap((photo) => photo.imageStoragePath ? [photo.imageStoragePath] : []);
   });
 }
 

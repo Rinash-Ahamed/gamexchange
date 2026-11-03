@@ -5,7 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, m, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { usePageVisible } from "@/lib/use-page-visible";
-import { site } from "@/data/site";
+import { branches, site } from "@/data/site";
 import { imageLoading } from "@/lib/image-loading";
 
 const d = (s: string) => ({ ["--d" as string]: s });
@@ -117,7 +117,7 @@ export function Hero() {
             <ControllerButton href="/game-zone" glyph="o" size="lg" variant="ghost" className="hero-cta">Game Zone</ControllerButton>
           </nav>
           <ul className="anim-rise mt-9 hidden flex-wrap gap-x-7 gap-y-2 text-sm text-muted sm:flex" style={d("1.35s")}>
-            <li><span className="font-display font-semibold text-ink">2</span> branches</li>
+            <li><span className="font-display font-semibold text-ink">{branches.length}</span> branches</li>
             <li>Repairs in <span className="font-display font-semibold text-ink">{site.repairTurnaround}</span></li>
             <li><span className="font-display font-semibold text-ink">PS4 · PS5</span> · G29 Racing</li>
           </ul>

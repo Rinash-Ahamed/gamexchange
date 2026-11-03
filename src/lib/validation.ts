@@ -9,7 +9,7 @@ const multiLine = (v: string) => v.replace(/\r\n?/g, "\n").replace(/[\u0000-\u00
 
 const contactMethods = ["WhatsApp", "Phone call"] as const;
 const contactTopics = ["General enquiry", "Franchise opportunity"] as const;
-const branchChoices = ["No preference", "Branch 1 – Sungam", "Branch 2 – Selvapuram South"] as const;
+const branchChoices = ["No preference", "Sungam Bypass Rd", "Karumbukkadai", "Pollachi"] as const;
 
 const name = z.string({ error: "Enter your name" }).transform(oneLine).pipe(z.string().min(2, "Enter your name").max(80, "Name is too long"));
 const phone = z

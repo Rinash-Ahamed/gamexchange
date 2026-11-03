@@ -105,6 +105,16 @@ Set ENQUIRY_SECRET to a unique cryptographically random server-only value of at 
 
 Inventory saves include the editor's original updatedAt value. A stale editor is rejected instead of overwriting newer stock/pricing. Reopen the editor after a conflict and reapply the intended changes. An unchanged legacy record needs no migration. This conflict guard is not an audit-history/undo feature.
 
+### Inventory photo galleries
+
+Inventory supports one to five ordered product photos. In Add/Edit, choose multiple files together, preview them, use Set as cover or the earlier/later controls and stage removals before the existing confirmed Save/Create action. First photo is the cover used by shop/home/cart; product detail pages show an uncropped main photo and selectable thumbnails. Selecting files again replaces unsaved selections, not retained saved photos. To replace a saved photo at the five-photo limit, remove it from the edit first, then choose its replacement. At least one photo is required by the server.
+
+New files must be static JPG/PNG/WebP, each side 300 to 4096 px, at most 4 MB combined per save (including selected files later removed from the staged gallery). The aggregate cap leaves room under common serverless multipart request limits; the app's Server Action cap remains 6 MB, not an unsafe 25 MB increase. Existing saved photos do not count toward the new-file byte budget. Add/save photos in batches if necessary, or reduce file sizes before uploading. Sharp retains the existing 1600 px maximum, orientation/metadata removal and WebP quality 85.
+
+The inventory document has optional ordered images metadata; primary image fields mirror the first photo for compatibility. Existing single-image records remain usable without migration or remote rewriting. Public Product objects include only safe image URLs/dimensions, not Storage paths. Existing versioned /api/inventory/[id]/image?v=... serves any currently referenced gallery version; draft/out-of-stock access still requires admin authorization. Removed versions no longer resolve through this route, although previously public browser/optimizer caches can retain bytes temporarily. Same Firebase bucket and inventory-images prefix; no new environment variables, public write rules or indexes.
+
+The server only accepts existing image references belonging to that inventory item or files present in the request. It rejects duplicates, zero/over-five images, foreign references and stale editor versions. After a confirmed save it cleans only removed, owned upload paths; deleting an item cleans all its owned gallery uploads. Bundled/external image URLs are never deleted. Partial upload failures clean newly uploaded files before any database save. Known transaction rejection cleans new uploads; an uncertain commit retains them for review instead of risking deletion of an image that may have been saved. Failed cleanup is logged without paths/customer data. No remote files or records were changed by implementation. Live admin upload/replace/remove/concurrency and device gallery checks remain unverified.
+
 The legacy files under `data/` are no longer read or written by the application. Keep them until any records you need have been migrated and verified in Firestore.
 
 ## 6. Homepage banner uploads

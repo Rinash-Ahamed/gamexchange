@@ -84,6 +84,10 @@ export function ControllerButton(props: AsLink | AsButton) {
   };
 
   if ("href" in props && props.href !== undefined) {
+    // Same-page anchors should use browser scrolling, not a route transition.
+    if (props.href.startsWith("#")) {
+      return <m.a href={props.href} {...motionProps}>{content}</m.a>;
+    }
     if (props.external) {
       return (
         <m.a href={props.href} target="_blank" rel="noopener noreferrer" {...motionProps}>

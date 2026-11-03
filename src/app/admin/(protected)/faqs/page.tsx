@@ -24,7 +24,7 @@ export default async function FaqsPage({ searchParams }: { searchParams: Promise
   const published = faqs.filter((faq) => faq.status === "published").length;
   return (
     <div className="mx-auto max-w-4xl">
-      <div className="flex flex-wrap items-end justify-between gap-3"><div><h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Homepage FAQs</h1><p className="mt-2 text-sm text-muted">Manage the questions and answers in Quick answers.</p></div><Link href="/#faq-h" target="_blank" rel="noopener noreferrer" className={adminGhostButtonClass}>View on website</Link></div>
+      <div className="flex flex-wrap items-end justify-between gap-3"><div><h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Homepage FAQs</h1><p className="mt-2 text-sm text-muted">Add more questions using Add FAQ. Set visibility to Published to show them on the homepage. You can publish 10 or more FAQs, up to 30 saved entries.</p></div><Link href="/#faq-h" target="_blank" rel="noopener noreferrer" className={adminGhostButtonClass}>View on website</Link></div>
 {query.notice && <AdminNotice eventKey={query}>{query.notice === "deleted" ? "FAQ deleted." : "FAQ saved."}</AdminNotice>}
       {query.error && <AdminNotice variant="error" eventKey={query}>{errors[query.error] ?? "Could not save this change. Please try again."}</AdminNotice>}
       <details key={query.saved ?? "new"} className="metal mt-6 rounded-xl p-4">

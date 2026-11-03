@@ -1,13 +1,10 @@
-/** Business facts, all taken from the live gamexchange.co.in site (audited 2026-10-13). */
+/** Shared business facts; branch list and hours updated by the owner on 2026-11-03. */
 
 export type Branch = {
-  id: "sungam" | "selvapuram";
+  id: "sungam" | "karumbukkadai" | "pollachi";
   name: string;
   area: string;
-  phone: string;
-  phoneDisplay: string;
-  lat: number;
-  lng: number;
+  mapsUrl: string;
 };
 
 export const site = {
@@ -18,7 +15,7 @@ export const site = {
   region: "Tamil Nadu",
   country: "IN",
   whatsappNumber: "917708845461",
-  hours: { open: "11:00", close: "20:30", display: "11:00 AM – 8:30 PM", closedDay: "Friday" },
+  hours: { open: "10:00", close: "20:00", display: "10 AM to 8 PM", days: "All Days" },
   social: {
     instagram: "https://www.instagram.com/gamexchg/",
     facebook: "https://www.facebook.com/gamexchange.gamexchange",
@@ -31,25 +28,25 @@ export const site = {
 export const branches: readonly Branch[] = [
   {
     id: "sungam",
-    name: "Branch 1",
-    area: "Sungam, Coimbatore",
-    phone: "+917708845461",
-    phoneDisplay: "+91 77088 45461",
-    lat: 10.991712292980997,
-    lng: 76.97845181698383,
+    name: "Sungam Bypass Rd",
+    area: "Coimbatore, Tamil Nadu",
+    mapsUrl: "https://share.google/bvHfeXQzB58OvCfh7",
   },
   {
-    id: "selvapuram",
-    name: "Branch 2",
-    area: "Selvapuram South, Coimbatore",
-    phone: "+918248002523",
-    phoneDisplay: "+91 82480 02523",
-    lat: 10.988305577740958,
-    lng: 76.94038836707266,
+    id: "karumbukkadai",
+    name: "Karumbukkadai",
+    area: "Coimbatore, Tamil Nadu",
+    mapsUrl: "https://share.google/FX0kiUr25sfzvjfwi",
+  },
+  {
+    id: "pollachi",
+    name: "Pollachi",
+    area: "Pollachi, Tamil Nadu",
+    mapsUrl: "https://share.google/A4UN3avHiiTfG0ysa",
   },
 ];
 
-export const mapsUrl = (b: Branch) => `https://www.google.com/maps?q=${b.lat},${b.lng}`;
+export const mapsUrl = (b: Branch) => b.mapsUrl;
 
 export const whatsappUrl = (message?: string) =>
   `https://wa.me/${site.whatsappNumber}${message ? `?text=${encodeURIComponent(message)}` : ""}`;

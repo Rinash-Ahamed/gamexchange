@@ -26,6 +26,11 @@ export const serviceStatuses = [
 ] as const;
 export type ServiceStatus = (typeof serviceStatuses)[number];
 
+export type InventoryPhoto = {
+  imageSrc: string; imageWidth: number; imageHeight: number;
+  imageStoragePath?: string; imageVersion?: string;
+};
+
 export type InventoryItem = {
   id: string;
   sku: string;
@@ -54,6 +59,7 @@ export type InventoryItem = {
   imageHeight: number;
   imageStoragePath?: string;
   imageVersion?: string;
+  images?: InventoryPhoto[];
   featured: boolean;
   status: InventoryStatus;
   createdAt: string;

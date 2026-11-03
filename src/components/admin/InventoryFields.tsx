@@ -24,7 +24,7 @@ export function InventoryFields({ item, categories }: { item?: InventoryItem; ca
       <InventoryPricingFields item={item} />
       <label><span className={adminLabelClass}>Status</span><select name="status" defaultValue={item?.status ?? "draft"} className={adminInputClass}>{inventoryStatuses.map((status) => <option key={status} value={status}>{titleCaseStatus(status)}</option>)}</select></label>
       <label className="admin-control flex items-center gap-2 self-end rounded-lg border border-line-strong bg-surface px-3 text-sm"><input name="featured" type="checkbox" defaultChecked={item?.featured} className="size-4 accent-[var(--fill)]" />Featured product</label>
-      <InventoryImageField src={item?.imageSrc} />
+      <InventoryImageField item={item} />
     </>
   );
 }

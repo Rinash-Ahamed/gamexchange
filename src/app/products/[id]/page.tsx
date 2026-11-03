@@ -7,7 +7,7 @@ import { publicProductDetails } from "@/lib/public-product";
 import { productConditionSchema, productHref } from "@/lib/product-links";
 import { site, whatsappUrl } from "@/data/site";
 import { formatINR } from "@/data/products";
-import { ProductImage } from "@/components/shop/ProductImage";
+import { ProductGallery } from "@/components/shop/ProductGallery";
 import { ProductPrice, DiscountBadge } from "@/components/shop/ProductPrice";
 import { ConditionBadge } from "@/components/shop/ConditionBadge";
 import { CatalogCard } from "@/components/shop/CatalogCard";
@@ -38,7 +38,7 @@ export default async function ProductDetailsPage({ params }: Props) {
   const jsonLd = {
     "@context": "https://schema.org", "@type": "Product", name: product.name,
     url: new URL(productHref(product.id), site.url).href,
-    image: new URL(product.image.src, site.url).href,
+    image: (product.images?.length ? product.images : [product.image]).map((image) => new URL(image.src, site.url).href),
     description: product.description || `${product.name} for ${product.platform}. Condition: ${product.condition}.`,
     category: product.category, itemCondition: productConditionSchema(product.condition),
     ...(product.brand ? { brand: { "@type": "Brand", name: product.brand } } : {}),
@@ -48,7 +48,7 @@ export default async function ProductDetailsPage({ params }: Props) {
   return <main className="mx-auto max-w-7xl px-5 pb-14 pt-28 sm:px-8 sm:pt-32">
     <nav aria-label="Breadcrumb" className="mb-6 text-xs text-muted"><ol className="flex flex-wrap items-center gap-2"><li><Link href="/" className="inline-flex min-h-9 items-center hover:text-ink">Home</Link></li><li aria-hidden><ChevronRight className="size-3" /></li><li><Link href="/products" className="inline-flex min-h-9 items-center hover:text-ink">Shop</Link></li><li aria-hidden><ChevronRight className="size-3" /></li><li aria-current="page" className="min-w-0 break-words">{product.name}</li></ol></nav>
     <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12">
-      <div className="min-w-0 lg:sticky lg:top-28"><div className="mx-auto flex aspect-square w-full max-w-[30rem] items-center justify-center rounded-3xl border border-line-strong bg-surface p-6 sm:p-10"><ProductImage product={product} priority presentation="catalog" sizes="(min-width: 1024px) 480px, (min-width: 640px) 448px, calc(100vw - 88px)" /></div></div>
+      <ProductGallery key={product.id} product={product} />
       <section className="min-w-0" aria-labelledby="product-title">
         <div className="flex flex-wrap items-center gap-2"><ConditionBadge condition={product.condition} /><DiscountBadge product={product} /></div>
         <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-accent-text">{product.platform}</p>

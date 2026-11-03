@@ -19,7 +19,7 @@ const helpLinks = [
   { href: "/contact", label: "Customer support" },
   { href: "/repair-service", label: "Repairs & servicing" },
   { href: "/franchise", label: "Franchise opportunities" },
-  { href: "/contact", label: "Find a store" },
+  { href: "/contact#stores", label: "Find a store" },
 ];
 const linkClass = "inline-flex min-h-11 items-center text-sm leading-6 text-white/75 transition-colors hover:text-white focus-visible:outline-offset-4";
 const headingClass = "font-display text-base font-semibold text-[#a9bfff]";
@@ -60,7 +60,7 @@ export function Footer() {
               <a href={`tel:${businessDetails.phone}`} className={`${linkClass} w-full gap-3`}><Phone className="size-4 shrink-0 text-[#a9bfff]" aria-hidden />{businessDetails.phoneDisplay}</a>
               <Link href="/contact" className={`${linkClass} w-full gap-3`}><MapPin className="size-4 shrink-0 text-[#a9bfff]" aria-hidden />Coimbatore, Tamil Nadu</Link>
             </address>
-            <p className="mt-3 text-xs leading-6 text-white/60">Business Hours: 10 AM to 8 PM (All Days)</p>
+            <p className="mt-3 text-xs leading-6 text-white/60">Business Hours: {site.hours.display} ({site.hours.days})</p>
           </section>
         </div>
         <p className="pt-5 text-center text-xs leading-6 text-white/55">© {new Date().getFullYear()} GameXchange, operated by {businessDetails.entity}. All rights reserved.</p>

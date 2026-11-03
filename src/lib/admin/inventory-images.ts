@@ -3,7 +3,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { firebaseStorageBucket } from "@/lib/firebase/storage";
 import { createByteCache } from "@/lib/byte-cache";
-import type { InventoryItem } from "./types";
+import type { InventoryPhoto } from "./types";
 
 export class InventoryImageError extends Error {
   constructor(public readonly code: "image" | "storage") { super(code); }
@@ -50,7 +50,7 @@ export async function removeInventoryImage(path?: string) {
 // Bounded cache stores only immutable bytes. Authorization is checked by the route on every request.
 const cache = createByteCache(8 * 1024 * 1024);
 
-export async function readInventoryImage(item: InventoryItem): Promise<Buffer> {
+export async function readInventoryImage(item: InventoryPhoto): Promise<Buffer> {
   const path = item.imageStoragePath;
   if (!path || !ownedPath.test(path)) throw new Error("Invalid inventory image");
   return cache.read(path, async () => {

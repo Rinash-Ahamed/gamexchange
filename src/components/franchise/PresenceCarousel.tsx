@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useInView, useReducedMotion } from "motion/react";
 import { imageLoading } from "@/lib/image-loading";
@@ -20,15 +19,14 @@ export function PresenceCarousel() {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
   const [loaded, setLoaded] = useState([false, false]);
-  const [paused, setPaused] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
 
   useEffect(() => {
-    if (!visible || !pageVisible || reduce || paused || hovered || focused || !loaded.every(Boolean)) return;
+    if (!visible || !pageVisible || reduce || hovered || focused || !loaded.every(Boolean)) return;
     const timer = window.setInterval(() => setActive((current) => (current + 1) % slides.length), 8000);
     return () => window.clearInterval(timer);
-  }, [visible, pageVisible, reduce, paused, hovered, focused, loaded]);
+  }, [visible, pageVisible, reduce, hovered, focused, loaded, active]);
 
   return (
     <figure ref={container} aria-label="GameXchange presence images" aria-roledescription="carousel"
@@ -54,14 +52,10 @@ export function PresenceCarousel() {
         <p className="min-w-0 flex-1 basis-48">Network overview and location artwork. Tap to view full size.</p>
         <div className="flex items-center gap-1">
           {slides.map((slide, index) => <button key={slide.src} type="button" aria-label={`Show ${slide.name}`} aria-pressed={active === index} disabled={!loaded[index]}
-            onClick={() => { setActive(index); setPaused(true); }}
+            onClick={() => setActive(index)}
             className="grid size-11 place-items-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-white disabled:opacity-40">
             <span aria-hidden className={`h-2 rounded-full transition-[width,background-color] motion-reduce:transition-none ${active === index ? "w-5 bg-[#a9bfff]" : "w-2 bg-white/40"}`} />
           </button>)}
-          {!reduce && <button type="button" onClick={() => setPaused((current) => !current)} aria-label={paused ? "Resume image rotation" : "Pause image rotation"}
-            className="grid size-11 place-items-center rounded-full border border-white/20 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
-            {paused ? <Play className="size-4" aria-hidden /> : <Pause className="size-4" aria-hidden />}
-          </button>}
         </div>
       </figcaption>
     </figure>

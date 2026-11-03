@@ -21,7 +21,7 @@ const errors: Record<string, string> = {
   conflict: "This item was changed in another editor. Your changes were not saved. Reopen Edit item, review the latest values and try again.",
   invalid: "Check the submitted values. Enter a whole-rupee price and a discount from 0 to 100%. A discount must reduce the final price by at least one rupee.", duplicate: "That SKU is already in use.",
   category: "That category has changed or been deleted. Reopen the form and select an available category.",
-  image: "Choose a static JPG, PNG or WebP under 5 MB, between 300 and 4096 pixels on each side.",
+  image: "Keep 1 to 5 photos. Upload static JPG, PNG or WebP, up to 4 MB combined per save, between 300 and 4096 pixels on each side.",
   storage: "Image upload failed. Please try again or contact support if the problem continues.",
   save: "Could not confirm this change. Refresh inventory before trying again.",
 };
