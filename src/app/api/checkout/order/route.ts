@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { checkoutSchema, createTestOrder } from "@/lib/payments/orders";
 import { checkoutBody, checkoutFailure, checkoutGuard, checkoutJson } from "@/lib/payments/http";
+import { requireCheckoutCustomer } from "@/lib/payments/customer-auth";
 
 export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
@@ -9,6 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     const input = checkoutSchema.safeParse(await checkoutBody(request));
     if (!input.success) return checkoutJson({ error: "Check your cart and try again." }, 400);
-    return checkoutJson(await createTestOrder(input.data));
+    const customer = await requireCheckoutCustomer(request);
+    return checkoutJson(await createTestOrder(input.data, customer));
   } catch (error) { return checkoutFailure(error); }
 }

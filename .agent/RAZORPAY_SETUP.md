@@ -2,6 +2,8 @@
 
 ## Implemented
 
+- Customer checkout now requires server-verified Google sign-in and validated Indian delivery details. Customer UID/email and recipient name, phone and address are saved with each new sandbox order and visible under protected Admin > Test orders. Customer verification is owner-bound; webhook verification is unchanged. Enable Firebase Google Authentication and authorized domains as described in FIREBASE_SETUP.md. Use sample shipping details for sandbox tests. This is not courier integration, delivery coverage validation, shipping pricing or live payment activation.
+
 - Add to cart on the shop grid and both homepage shelf presentations. A navigation cart icon shows quantity on desktop and mobile. The themed `/cart` page supports multiple products, stock-aware quantity controls, removal, unavailable-item warnings and one combined WhatsApp enquiry.
 - Browser storage contains only product IDs and quantities, capped at 30 different products and 99 units per line. It is untrusted convenience state, not an authoritative price, reservation or order. Storage-disabled visitors retain an in-memory cart. Cart rendering uses hydration-safe external-store subscriptions and cross-tab updates.
 - Test checkout re-reads current inventory directly from Firestore without public cache/demo initialization. It validates availability, stock quantities, positive whole-rupee prices and the expected INR subtotal. Amounts sent to Razorpay use integer paise. Changed prices/stock require refreshing the cart.

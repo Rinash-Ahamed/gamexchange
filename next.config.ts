@@ -7,20 +7,23 @@ import type { NextConfig } from "next";
  * debugging, but it is deliberately excluded from production.
  */
 const scriptSrc = [
-  "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdn.razorpay.com",
+  "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdn.razorpay.com https://apis.google.com",
   process.env.NODE_ENV === "development" ? "'unsafe-eval'" : "",
 ]
   .filter(Boolean)
   .join(" ");
 
+// Allow only the configured auth host, never arbitrary environment text in CSP.
+const authDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN?.trim() ?? "";
+const authOrigin = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/.test(authDomain) ? `https://${authDomain}` : "";
 const csp = [
   "default-src 'self'",
   scriptSrc,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://framerusercontent.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.razorpay.com https://checkout.razorpay.com",
-  "frame-src https://api.razorpay.com https://checkout.razorpay.com",
+  `connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.razorpay.com https://checkout.razorpay.com ${authOrigin}`,
+  `frame-src https://api.razorpay.com https://checkout.razorpay.com ${authOrigin}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -51,7 +54,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [{ protocol: "https", hostname: "framerusercontent.com", pathname: "/images/**" }],
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/cart", headers: [{ key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" }] },
+    ];
   },
 };
 

@@ -9,6 +9,7 @@
 - [QA and security audit, 2026-11-03](QA_SECURITY_AUDIT_2026-11-03.md): findings, local test results, priorities and live-provider verification limits.
 - [Security operations](SECURITY_OPERATIONS.md): shared protection, temporary TTL setup, admin history, readiness and release checks.
 - [Cart and Razorpay test setup](RAZORPAY_SETUP.md): test keys, webhook configuration, verification and live-payment limits.
+- [Gmail notification setup](EMAIL_SETUP.md): App Password and planned server-only mail settings; sending integration is still pending.
 - [Privacy policy draft](PRIVACY_POLICY_DRAFT.md): proposed wording and business/legal checks required before publication.
 
 These documents live in `.agent/`. Source paths and commands below are relative to the repository root, not this directory. The root [AGENTS.md](../AGENTS.md) directs coding agents here.
@@ -40,7 +41,7 @@ Shop cards use a compact responsive grid: two columns on mobile, three to four o
 
 The consumer sidebar keeps sort, price inputs/sliders, condition, platforms and discounted-only choices. Categories appear when there are multiple subcategories, hardware brand when supplied, and game genre/format/player modes/age rating/release year only when stocked products provide the data. Edition/model remains searchable and visible on cards but is not a separate default filter. The minimum-discount dropdown was removed as redundant clutter; biggest-discount sorting remains. Optional inventory metadata is preserved. Selected facets remain removable even with no matching products. No fake stock, gameplay-hour guesses, preorder or PC-component offerings are added.
 
-Visitors can collect multiple products at `/cart`, change quantities and send one combined WhatsApp enquiry. Razorpay checkout is test-only and needs the three server environment values in `RAZORPAY_SETUP.md`. Admin > Test orders shows sandbox records. Live keys are blocked; simulated orders do not change stock or create deliveries.
+Visitors can collect multiple products at `/cart`, change quantities, sign in with Google and enter Indian delivery details before Razorpay checkout. Cart checkout no longer links to WhatsApp. Enable the Firebase Google provider and authorized domains as described in FIREBASE_SETUP.md. Razorpay checkout is test-only and needs the three server environment values in `RAZORPAY_SETUP.md`. Admin > Test orders shows sandbox records with customer email and delivery details. Live keys are blocked; simulated orders do not change stock or create deliveries. Shipping rates, courier serviceability and finance email delivery are not implemented.
 
 Homepage promotions are managed at `/admin/banners`. Set `FIREBASE_STORAGE_BUCKET` for image uploads. Admins can preview, reorder, save drafts, publish up to five slides and replace or delete images. Upload requirements are shown in the editor. See the banner upload section of `FIREBASE_SETUP.md` for Storage setup and artwork sizes.
 

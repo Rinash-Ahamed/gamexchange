@@ -12,7 +12,7 @@ export function testCheckoutConfigured() {
       process.env.FIREBASE_PROJECT_ID?.trim() && process.env.FIREBASE_PROJECT_ID !== "your-firebase-project-id");
 }
 export function testCredentials() {
-  if (!testCheckoutConfigured()) throw new CheckoutError("Razorpay test checkout is not configured. You can still send your cart to the team.", 503);
+  if (!testCheckoutConfigured()) throw new CheckoutError("Online payments are temporarily unavailable. Please try again later.", 503);
   return { key: process.env.RAZORPAY_KEY_ID!.trim(), secret: process.env.RAZORPAY_KEY_SECRET!.trim() };
 }
 export function validSignature(payload: string, signature: string, secret: string) {

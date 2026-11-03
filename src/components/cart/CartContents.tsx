@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { formatINR, type Product } from "@/data/products";
-import { whatsappUrl } from "@/data/site";
 import { useCart } from "./use-cart";
 import { ProductImage } from "@/components/shop/ProductImage";
 import { TestCheckout } from "./TestCheckout";
@@ -19,7 +18,6 @@ export function CartContents({ products, checkoutEnabled }: { products: Product[
   const lines = cart.items.map((item) => ({ ...item, product: products.find((product) => product.id === item.id) }));
   const invalid = lines.some((line) => !line.product || line.quantity > (line.product.stock ?? 1));
   const total = lines.reduce((sum, line) => sum + (line.product?.price ?? 0) * 100 * line.quantity, 0);
-  const message = ["Hi GameXchange, I'd like to enquire about these items:", ...lines.filter((line) => line.product).map((line) => `${line.quantity} x ${line.product!.name} (${line.product!.platform}, ${line.product!.condition}) - ${formatINR(line.product!.price * line.quantity)}`), `Estimated product subtotal: ${formatINR(total / 100)}`, "Please confirm availability, delivery or collection, and any additional charges."].join("\n");
   if (!cart.ready) return <p role="status" className="min-h-60 text-muted">Loading your cart...</p>;
   return <>
     {receipt && <section role="status" className="mb-6 rounded-2xl border border-ok/30 bg-ok/10 p-5"><h2 className="font-display text-xl font-semibold">Test payment verified</h2><p className="mt-2 break-all text-sm">Reference: {receipt}</p><p className="mt-2 text-sm text-muted">This was a simulation. No real money was collected, no stock was reserved and no delivery was booked.</p></section>}
@@ -48,7 +46,6 @@ export function CartContents({ products, checkoutEnabled }: { products: Product[
         <p className="mt-2 text-xs leading-5 text-muted">Prices and availability are checked again at checkout. Delivery and additional charges are not calculated here.</p>
         {invalid && <p role="alert" className="mt-3 text-sm text-danger">Update unavailable items before continuing.</p>}
         <TestCheckout enabled={checkoutEnabled} items={cart.items} amount={total} disabled={invalid || total <= 0} onBusy={setBusy} onSuccess={(reference, purchased) => { setReceipt(reference); cart.complete(purchased); }} />
-        {!invalid && !busy && <a href={whatsappUrl(message)} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-line-strong px-4 font-display text-sm font-semibold text-accent-text">Send cart on WhatsApp</a>}
         <Link href="/products" className="mt-3 inline-flex min-h-11 w-full items-center justify-center text-sm text-muted underline">Continue shopping</Link>
       </aside>
     </div>}

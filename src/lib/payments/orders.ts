@@ -6,34 +6,37 @@ import { firebaseFirestore } from "@/lib/firebase/firestore";
 import { isPcComponentCategory } from "@/data/catalog";
 import type { InventoryItem } from "@/lib/admin/types";
 import { CheckoutError, gatewayOrderSchema, gatewayPaymentSchema, razorpayRequest, testCredentials, validSignature } from "./razorpay";
+import { shippingSchema, type CheckoutCustomer, type ShippingAddress } from "./shipping";
 
 export const checkoutSchema = z.object({
   requestId: z.uuid(),
   items: z.array(z.object({ id: z.string().regex(/^[a-zA-Z0-9-]{1,128}$/), quantity: z.number().int().min(1).max(99) })).min(1).max(30),
   expectedAmount: z.number().int().positive().max(100_000_000),
+  shipping: shippingSchema,
 }).refine((value) => new Set(value.items.map((item) => item.id)).size === value.items.length, "Duplicate products are not allowed.");
 export const verifySchema = z.object({ requestId: z.uuid(), razorpay_order_id: z.string().regex(/^order_[a-zA-Z0-9]+$/), razorpay_payment_id: z.string().regex(/^pay_[a-zA-Z0-9]+$/), razorpay_signature: z.string().regex(/^[a-fA-F0-9]{64}$/) });
 export type TestOrder = {
   id: string; mode: "test"; keyId: string; fingerprint: string; status: "creating" | "created" | "paid";
   amount: number; currency: "INR"; items: { id: string; name: string; quantity: number; unitAmount: number }[];
   createdAt: string; updatedAt: string; razorpayOrderId?: string; paymentId?: string;
+  customer?: CheckoutCustomer; shipping?: ShippingAddress;
 };
 const collection = () => firebaseFirestore().collection("checkoutTestOrders");
-const fingerprint = (input: z.infer<typeof checkoutSchema>) => createHash("sha256").update(JSON.stringify({ amount: input.expectedAmount, items: [...input.items].sort((a, b) => a.id.localeCompare(b.id)) })).digest("hex");
+const fingerprint = (input: z.infer<typeof checkoutSchema>, customer: CheckoutCustomer) => createHash("sha256").update(JSON.stringify({ uid: customer.uid, shipping: input.shipping, amount: input.expectedAmount, items: [...input.items].sort((a, b) => a.id.localeCompare(b.id)) })).digest("hex");
 function checkoutResponse(order: TestOrder) {
   if (order.status === "paid") throw new CheckoutError("This test order is already paid. Check your order reference.", 409);
   if (!order.razorpayOrderId) throw new CheckoutError("This checkout is still being prepared. Please retry shortly.", 409);
   return { requestId: order.id, key: order.keyId, orderId: order.razorpayOrderId, amount: order.amount, currency: order.currency, mode: "test" as const };
 }
 
-export async function createTestOrder(input: z.infer<typeof checkoutSchema>) {
+export async function createTestOrder(input: z.infer<typeof checkoutSchema>, customer: CheckoutCustomer) {
   const credentials = testCredentials();
   const ref = collection().doc(input.requestId);
-  const hash = fingerprint(input);
+  const hash = fingerprint(input, customer);
   const existing = await ref.get();
   if (existing.exists) {
     const order = existing.data() as TestOrder;
-    if (order.fingerprint !== hash || order.keyId !== credentials.key) throw new CheckoutError("Cart changed. Start a new checkout.", 409);
+    if (order.customer?.uid !== customer.uid || order.fingerprint !== hash || order.keyId !== credentials.key) throw new CheckoutError("Checkout details changed. Start a new checkout.", 409);
   }
   // Read current inventory directly, never client prices or the public cache. No demo seeding.
   const db = firebaseFirestore();
@@ -54,7 +57,7 @@ export async function createTestOrder(input: z.infer<typeof checkoutSchema>) {
     return checkoutResponse(order);
   }
   const now = new Date().toISOString();
-  const order: TestOrder = { id: input.requestId, mode: "test", keyId: credentials.key, fingerprint: hash, status: "creating", amount, currency: "INR", items, createdAt: now, updatedAt: now };
+  const order: TestOrder = { id: input.requestId, mode: "test", keyId: credentials.key, fingerprint: hash, status: "creating", amount, currency: "INR", items, customer, shipping: input.shipping, createdAt: now, updatedAt: now };
   const claimed = await db.runTransaction(async (transaction) => {
     if ((await transaction.get(ref)).exists) return false;
     transaction.create(ref, order);
@@ -88,10 +91,10 @@ async function confirmCaptured(order: TestOrder, paymentId: string) {
   return { ok: true, mode: "test", reference: order.id };
 }
 
-export async function verifyTestOrder(input: z.infer<typeof verifySchema>) {
+export async function verifyTestOrder(input: z.infer<typeof verifySchema>, customer: CheckoutCustomer) {
   const { secret } = testCredentials();
   const order = (await collection().doc(input.requestId).get()).data() as TestOrder | undefined;
-  if (!order?.razorpayOrderId || order.razorpayOrderId !== input.razorpay_order_id ||
+  if (order?.customer?.uid !== customer.uid || !order?.razorpayOrderId || order.razorpayOrderId !== input.razorpay_order_id ||
     !validSignature(`${order.razorpayOrderId}|${input.razorpay_payment_id}`, input.razorpay_signature, secret)) throw new CheckoutError("Payment signature could not be verified.", 400);
   return confirmCaptured(order, input.razorpay_payment_id);
 }
