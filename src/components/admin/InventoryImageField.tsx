@@ -20,7 +20,7 @@ export function InventoryImageField({ src }: { src?: string }) {
             setPreview(file && !invalid ? URL.createObjectURL(file) : "");
           }} />
       </label>
-      <p id={hintId} className="mt-2 text-xs text-muted">JPG, PNG or WebP, max 5 MB. Use a portrait cover for games or a square product photo for hardware. Images are shown uncropped.{src ? " Leave unchanged to keep the current image." : ""}</p>
+      <p id={hintId} className="mt-2 text-xs text-muted">JPG, PNG or WebP, up to 5 MB.{src ? " Choose a file only to replace the current image." : " Use a clear product photo or game cover."}</p>
       {error && <p role="alert" className="mt-2 text-xs text-danger">{error}</p>}
       {(preview || src) && <div className="mt-3 flex h-32 w-40 items-center justify-center overflow-hidden rounded-lg border border-line-strong bg-surface p-2">
         {/* Native image supports local file previews and authenticated draft artwork. */}

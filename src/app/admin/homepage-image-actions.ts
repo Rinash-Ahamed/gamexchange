@@ -12,5 +12,5 @@ export async function saveHomepageImageAction(_previous: HomepageImageState, dat
   try { await saveHomepageImage(id, formFile(data, "image"), reset); }
   catch (error) { return { error: error instanceof Error ? error.message : "Could not save the image." }; }
   refreshAdminData("homepageImages");
-  return { message: reset ? "Original image restored." : "Image updated. Changes appear on the next homepage visit or refresh.", saved: Date.now() };
+  return { message: reset ? "Original image restored." : "Image updated.", saved: Date.now() };
 }

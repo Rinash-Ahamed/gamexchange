@@ -22,7 +22,7 @@ const errors: Record<string, string> = {
   invalid: "Check the submitted values. Enter a whole-rupee price and a discount from 0 to 100%. A discount must reduce the final price by at least one rupee.", duplicate: "That SKU is already in use.",
   category: "That category has changed or been deleted. Reopen the form and select an available category.",
   image: "Choose a static JPG, PNG or WebP under 5 MB, between 300 and 4096 pixels on each side.",
-  storage: "Image upload failed. Check the Firebase Storage bucket and server permissions, then try again.",
+  storage: "Image upload failed. Please try again or contact support if the problem continues.",
 };
 
 export default async function InventoryPage({ searchParams }: { searchParams: Promise<InventorySearchParams> }) {

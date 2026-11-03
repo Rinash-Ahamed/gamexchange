@@ -22,7 +22,7 @@ export default async function BannersPage({ searchParams }: { searchParams: Prom
         <div><h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Homepage banners</h1><p className="mt-2 text-muted">Add artwork, preview it and publish when ready.</p></div>
         <Link href="/#promo-switch-heading" target="_blank" rel="noopener noreferrer" className={adminGhostButtonClass}>View on website</Link>
       </div>
-      {!storageConfigured && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">Image uploads need Firebase Storage. Create or open your Storage bucket and add FIREBASE_STORAGE_BUCKET to your environment, then restart the server.</p>}
+      {!storageConfigured && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">Image uploads are unavailable. Please contact support.</p>}
 {query.notice === "deleted" && <AdminNotice key={query.saved} className="mt-6">Banner deleted.</AdminNotice>}
       {query.error && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">The banner could not be deleted. Refresh and try again.</p>}
       <aside className="metal mt-6 rounded-xl p-4 text-sm">

@@ -24,7 +24,7 @@ export default async function FaqsPage({ searchParams }: { searchParams: Promise
   return (
     <div className="mx-auto max-w-4xl">
       <div className="flex flex-wrap items-end justify-between gap-3"><div><h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Homepage FAQs</h1><p className="mt-2 text-sm text-muted">Manage the questions and answers in Quick answers.</p></div><Link href="/#faq-h" target="_blank" rel="noopener noreferrer" className={adminGhostButtonClass}>View on website</Link></div>
-{query.notice && <AdminNotice key={`${query.notice}-${query.saved}`} className="mt-5">{query.notice === "deleted" ? "FAQ deleted." : "FAQ saved. Published changes appear on the next homepage visit or refresh."}</AdminNotice>}
+{query.notice && <AdminNotice key={`${query.notice}-${query.saved}`} className="mt-5">{query.notice === "deleted" ? "FAQ deleted." : "FAQ saved."}</AdminNotice>}
       {query.error && errors[query.error] && <p role="alert" className="mt-5 rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">{errors[query.error]}</p>}
       <details key={query.saved ?? "new"} className="metal mt-6 rounded-xl p-4">
         <summary className="cursor-pointer font-display text-base font-bold uppercase">Add FAQ</summary>

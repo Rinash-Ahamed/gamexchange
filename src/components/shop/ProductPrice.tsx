@@ -10,6 +10,6 @@ export function ProductPrice({ product, className = "text-xl sm:text-2xl", quant
   const discount = productDiscount(product);
   return <div className="min-w-0">
     <p className={`break-words font-display font-bold tabular-nums ${className}`}><span className="sr-only">Selling price: </span>{formatINR(product.price * quantity)}</p>
-    {discount && <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5"><span><span className="sr-only">Before discount: </span><s className="text-muted">{formatINR(discount.original * quantity)}</s></span><span className="font-semibold text-ok">Save {formatINR(discount.saving * quantity)} ({discount.label}%)</span></p>}
+    {discount && <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5"><span><span className="sr-only">Before discount: </span><s className="text-muted">{formatINR(discount.original * quantity)}</s></span><span className="font-semibold text-ok">Save {formatINR(discount.saving * quantity)}</span></p>}
   </div>;
 }

@@ -36,11 +36,11 @@ function errorMessage(error: unknown) {
       "auth/requires-recent-login": "Please start again to confirm your identity.",
       "auth/too-many-requests": "Too many attempts. Please wait before trying again.",
       "auth/network-request-failed": "Unable to connect. Check your connection and try again.",
-      "auth/operation-not-allowed": "Email/password sign-in or TOTP is not enabled in Firebase. Contact the site owner.",
+      "auth/operation-not-allowed": "Admin sign-in is unavailable. Please contact support.",
       "auth/unverified-email": "Verify your email before setting up your authenticator.",
-      "auth/unsupported-first-factor": "TOTP needs Firebase Authentication with Identity Platform enabled.",
+      "auth/unsupported-first-factor": "Authenticator setup is unavailable. Please contact support.",
       "auth/user-disabled": "This account has been disabled. Contact the site owner.",
-      "auth/invalid-api-key": "Firebase browser configuration is invalid. Contact the site owner.",
+      "auth/invalid-api-key": "Admin sign-in is unavailable. Please contact support.",
     };
     return messages[error.code] ?? "Authentication could not be completed. Start again or contact the site owner.";
   }
@@ -166,14 +166,14 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
 
   return (
     <div className="mt-6 space-y-4">
-      {!configured && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">Firebase admin login is not configured. Add the Firebase web app settings and approved admin UIDs, then restart the server.</p>}
+      {!configured && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">Admin sign-in is unavailable. Please contact support.</p>}
       {error && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">{error}</p>}
       {notice && <p role="status" className="rounded-xl border border-line bg-surface p-4 text-sm text-ink">{notice}</p>}
       <form onSubmit={submit} className="space-y-4" aria-busy={busy}>
         <fieldset disabled={busy || !configured} className="min-w-0 space-y-4 disabled:opacity-60">
           {stage === "password" || stage === "reset" ? (
             <>
-              {stage === "reset" && <div><h2 className="font-display text-xl font-semibold uppercase">Reset your password</h2><p className="mt-2 text-sm leading-6 text-muted">Enter your admin email to request a secure reset link from Firebase. This does not reset your authenticator.</p></div>}
+              {stage === "reset" && <div><h2 className="font-display text-xl font-semibold uppercase">Reset your password</h2><p className="mt-2 text-sm leading-6 text-muted">Enter your admin email to receive a password reset link. Your authenticator stays connected.</p></div>}
               <div>
                 <label htmlFor="admin-email" className={adminLabelClass}>Email</label>
                 <input id="admin-email" name="email" type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} className={adminInputClass} />
@@ -188,7 +188,7 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
               <h2 className="font-display text-xl font-semibold uppercase">{stage === "enroll" ? "Set up your authenticator" : "Authenticator code"}</h2>
               {stage === "enroll" && secret ? (
                 <div className="space-y-3 text-sm text-muted">
-                  <p>Scan this QR code with Google Authenticator, Microsoft Authenticator or another TOTP app.</p>
+                  <p>Scan this QR code with Google Authenticator, Microsoft Authenticator or another authenticator app.</p>
                   {qr && <Image src={qr} alt="Scan to connect your admin authenticator" width={240} height={240} unoptimized {...imageLoading("visible")} className="mx-auto h-auto max-w-full rounded-xl" />}
                   <p>Or enter this setup key manually:</p>
                   <code className="block select-all break-all rounded-xl border border-line bg-surface p-3 text-ink">{secret.secretKey}</code>

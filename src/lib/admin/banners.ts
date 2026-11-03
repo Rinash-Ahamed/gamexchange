@@ -38,7 +38,7 @@ export const bannerIdSchema = z.string().regex(/^[a-zA-Z0-9-]{1,80}$/);
 function collection() { return db().collection("homepageBanners"); }
 function settings() { return db().collection("settings").doc("homepageBanners"); }
 function bucket() {
-  return firebaseStorageBucket(() => new BannerError("Set FIREBASE_STORAGE_BUCKET to the bucket name from Firebase Storage, without gs://."));
+  return firebaseStorageBucket(() => new BannerError("Image uploads are unavailable. Please contact support."));
 }
 
 export function bannerStorageConfigured() { return Boolean(process.env.FIREBASE_STORAGE_BUCKET?.trim()); }

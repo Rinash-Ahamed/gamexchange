@@ -60,7 +60,7 @@ export function TestCheckout({ enabled, items, amount, disabled, onBusy, onSucce
     const purchased = items.map((item) => ({ ...item }));
     try {
       const order = await post("/api/checkout/order", { requestId, items: purchased, expectedAmount: amount });
-      if (order.mode !== "test" || !/^rzp_test_/.test(order.key) || order.amount !== amount || order.currency !== "INR") throw new Error("Test checkout configuration did not match.");
+      if (order.mode !== "test" || !/^rzp_test_/.test(order.key) || order.amount !== amount || order.currency !== "INR") throw new Error("Checkout could not be verified. Please try again.");
       const checkout = new window.Razorpay({
         key: order.key, amount: order.amount, currency: order.currency, order_id: order.orderId,
         name: "GamexChange", description: "Test order only. No delivery or stock reservation.", theme: { color: "#3a69f5" },
@@ -75,7 +75,7 @@ export function TestCheckout({ enabled, items, amount, disabled, onBusy, onSucce
 
   return <div className="mt-5 border-t border-line pt-5">
     {enabled && <Script id="razorpay-checkout" src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" onReady={() => setReady(true)} onError={() => { setReady(false); setMessage("Razorpay could not load. Check your connection or send your cart to the team."); }} />}
-    <p className="text-xs leading-5 text-muted">{enabled ? "Test checkout only. No real payment, delivery or stock reservation. Use dummy contact details in Razorpay." : "Online payments are not configured yet. Send the full cart to our team on WhatsApp."}</p>
+    <p className="text-xs leading-5 text-muted">{enabled ? "Test checkout only. No real payment or delivery. Use test contact details." : "To purchase, send your cart to our team on WhatsApp."}</p>
     {enabled && <button type="button" disabled={busy || !ready || (disabled && !needsVerification)} onClick={() => needsVerification ? void verify() : void checkout()} className="mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-gradient-to-br from-fill to-fill-2 px-4 font-display text-sm font-semibold text-accent-ink disabled:cursor-not-allowed disabled:opacity-60">
       {busy ? "Please wait..." : needsVerification ? "Retry payment verification" : !ready ? "Loading Razorpay..." : `Test checkout ${formatINR(amount / 100)}`}
     </button>}

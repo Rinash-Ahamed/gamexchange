@@ -13,13 +13,14 @@ type ConfirmSubmitProps = {
   confirmLabel?: string;
   cancelLabel?: string;
   intent?: "danger" | "primary";
+  /** Layout and spacing for the controls, applied to their actual fieldset parent. */
   className?: string;
   formRef?: RefObject<HTMLFormElement | null>;
 };
 
-function PendingFields({ children }: { children: ReactNode }) {
+function PendingFields({ children, className = "" }: { children: ReactNode; className?: string }) {
   const { pending } = useFormStatus();
-  return <fieldset disabled={pending} className="contents">{children}{pending && <p role="status" className="col-span-full text-sm text-muted">Please wait...</p>}</fieldset>;
+  return <fieldset disabled={pending} className={`min-w-0 ${className}`}>{children}{pending && <p role="status" className="col-span-full text-sm text-muted">Please wait...</p>}</fieldset>;
 }
 
 export function ConfirmSubmit({ children, message, submitAction, title = "Delete this item?", confirmLabel = "Delete permanently", cancelLabel = "Keep item", intent = "danger", className, formRef }: ConfirmSubmitProps) {
@@ -81,8 +82,8 @@ export function ConfirmSubmit({ children, message, submitAction, title = "Delete
   }, []);
 
   return (
-    <form ref={form} action={submitAction} onSubmit={interceptSubmit} className={className}>
-      <PendingFields>{children}</PendingFields>
+    <form ref={form} action={submitAction} onSubmit={interceptSubmit} className="min-w-0">
+      <PendingFields className={className}>{children}</PendingFields>
 
       <dialog
         ref={dialog}

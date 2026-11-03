@@ -8,7 +8,7 @@ import { createByteCache } from "@/lib/byte-cache";
 
 type ImageAsset = { path: string; version: string; updatedAt: string };
 const document = () => firebaseFirestore().collection("settings").doc("homepageImages");
-const bucket = () => firebaseStorageBucket(() => new Error("Configure Firebase Storage with the bucket name, without gs://."));
+const bucket = () => firebaseStorageBucket(() => new Error("Image uploads are unavailable. Please contact support."));
 const ownedPath = /^homepage-images\/[a-f0-9-]+\.webp$/;
 const cache = createByteCache(8 * 1024 * 1024);
 export const HOMEPAGE_IMAGES_TAG = "homepage-images";
@@ -52,7 +52,7 @@ export async function saveHomepageImage(id: string, file: File | undefined, rese
     const version = randomUUID();
     uploaded = { path: `homepage-images/${version}.webp`, version, updatedAt: new Date().toISOString() };
     try { await bucket().file(uploaded.path).save(output, { resumable: false, contentType: "image/webp", metadata: { cacheControl: "private, no-store" } }); }
-    catch { throw new Error("Upload failed. Check the Storage bucket and service-account permissions."); }
+    catch { throw new Error("Image upload failed. Please try again or contact support if the problem continues."); }
   }
   let previous: ImageAsset | undefined;
   try {

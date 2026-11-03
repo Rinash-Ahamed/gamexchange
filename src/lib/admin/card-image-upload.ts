@@ -16,7 +16,7 @@ export async function uploadCardImage(file: File, prefix: "franchise-images") {
   const version = randomUUID();
   const path = `${prefix}/${version}.webp`;
   try {
-    await firebaseStorageBucket(() => new Error("Storage is not configured.")).file(path).save(output.data, { resumable: false, contentType: "image/webp", metadata: { cacheControl: "private, no-store" } });
-  } catch { throw new Error("Upload failed. Check the Storage bucket and service-account permissions."); }
+    await firebaseStorageBucket(() => new Error("Image uploads are unavailable. Please contact support.")).file(path).save(output.data, { resumable: false, contentType: "image/webp", metadata: { cacheControl: "private, no-store" } });
+  } catch { throw new Error("Image upload failed. Please try again or contact support if the problem continues."); }
   return { storagePath: path, version, width: output.info.width, height: output.info.height };
 }

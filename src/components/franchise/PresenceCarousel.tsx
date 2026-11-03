@@ -9,7 +9,7 @@ import { usePageVisible } from "@/lib/use-page-visible";
 
 const slides = [
   { src: "/franchise/presence-network-v2.webp", name: "network illustration", alt: "Concept illustration connecting GamexChange's network cities: Coimbatore, Pollachi, Perundurai and Karur. Exact locations are listed alongside." },
-  { src: "/franchise/presence-location-map-v2.webp", name: "location map", alt: "Owner-supplied GamexChange location artwork for Coimbatore, Pollachi, Perundurai and Karur. The locations are also listed in page text." },
+  { src: "/franchise/presence-location-map-v2.webp", name: "location map", alt: "GamexChange locations in Coimbatore, Pollachi, Perundurai and Karur. The locations are also listed alongside." },
 ] as const;
 
 export function PresenceCarousel() {

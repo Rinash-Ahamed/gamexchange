@@ -19,10 +19,10 @@ export async function saveBannerAction(_previous: BannerSaveState, data: FormDat
   try {
     await saveBanner(rawId || undefined, fields.data, file);
   } catch (error) {
-    return { error: error instanceof BannerError ? error.message : "Unable to save the banner. Check your Firebase Storage bucket and service-account permissions, then try again." };
+    return { error: error instanceof BannerError ? error.message : "Unable to save the banner. Please try again or contact support if the problem continues." };
   }
   refreshAdminData("banners");
-  return { message: fields.data.status === "published" ? "Banner published. It will appear on the next homepage visit or refresh." : "Draft saved. It is not shown on the website.", saved: Date.now() };
+  return { message: fields.data.status === "published" ? "Banner published." : "Draft saved.", saved: Date.now() };
 }
 
 export async function deleteBannerAction(data: FormData) {

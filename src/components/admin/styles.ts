@@ -2,7 +2,7 @@ export const adminInputClass =
   "admin-control w-full rounded-lg border border-line-strong bg-surface px-3 text-base text-ink placeholder:text-muted/70 transition-[border-color,box-shadow] duration-200 focus:border-blue focus:outline-none focus:ring-2 focus:ring-blue/20 sm:text-sm";
 
 export const adminFileInputClass =
-  `${adminInputClass} min-w-0 py-1 file:mr-3 file:min-h-9 file:cursor-pointer file:rounded-lg file:border-0 file:bg-gradient-to-b file:from-fill file:to-fill-2 file:px-3 file:py-2 file:font-display file:text-xs file:font-semibold file:uppercase file:tracking-[0.08em] file:text-accent-ink file:transition-[filter] file:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50`;
+  `${adminInputClass} block min-w-0 max-w-full overflow-hidden py-1 file:mr-3 file:min-h-9 file:cursor-pointer file:rounded-lg file:border-0 file:bg-gradient-to-b file:from-fill file:to-fill-2 file:px-3 file:py-2 file:font-display file:text-xs file:font-semibold file:uppercase file:leading-5 file:tracking-[0.08em] file:text-accent-ink file:transition-[filter] file:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50`;
 
 export const adminLabelClass = "mb-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-muted";
 

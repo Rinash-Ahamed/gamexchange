@@ -88,6 +88,8 @@ The default theme follows the visitor's local time: light from 6:00 AM through 5
 
 ## Environment & security notes
 
+Visible website/admin copy should describe tasks and outcomes, not deployment, Firebase, bucket permissions, environment variables or raw JSON diagnostics. Keep technical setup, troubleshooting and verification limits in .agent documents. Keep concise upload requirements, actionable validation, authenticator guidance, unapproved-policy notices and honest test-payment/no-delivery warnings in the interface. Do not imply production payments, legal approval or full service readiness merely to simplify copy. Admin Activity uses readable field labels and before/after lists; the underlying audit data and private readiness API remain intact.
+
 Shared implementation helpers:
 
 - `src/lib/admin/form-data.ts`: allowlisted form text fields and optional file extraction.

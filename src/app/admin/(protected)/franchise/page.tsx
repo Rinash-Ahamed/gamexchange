@@ -10,10 +10,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
   const [photos, query] = await Promise.all([adminFranchisePhotos(), searchParams]);
   return <div className="mx-auto max-w-6xl">
     <h1 className="font-display text-2xl font-bold uppercase">Franchise photos & locations</h1>
-    <p className="mt-2 text-sm leading-6 text-muted">Add store images with city, state and locality for the franchise gallery. Drafts stay private. The illustrated map is a separate static overview.</p>
-    <p className="mt-3 rounded-xl border border-line bg-surface p-3 text-sm text-muted">Recommended: 1200 x 900 px. Static JPG, PNG or WebP up to 5 MB, each side 300 to 4096 px. Portrait photos are supported without cropping.</p>
+    <p className="mt-2 text-sm leading-6 text-muted">Manage store photos and locations. Publish photos to show them on the franchise page.</p>
+    <p className="mt-3 text-xs leading-5 text-muted">Recommended: 1200 x 900 px. JPG, PNG or WebP, up to 5 MB.</p>
     {query.notice && <AdminNotice key={query.saved} className="mt-4">{query.notice === "deleted" ? "Franchise photo deleted." : "Franchise photo saved."}</AdminNotice>}
-    {query.error && <p role="alert" className="mt-4 text-sm text-danger">{query.error === "invalid" ? "Complete the city, state, location and image description. Check the display order." : "Could not complete this change. Check the image size, Storage permissions and connection, then try again."}</p>}
+    {query.error && <p role="alert" className="mt-4 text-sm text-danger">{query.error === "invalid" ? "Complete the city, state, location and image description. Check the display order." : "Could not save this change. Check your image and connection, then try again. Contact support if the problem continues."}</p>}
     <details key={query.saved ?? "new"} className="mt-5 rounded-2xl border border-line-strong bg-surface p-4"><summary className="min-h-11 cursor-pointer font-display font-semibold">Add franchise photo</summary>
       <ConfirmSubmit submitAction={saveFranchiseAction} title="Save franchise photo?" message="Save this store image and location? Published photos appear in the franchise gallery; drafts stay private." confirmLabel="Save photo" intent="primary" className="mt-3 grid gap-3 sm:grid-cols-2"><FranchiseFields /><div className="sm:col-span-2"><button type="submit" className={adminButtonClass}>Save photo</button></div></ConfirmSubmit>
     </details>
@@ -22,7 +22,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
         <ConfirmSubmit submitAction={deleteFranchiseAction} title="Delete franchise photo?" message={`Remove ${photo.title} and its uploaded artwork? This cannot be undone.`}><input name="id" type="hidden" value={photo.id} /><button type="submit" className={`${adminGhostButtonClass} text-danger`}>Delete</button></ConfirmSubmit>
       </div>
       <details className="mt-3"><summary className="min-h-11 cursor-pointer text-sm font-semibold text-accent-text">Edit photo & location</summary>
-        {(!photo.city || !photo.state || !photo.location) && <p className="mt-2 text-xs text-muted">This original photo has no structured address yet. Confirm its city, state and locality before saving.</p>}
+        {(!photo.city || !photo.state || !photo.location) && <p className="mt-2 text-xs text-muted">Add the city, state and locality before saving.</p>}
         <ConfirmSubmit submitAction={saveFranchiseAction} title="Update franchise photo?" message="Save this photo, location and visibility? Published changes update the franchise page." confirmLabel="Save changes" intent="primary" className="mt-3 grid gap-3 sm:grid-cols-2"><FranchiseFields photo={photo} /><div className="sm:col-span-2"><button type="submit" className={adminButtonClass}>Save changes</button></div></ConfirmSubmit>
       </details>
     </article>)}</div>
