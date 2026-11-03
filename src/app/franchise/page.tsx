@@ -11,25 +11,25 @@ import { whatsappUrl } from "@/data/site";
 
 export const metadata: Metadata = {
   title: "Franchise opportunities",
-  description: "Bring GamexChange to your city. Explore our store spaces and locations, and speak to the team about a franchise opportunity.",
+  description: "Bring GameXchange to your city. Explore our store spaces and locations, and speak to the team about a franchise opportunity.",
   alternates: { canonical: "/franchise" },
 };
 
 export const dynamic = "force-dynamic";
 
-const enquiry = whatsappUrl("Hi GamexChange, I would like to enquire about a franchise. My preferred city / area is: \nDo I have a premises in mind? \nPlease share the requirements, investment details and next steps.");
+const enquiry = whatsappUrl("Hi GameXchange, I would like to enquire about a franchise. My preferred city / area is: \nDo I have a premises in mind? \nPlease share the requirements, investment details and next steps.");
 
 export default function FranchisePage() {
   return <main>
     <PageHero title={<>Your city.<br /><span className="text-gradient">Our next level.</span></>}>
-      Bring GamexChange to your city. Explore our spaces and start a conversation about becoming a franchise partner.
+      Bring GameXchange to your city. Explore our spaces and start a conversation about becoming a franchise partner.
     </PageHero>
 
     <div className="mx-auto max-w-7xl space-y-14 px-5 pb-10 sm:px-8 sm:space-y-20">
       <section aria-labelledby="franchise-intro" className="grid items-center gap-7 lg:grid-cols-2 lg:gap-12">
         <div className="min-w-0">
           <h2 id="franchise-intro" className="font-display text-3xl font-bold uppercase leading-tight sm:text-4xl">A place to play.<br /><span className="text-gradient">A space to connect.</span></h2>
-          <p className="mt-4 max-w-xl text-base leading-7 text-muted">From gaming gear to shared gaming experiences, get a closer look at the GamexChange store environment. Interested in a location of your own? Tell us where you would like to bring the brand.</p>
+          <p className="mt-4 max-w-xl text-base leading-7 text-muted">From gaming gear to shared gaming experiences, get a closer look at the GameXchange store environment. Interested in a location of your own? Tell us where you would like to bring the brand.</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <ControllerButton href={enquiry} external glyph="x" size="md" className="w-full min-w-0 text-xs tracking-normal sm:w-auto">Enquire about a franchise</ControllerButton>
             <ControllerButton href="#our-spaces" variant="ghost" glyph="sq" size="md">Explore our spaces</ControllerButton>
@@ -40,7 +40,7 @@ export default function FranchisePage() {
       </section>
 
       <section id="our-spaces" aria-labelledby="spaces-heading" className="scroll-mt-28">
-        <div className="mb-6 max-w-2xl"><h2 id="spaces-heading" className="font-display text-3xl font-bold uppercase">Inside <span className="text-gradient">GamexChange.</span></h2><p className="mt-3 leading-7 text-muted">A look at our stores and gaming lounges. Layouts and facilities vary by location.</p></div>
+        <div className="mb-6 max-w-2xl"><h2 id="spaces-heading" className="font-display text-3xl font-bold uppercase">Inside <span className="text-gradient">GameXchange.</span></h2><p className="mt-3 leading-7 text-muted">A look at our stores and gaming lounges. Layouts and facilities vary by location.</p></div>
         <Suspense fallback={<div role="status" className="min-h-64 rounded-2xl border border-line bg-surface p-6 text-sm text-muted">Loading store photos...</div>}><FranchiseGallery /></Suspense>
       </section>
 

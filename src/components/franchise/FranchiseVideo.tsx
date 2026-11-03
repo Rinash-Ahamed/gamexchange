@@ -25,9 +25,9 @@ export function FranchiseVideo() {
     };
   }, []);
   return <figure className="min-w-0 overflow-hidden rounded-3xl border border-line-strong bg-surface">
-    <video ref={video} src="/video/franchise-video.mp4" muted loop controls playsInline preload="metadata" aria-label="GamexChange franchise store video" className="mx-auto aspect-[4/3] max-h-[34rem] w-full bg-black object-contain">
+    <video ref={video} src="/video/franchise-video.mp4" muted loop controls playsInline preload="metadata" aria-label="GameXchange franchise store video" className="mx-auto aspect-[4/3] max-h-[34rem] w-full bg-black object-contain">
       Your browser does not support this video. <a href="/video/franchise-video.mp4">Download the franchise video</a>.
     </video>
-    <figcaption className="border-t border-line px-5 py-3 text-sm text-muted">Explore the GamexChange store experience. Use the controls to pause or enable sound.</figcaption>
+    <figcaption className="border-t border-line px-5 py-3 text-sm text-muted">Explore the GameXchange store experience. Use the controls to pause or enable sound.</figcaption>
   </figure>;
 }

@@ -23,9 +23,9 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
         <p className="mt-2 text-muted">Track every customer device from intake through collection.</p>
       </div>
 
-{query.notice === "created" && <AdminNotice key={`created-${query.saved}`} className="mt-6">Service record created. Ticket: <strong>{query.ticket}</strong></AdminNotice>}
-{query.notice === "updated" && <AdminNotice key={`updated-${query.saved}`} className="mt-6">Service record updated.</AdminNotice>}
-      {query.error && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">Check the submitted values and try again.</p>}
+{query.notice === "created" && <AdminNotice eventKey={query}>Service record created. Ticket: <strong>{query.ticket}</strong></AdminNotice>}
+{query.notice === "updated" && <AdminNotice eventKey={query}>Service record updated.</AdminNotice>}
+      {query.error && <AdminNotice variant="error" eventKey={query}>{query.error === "save" ? "Could not confirm this change. Refresh service records before trying again." : "Check the submitted values and try again."}</AdminNotice>}
 
       <details className="metal group mt-6 rounded-2xl p-4 sm:p-5">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-lg font-bold uppercase">

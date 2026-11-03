@@ -32,7 +32,7 @@ export function ProductCard({ product, index, total, priority = false }: { produ
   };
   const onLeave = () => { px.set(0); py.set(0); };
 
-  const message = `Hi GamexChange, I'm interested in the ${product.name} (${product.condition}, listed at ${formatINR(product.price)}). Is it available?`;
+  const message = `Hi GameXchange, I'm interested in the ${product.name} (${product.condition}, listed at ${formatINR(product.price)}). Is it available?`;
 
   return (
     <article

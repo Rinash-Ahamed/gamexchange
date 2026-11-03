@@ -1,4 +1,4 @@
-# GamexChange
+# GameXchange
 
 ## Project documentation
 
@@ -91,6 +91,8 @@ The default theme follows the visitor's local time: light from 6:00 AM through 5
 Visible website/admin copy should describe tasks and outcomes, not deployment, Firebase, bucket permissions, environment variables or raw JSON diagnostics. Keep technical setup, troubleshooting and verification limits in .agent documents. Keep concise upload requirements, actionable validation, authenticator guidance, unapproved-policy notices and honest test-payment/no-delivery warnings in the interface. Do not imply production payments, legal approval or full service readiness merely to simplify copy. Admin Activity uses readable field labels and before/after lists; the underlying audit data and private readiness API remain intact.
 
 Shared implementation helpers:
+
+- `src/components/seo/JsonLd.tsx`: server-only native application/ld+json data blocks, using the shared escaping serializer. Do not use next/script or beforeInteractive for JSON-LD: those strategies are for executable JavaScript, and the bootstrap wrapper can trigger React's client-rendered-script warning. Razorpay still uses next/script for its actual JavaScript SDK. See https://nextjs.org/docs/app/guides/json-ld.
 
 - `src/lib/admin/form-data.ts`: allowlisted form text fields and optional file extraction.
 - `src/lib/admin/revalidate.ts`: resource-specific route and public-cache invalidation after successful admin mutations.

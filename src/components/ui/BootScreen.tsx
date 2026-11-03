@@ -103,7 +103,7 @@ export function BootScreen() {
       ref={screen}
       role="status"
       aria-live="polite"
-      aria-label="GamexChange is starting"
+      aria-label="GameXchange is starting"
       tabIndex={-1}
       className={`boot-screen ${phase === "leaving" ? "boot-screen-leaving" : ""}`}
     >
@@ -123,7 +123,7 @@ export function BootScreen() {
         </div>
         <Image
           src="/brand/gamexchange-logo-900.png"
-          alt="GamexChange"
+          alt="GameXchange"
           width={900}
           height={368}
           {...imageLoading("visible")}

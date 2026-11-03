@@ -33,5 +33,5 @@ test("native scrolling retains anchor navigation without a JavaScript wheel engi
   await expect(page.locator("html")).not.toHaveClass(/\blenis\b/);
   await page.getByRole("link", { name: "Explore our spaces", exact: true }).click();
   await expect(page).toHaveURL(/#our-spaces$/);
-  await expect(page.getByRole("heading", { name: "Inside GamexChange.", exact: true })).toBeInViewport();
+  await expect(page.getByRole("heading", { name: "Inside GameXchange.", exact: true })).toBeInViewport();
 });

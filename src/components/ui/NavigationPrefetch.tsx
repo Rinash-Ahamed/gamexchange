@@ -29,22 +29,28 @@ export function NavigationPrefetch() {
       router.prefetch(href);
     };
     const hover = (event: PointerEvent) => {
-      window.clearTimeout(timer);
       if (event.pointerType !== "mouse") return;
-      const target = event.target;
-      timer = window.setTimeout(() => warm(target), 80);
+      const anchor = event.target instanceof Element ? event.target.closest("a[href]") : null;
+      if (!anchor || (event.relatedTarget instanceof Node && anchor.contains(event.relatedTarget))) return;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => warm(anchor), 80);
     };
     const focus = (event: FocusEvent) => warm(event.target);
     const touch = (event: PointerEvent) => { if (event.pointerType === "touch") warm(event.target); };
     const cancel = () => window.clearTimeout(timer);
+    const leave = (event: PointerEvent) => {
+      const anchor = event.target instanceof Element ? event.target.closest("a[href]") : null;
+      if (anchor && event.relatedTarget instanceof Node && anchor.contains(event.relatedTarget)) return;
+      cancel();
+    };
     document.addEventListener("pointerover", hover, { passive: true });
-    document.addEventListener("pointerout", cancel, { passive: true });
+    document.addEventListener("pointerout", leave, { passive: true });
     document.addEventListener("focusin", focus);
     document.addEventListener("pointerdown", touch, { passive: true });
     return () => {
       cancel();
       document.removeEventListener("pointerover", hover);
-      document.removeEventListener("pointerout", cancel);
+      document.removeEventListener("pointerout", leave);
       document.removeEventListener("focusin", focus);
       document.removeEventListener("pointerdown", touch);
     };

@@ -59,10 +59,10 @@ export function Footer() {
               <a href={`tel:${businessDetails.phone}`} className={`${linkClass} w-full gap-3`}><Phone className="size-4 shrink-0 text-[#a9bfff]" aria-hidden />{businessDetails.phoneDisplay}</a>
               <Link href="/contact" className={`${linkClass} w-full gap-3`}><MapPin className="size-4 shrink-0 text-[#a9bfff]" aria-hidden />Coimbatore, Tamil Nadu</Link>
             </address>
-            <p className="mt-3 text-xs leading-6 text-white/60">{site.hours.display}<br />Closed on {site.hours.closedDay}s</p>
+            <p className="mt-3 text-xs leading-6 text-white/60">Business Hours: 10 AM to 8 PM (All Days)</p>
           </section>
         </div>
-        <p className="pt-5 text-center text-xs leading-6 text-white/55">© {new Date().getFullYear()} GamexChange, operated by {businessDetails.entity}. All rights reserved.</p>
+        <p className="pt-5 text-center text-xs leading-6 text-white/55">© {new Date().getFullYear()} GameXchange, operated by {businessDetails.entity}. All rights reserved.</p>
       </div>
     </footer>
   );

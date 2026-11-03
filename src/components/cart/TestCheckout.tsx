@@ -63,7 +63,7 @@ export function TestCheckout({ enabled, items, amount, disabled, onBusy, onSucce
       if (order.mode !== "test" || !/^rzp_test_/.test(order.key) || order.amount !== amount || order.currency !== "INR") throw new Error("Checkout could not be verified. Please try again.");
       const checkout = new window.Razorpay({
         key: order.key, amount: order.amount, currency: order.currency, order_id: order.orderId,
-        name: "GamexChange", description: "Test order only. No delivery or stock reservation.", theme: { color: "#3a69f5" },
+        name: "GameXchange", description: "Test order only. No delivery or stock reservation.", theme: { color: "#3a69f5" },
         handler(result) { pending.current = { requestId, result, items: purchased }; setNeedsVerification(true); void verify(); },
         modal: { ondismiss() { if (!verifying.current && !pending.current) { setLocked(false); setMessage("Checkout closed. Your cart is unchanged."); } } },
       });

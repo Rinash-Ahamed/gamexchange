@@ -19,7 +19,8 @@ export async function saveCategoryAction(formData: FormData) {
     await saveInventoryCategory(name.data, actor, rawId || undefined);
   } catch (error) {
     if (error instanceof CategoryError) redirect(`/admin/categories?error=${error.code}`);
-    throw error;
+    console.error("[admin] Category change could not be confirmed.");
+    redirect("/admin/categories?error=save");
   }
   refreshAdminData("categories");
   redirect(`/admin/categories?notice=${rawId ? "renamed" : "created"}&saved=${Date.now()}`);
@@ -33,7 +34,8 @@ export async function deleteCategoryAction(formData: FormData) {
     await deleteInventoryCategory(id.data, actor);
   } catch (error) {
     if (error instanceof CategoryError) redirect(`/admin/categories?error=${error.code}`);
-    throw error;
+    console.error("[admin] Category deletion could not be confirmed.");
+    redirect("/admin/categories?error=save");
   }
   refreshAdminData("categories");
   redirect(`/admin/categories?notice=deleted&saved=${Date.now()}`);

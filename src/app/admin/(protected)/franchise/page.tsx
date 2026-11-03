@@ -12,8 +12,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
     <h1 className="font-display text-2xl font-bold uppercase">Franchise photos & locations</h1>
     <p className="mt-2 text-sm leading-6 text-muted">Manage store photos and locations. Publish photos to show them on the franchise page.</p>
     <p className="mt-3 text-xs leading-5 text-muted">Recommended: 1200 x 900 px. JPG, PNG or WebP, up to 5 MB.</p>
-    {query.notice && <AdminNotice key={query.saved} className="mt-4">{query.notice === "deleted" ? "Franchise photo deleted." : "Franchise photo saved."}</AdminNotice>}
-    {query.error && <p role="alert" className="mt-4 text-sm text-danger">{query.error === "invalid" ? "Complete the city, state, location and image description. Check the display order." : "Could not save this change. Check your image and connection, then try again. Contact support if the problem continues."}</p>}
+    {query.notice && <AdminNotice eventKey={query}>{query.notice === "deleted" ? "Franchise photo deleted." : "Franchise photo saved."}</AdminNotice>}
+    {query.error && <AdminNotice variant="error" eventKey={query}>{query.error === "invalid" ? "Complete the city, state, location and image description. Check the display order." : "Could not save this change. Check your image and connection, then try again. Contact support if the problem continues."}</AdminNotice>}
     <details key={query.saved ?? "new"} className="mt-5 rounded-2xl border border-line-strong bg-surface p-4"><summary className="min-h-11 cursor-pointer font-display font-semibold">Add franchise photo</summary>
       <ConfirmSubmit submitAction={saveFranchiseAction} title="Save franchise photo?" message="Save this store image and location? Published photos appear in the franchise gallery; drafts stay private." confirmLabel="Save photo" intent="primary" className="mt-3 grid gap-3 sm:grid-cols-2"><FranchiseFields /><div className="sm:col-span-2"><button type="submit" className={adminButtonClass}>Save photo</button></div></ConfirmSubmit>
     </details>

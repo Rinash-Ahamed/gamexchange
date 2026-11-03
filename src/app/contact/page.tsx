@@ -6,7 +6,7 @@ import { branches, mapsUrl, site, whatsappUrl } from "@/data/site";
 
 export const metadata: Metadata = {
   title: "Contact & branches",
-  description: "Two GamexChange branches in Coimbatore: Sungam and Selvapuram South. Open 11:00 AM – 8:30 PM, closed Fridays.",
+  description: "Two GameXchange branches in Coimbatore: Sungam and Selvapuram South. Open 11:00 AM – 8:30 PM, closed Fridays.",
   alternates: { canonical: "/contact" },
 };
 
@@ -34,7 +34,7 @@ export default function ContactPage() {
             <h2 className="font-display text-2xl font-bold uppercase">Fastest reply</h2>
             <p className="mt-1 text-muted">WhatsApp is the quickest way to reach the shop.</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <ControllerButton href={whatsappUrl("Hi GamexChange!")} external glyph="x" size="sm">WhatsApp</ControllerButton>
+              <ControllerButton href={whatsappUrl("Hi GameXchange!")} external glyph="x" size="sm">WhatsApp</ControllerButton>
               <ControllerButton href={site.social.instagram} external glyph="o" size="sm" variant="ghost">Instagram</ControllerButton>
               <ControllerButton href={site.social.facebook} external glyph="o" size="sm" variant="ghost">Facebook</ControllerButton>
             </div>

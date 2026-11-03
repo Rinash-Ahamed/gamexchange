@@ -14,6 +14,7 @@ const notices: Record<string, string> = {
   created: "Category added. You can now select it in inventory.", renamed: "Category renamed across inventory and the shop.", deleted: "Category deleted.",
 };
 const errors: Record<string, string> = {
+  save: "Could not confirm this change. Refresh categories before trying again.",
   "category-unsupported": "PC components are not sold here. Use a category for games, consoles or accessories.",
   invalid: "Enter a category name between 1 and 160 characters.",
   "category-missing": "This category is no longer available. Refresh and try again.",
@@ -33,8 +34,8 @@ export default async function CategoriesPage({ searchParams }: { searchParams: P
         <div><h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Categories</h1><p className="mt-2 text-sm text-muted">Keep your shop organised. Categories appear in the shop when they have available stock.</p></div>
         <Link href="/admin/inventory" className={adminGhostButtonClass}>Back to inventory</Link>
       </div>
-{query.notice && notices[query.notice] && <AdminNotice key={`${query.notice}-${query.saved}`} className="mt-5">{notices[query.notice]}</AdminNotice>}
-      {query.error && errors[query.error] && <p role="alert" className="mt-5 rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">{errors[query.error]}</p>}
+{query.notice && notices[query.notice] && <AdminNotice eventKey={query}>{notices[query.notice]}</AdminNotice>}
+      {query.error && <AdminNotice variant="error" eventKey={query}>{errors[query.error] ?? "Could not save this change. Please try again."}</AdminNotice>}
       <section className="metal mt-6 rounded-xl p-4" aria-labelledby="add-category-heading">
         <h2 id="add-category-heading" className="font-display text-base font-bold uppercase">Add category</h2>
         <ConfirmSubmit key={query.saved ?? "new"} submitAction={saveCategoryAction} title="Add category?" message="Make this category available in the inventory dropdown?" confirmLabel="Add category" cancelLabel="Keep editing" intent="primary" className="mt-3 flex flex-wrap items-end gap-3">

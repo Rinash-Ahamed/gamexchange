@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "GamexChange",
-    short_name: "GamexChange",
+    name: "GameXchange",
+    short_name: "GameXchange",
     description: "Buy, sell, exchange and repair gaming consoles in Coimbatore.",
     start_url: "/",
     display: "standalone",

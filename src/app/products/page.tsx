@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import Script from "next/script";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { PageHero } from "@/components/ui/PageHero";
 import { ProductBrowser } from "@/components/shop/ProductBrowser";
 import { site } from "@/data/site";
 import { listPublicProducts } from "@/lib/admin/db";
-import { serializeJsonLd } from "@/lib/structured-data";
 import { normalizePlatform, shopSections } from "@/data/catalog";
 import { availableCatalog, type CatalogFilters } from "@/lib/catalog";
 import { productConditionSchema, productHref } from "@/lib/product-links";
 
 export const metadata: Metadata = {
   title: "Shop games, consoles & accessories",
-  description: "Browse available games, consoles, controllers and accessories. Filter by platform, condition and price, then enquire with GamexChange.",
+  description: "Browse available games, consoles, controllers and accessories. Filter by platform, condition and price, then enquire with GameXchange.",
   alternates: { canonical: "/products" },
 };
 
@@ -48,11 +47,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         Browse games, consoles and accessories. Choose your platform and filter by price, condition and category.
       </PageHero>
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8"><ProductBrowser key={JSON.stringify(initialFilters)} products={products} initialFilters={initialFilters} /></div>
-      <Script
-        id="gamexchange-products-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-      />
+      <JsonLd id="gamexchange-products-jsonld" data={jsonLd} />
     </main>
   );
 }

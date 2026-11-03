@@ -85,7 +85,8 @@ function handleInventoryError(error: unknown): never {
   if (error instanceof CategoryError) redirect("/admin/inventory?error=category");
   if (error instanceof InventoryImageError) redirect(`/admin/inventory?error=${error.code}`);
   if (isDuplicateSkuError(error)) redirect("/admin/inventory?error=duplicate");
-  throw error;
+  console.error("[admin] Inventory change could not be confirmed.");
+  redirect("/admin/inventory?error=save");
 }
 
 export async function logoutAction() {
@@ -139,8 +140,10 @@ export async function deleteInventoryAction(formData: FormData) {
   const actor = await requireAdmin();
   const id = formText(formData, "id");
   if (!documentId.safeParse(id).success) redirect("/admin/inventory?error=invalid");
-  const previousPath = await deleteInventoryItem(id, actor);
-  await removeInventoryImage(previousPath);
+  try {
+    const previousPath = await deleteInventoryItem(id, actor);
+    await removeInventoryImage(previousPath);
+  } catch (error) { handleInventoryError(error); }
   refreshAdminData("inventory");
   redirect(`/admin/inventory?notice=deleted&saved=${Date.now()}`);
 }
@@ -150,7 +153,12 @@ export async function createServiceAction(formData: FormData) {
   const parsed = serviceCreateSchema.safeParse(formTextFields(formData,
     ["customerName", "phone", "device", "issue", "status", "estimatedCost", "notes"]));
   if (!parsed.success) redirect("/admin/services?error=invalid");
-  const ticket = await createServiceRecord(parsed.data, actor);
+  let ticket: string;
+  try { ticket = await createServiceRecord(parsed.data, actor); }
+  catch {
+    console.error("[admin] Service creation could not be confirmed.");
+    redirect("/admin/services?error=save");
+  }
   refreshAdminData("services");
   redirect(`/admin/services?notice=created&ticket=${encodeURIComponent(ticket)}&saved=${Date.now()}`);
 }
@@ -159,7 +167,11 @@ export async function updateServiceAction(formData: FormData) {
   const actor = await requireAdmin();
   const parsed = serviceUpdateSchema.safeParse(formTextFields(formData, ["id", "status", "estimatedCost", "notes"]));
   if (!parsed.success) redirect("/admin/services?error=invalid");
-  await updateServiceRecord(parsed.data.id, parsed.data, actor);
+  try { await updateServiceRecord(parsed.data.id, parsed.data, actor); }
+  catch {
+    console.error("[admin] Service update could not be confirmed.");
+    redirect("/admin/services?error=save");
+  }
   refreshAdminData("services");
   redirect(`/admin/services?notice=updated&saved=${Date.now()}`);
 }

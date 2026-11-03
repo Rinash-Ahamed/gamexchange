@@ -12,6 +12,7 @@ import { AdminNotice } from "@/components/admin/AdminNotice";
 export const metadata: Metadata = { title: "Homepage FAQs", robots: { index: false, follow: false } };
 
 const errors: Record<string, string> = {
+  save: "Could not confirm this change. Refresh FAQs before trying again.",
   invalid: "Use a question of 3 to 200 characters, an answer of 3 to 6000 characters and a display order from 1 to 999.",
   missing: "This FAQ no longer exists. Refresh and try again.", limit: "You can save up to 30 FAQs. Remove an unused one first.",
   duplicate: "That question already exists. Edit the existing FAQ instead.",
@@ -24,8 +25,8 @@ export default async function FaqsPage({ searchParams }: { searchParams: Promise
   return (
     <div className="mx-auto max-w-4xl">
       <div className="flex flex-wrap items-end justify-between gap-3"><div><h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Homepage FAQs</h1><p className="mt-2 text-sm text-muted">Manage the questions and answers in Quick answers.</p></div><Link href="/#faq-h" target="_blank" rel="noopener noreferrer" className={adminGhostButtonClass}>View on website</Link></div>
-{query.notice && <AdminNotice key={`${query.notice}-${query.saved}`} className="mt-5">{query.notice === "deleted" ? "FAQ deleted." : "FAQ saved."}</AdminNotice>}
-      {query.error && errors[query.error] && <p role="alert" className="mt-5 rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">{errors[query.error]}</p>}
+{query.notice && <AdminNotice eventKey={query}>{query.notice === "deleted" ? "FAQ deleted." : "FAQ saved."}</AdminNotice>}
+      {query.error && <AdminNotice variant="error" eventKey={query}>{errors[query.error] ?? "Could not save this change. Please try again."}</AdminNotice>}
       <details key={query.saved ?? "new"} className="metal mt-6 rounded-xl p-4">
         <summary className="cursor-pointer font-display text-base font-bold uppercase">Add FAQ</summary>
         <ConfirmSubmit submitAction={saveFaqAction} title="Save FAQ?" message="Save this question and answer? Published FAQs appear on the homepage; drafts stay private." confirmLabel="Save FAQ" cancelLabel="Keep editing" intent="primary" className="mt-4 grid gap-3 sm:grid-cols-2">

@@ -11,7 +11,7 @@ export type Branch = {
 };
 
 export const site = {
-  name: "GamexChange",
+  name: "GameXchange",
   url: "https://gamexchange.co.in",
   tagline: "Buy. Sell. Exchange. Repair. Play.",
   city: "Coimbatore",

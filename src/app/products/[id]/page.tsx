@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Script from "next/script";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { notFound } from "next/navigation";
 import { ChevronRight, MessageCircle } from "lucide-react";
 import { publicProductDetails } from "@/lib/public-product";
 import { productConditionSchema, productHref } from "@/lib/product-links";
-import { serializeJsonLd } from "@/lib/structured-data";
 import { site, whatsappUrl } from "@/data/site";
 import { formatINR } from "@/data/products";
 import { ProductImage } from "@/components/shop/ProductImage";
@@ -21,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const result = await publicProductDetails((await params).id);
   if (!result) return { title: "Product unavailable", robots: { index: false, follow: false } };
   const { product } = result;
-  const description = product.description?.slice(0, 160) || `${product.name} for ${product.platform}, ${product.condition}. Listed at ${formatINR(product.price)}. View details and enquire with GamexChange.`;
+  const description = product.description?.slice(0, 160) || `${product.name} for ${product.platform}, ${product.condition}. Listed at ${formatINR(product.price)}. View details and enquire with GameXchange.`;
   return { title: product.name, description, alternates: { canonical: productHref(product.id) }, openGraph: { title: product.name, description, url: productHref(product.id), images: [{ url: new URL(product.image.src, site.url).href, width: product.image.width, height: product.image.height, alt: product.name }] } };
 }
 
@@ -35,7 +34,7 @@ export default async function ProductDetailsPage({ params }: Props) {
     ["Format", product.format], ["Player modes", product.playModes?.join(", ")], ["Age rating", product.ageRating],
     ["Release year", product.releaseYear ? String(product.releaseYear) : undefined],
   ].filter((entry): entry is [string, string] => Boolean(entry[1]));
-  const message = `Hi GamexChange, I'm interested in ${product.name} (${product.platform}, ${product.condition}), listed at ${formatINR(product.price)}. Please confirm availability, condition, included items and collection or delivery options.`;
+  const message = `Hi GameXchange, I'm interested in ${product.name} (${product.platform}, ${product.condition}), listed at ${formatINR(product.price)}. Please confirm availability, condition, included items and collection or delivery options.`;
   const jsonLd = {
     "@context": "https://schema.org", "@type": "Product", name: product.name,
     url: new URL(productHref(product.id), site.url).href,
@@ -66,6 +65,6 @@ export default async function ProductDetailsPage({ params }: Props) {
       </section>
     </div>
     {related.length > 0 && <section aria-labelledby="related-products" className="mt-12 border-t border-line pt-7"><div className="mb-5 flex flex-wrap items-center justify-between gap-3"><h2 id="related-products" className="font-display text-2xl font-bold">More to explore</h2><Link href="/products" className="inline-flex min-h-11 items-center text-sm text-accent-text hover:underline">Browse all products</Link></div><ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">{related.map((item) => <li key={item.id} className="min-w-0"><CatalogCard product={item} /></li>)}</ul></section>}
-    <Script id="gamexchange-product-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
+    <JsonLd id="gamexchange-product-jsonld" data={jsonLd} />
   </main>;
 }

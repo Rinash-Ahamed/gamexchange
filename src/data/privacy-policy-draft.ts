@@ -5,14 +5,14 @@ import type { LegalPolicy } from "./legal";
 export const privacyPolicyDraft: LegalPolicy = {
   "slug": "privacy-policy",
   "title": "Privacy policy",
-  "description": "How GamexChange handles information collected through website enquiries, customer service and authorised administration.",
+  "description": "How GameXchange handles information collected through website enquiries, customer service and authorised administration.",
   "updated": "30 October 2026",
   "sections": [
     {
       "id": "who-we-are",
       "title": "Who we are",
       "paragraphs": [
-        "GamexChange is operated by GXC Concepts Pvt Ltd. This policy explains how we handle personal information when you use our website, contact our team or receive customer support.",
+        "GameXchange is operated by GXC Concepts Pvt Ltd. This policy explains how we handle personal information when you use our website, contact our team or receive customer support.",
         "For privacy questions or requests, contact support@gamexchange.co.in or +91 77088 45461. Our registered office is No. 7, Shanmuganagar, Sungam Bypass Road, Ramanathapuram, Coimbatore - 641045, Tamil Nadu, India."
       ]
     },

@@ -45,7 +45,7 @@ export function ShelfShowcase({ products }: { products: readonly Product[] }) {
 
   const p = products[active] ?? products[0];
   if (!p) return null;
-  const message = `Hi GamexChange, I'm interested in the ${p.name} (${p.condition}, listed at ${formatINR(p.price)}). Is it available?`;
+  const message = `Hi GameXchange, I'm interested in the ${p.name} (${p.condition}, listed at ${formatINR(p.price)}). Is it available?`;
 
   return (
     <>

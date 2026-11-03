@@ -100,8 +100,8 @@ export function BannerEditor({ banner, nextPosition = 1, storageConfigured }: { 
         <p className="text-xs text-muted">Headline and supporting text are optional.</p>
         <button type="submit" disabled={Boolean(fileError) || (!banner && !storageConfigured)} className={`${adminButtonClass} w-full disabled:cursor-not-allowed disabled:opacity-50`}>{pending ? "Uploading and saving..." : banner ? "Save changes" : "Save banner"}</button>
       </fieldset>
-      {state.error && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">{state.error} If you were uploading an image, select it again before retrying. Your text and visibility selections are kept.</p>}
-{state.message && <AdminNotice key={state.saved} clearQuery={false}>{state.message}</AdminNotice>}
+      {state.error && <AdminNotice variant="error" eventKey={state} clearQuery={false}>{state.error} If you were uploading an image, select it again before retrying.</AdminNotice>}
+      {state.message && <AdminNotice eventKey={state} clearQuery={false}>{state.message}</AdminNotice>}
     </ConfirmSubmit>
   );
 }

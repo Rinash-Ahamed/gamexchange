@@ -35,6 +35,26 @@ The banner LCP warning exposed a timing gap in the earlier lazy-to-eager viewpor
 
 ## Verification and limits
 
+### 2026-11-03: Native custom cursor
+
+- Added two small SVG assets used by native CSS cursor URLs on public pages. This adds no JavaScript listener, pointer-following DOM element, continuous animation loop or dependency. Existing card-specific lighting remains separate and unchanged.
+- Fine-pointer/hover, non-reduced-motion and non-forced-colour media guards limit the custom cursor to eligible desktop users. Admin screens and native input/media/disabled/busy states retain standard behavior, with native fallback keywords when cursor assets are unavailable. Colors have both light and dark outlines rather than expensive blur effects.
+- Source/whitespace and vector markup reviewed only. Browser/OS cursor rendering and frame timing were not measured; build, lint and tests were not run for this update.
+
+### 2026-11-03: Quick interaction audit after admin copy/layout updates
+
+Source-level findings and fixes:
+
+- Shop search and facet counting previously ran in the same urgent render as input edits. ProductBrowser now uses React useDeferredValue for the saved filter object, keeping controlled inputs immediate while result/facet rendering catches up without a fixed debounce delay. Results expose aria-busy; pagination is temporarily disabled while results are pending so it cannot navigate the previous filter set. All filters, sorting, counts, page sizes and stock visibility rules remain unchanged.
+- CatalogCard is memoized and the section price ceiling is memoized. Unchanged product objects and loading flags can skip card rerenders when unrelated filter-panel state changes. This does not cache stock or suppress Add to cart's own context updates.
+- useMedia previously supplied a fresh subscription function each render and recreated matchMedia objects on snapshot reads. It now shares a lazy browser MediaQueryList and stable subscription per fixed internal query, attaches one native change listener for its current subscribers, removes that listener when unused, and preserves the same server/hydration fallback. LightCard uses the shared pointer/reduced-motion query rather than evaluating matchMedia on every pointer event.
+- LightCard still coalesces pointer work to one requested frame and writes custom properties only to the decorative overlay. Pointer leave now cancels the outstanding frame and clears its pending coordinates; touch/non-hover/reduced-motion cases do not attach the pointer-move handler.
+- NavigationPrefetch no longer schedules hover timers over non-links. Moving between children of the same link no longer repeatedly cancels/reschedules its warm-up. Existing 80 ms intent delay, route allowlist, bounded deduplication, Save-Data/2G guards and public-only prefetch policy remain.
+
+No artwork, image quality, card styling, motion cadence, content or security checks were removed. React implementation references: [useDeferredValue](https://react.dev/reference/react/useDeferredValue) and [stable external-store subscriptions](https://react.dev/reference/react/useSyncExternalStore).
+
+Initial lint/build/TypeScript and all 14 isolated postbuild API checks passed; final validation after the pagination safeguard is recorded in SESSION.md. Browser profiling/E2E was not run in this quick build/lint request. These are bounded-work improvements, not measured FPS, input-latency, LCP or production API-speed claims. Larger catalogue payloads and full admin collection reads still need cursor-based query design when warranted; SVG stroke painting and real-image/mobile performance need a separate production trace. Firebase latency, live authentication/uploads, hosting cold starts and payments were not measured. Authorization and idle-session reads remain uncached deliberately.
+
 ### 2026-11-03: Hero fibers and platform motion
 
 - Reworked decorative fibers as a coordinated sweeping bundle with shared theme-aware gradients, static wide-stroke bloom and staggered short highlights. Removed per-pulse drop-shadow filters and ineffective will-change hints for stroke painting. Stroke-dashoffset still requires painting; this is not described as compositor-only motion. Smaller screens omit the third track, and existing hidden/off-screen and reduced-motion gates remain.

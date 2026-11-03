@@ -23,6 +23,7 @@ const errors: Record<string, string> = {
   category: "That category has changed or been deleted. Reopen the form and select an available category.",
   image: "Choose a static JPG, PNG or WebP under 5 MB, between 300 and 4096 pixels on each side.",
   storage: "Image upload failed. Please try again or contact support if the problem continues.",
+  save: "Could not confirm this change. Refresh inventory before trying again.",
 };
 
 export default async function InventoryPage({ searchParams }: { searchParams: Promise<InventorySearchParams> }) {
@@ -45,8 +46,8 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
     <div className="mx-auto max-w-7xl">
       <h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Inventory</h1>
       <p className="mt-2 text-muted">Browse by category. Open Edit only when you need to make a change. Active products with stock appear in the public shop.</p>
-{notice && notices[notice] && <AdminNotice key={`${notice}-${queryValue(query.saved)}`} className="mt-6">{notices[notice]}</AdminNotice>}
-      {error && errors[error] && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">{errors[error]}</p>}
+{notice && notices[notice] && <AdminNotice eventKey={query}>{notices[notice]}</AdminNotice>}
+      {error && <AdminNotice variant="error" eventKey={query}>{errors[error] ?? "Could not save this change. Please try again."}</AdminNotice>}
 
       <details key={queryValue(query.saved) || "new-item"} className="metal group mt-6 rounded-2xl p-4 sm:p-5">
         <summary className="admin-control flex cursor-pointer list-none items-center justify-between gap-3 font-display text-base font-bold uppercase">

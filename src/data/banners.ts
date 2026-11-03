@@ -20,7 +20,7 @@ export const bannerImageRequirements = {
 } as const;
 
 export const defaultBannerSlides: BannerSlide[] = [
-  { id: "neon-rush", title: "New releases", headline: "New worlds. Fresh drops.", description: "Explore the latest adventures landing at GameXChange.", alt: "Futuristic racing game artwork", image: "/promos/neon-rush.png" },
+  { id: "neon-rush", title: "New releases", headline: "New worlds. Fresh drops.", description: "Explore the latest adventures landing at GameXchange.", alt: "Futuristic racing game artwork", image: "/promos/neon-rush.png" },
   { id: "disc-vault", title: "Game discs", headline: "The disc vault is open.", description: "Build your physical game library with new and pre-owned favourites.", alt: "Game cases and physical game discs", image: "/promos/disc-vault.png" },
   { id: "console-arrivals", title: "Consoles", headline: "Console arrivals.", description: "Power up with fresh hardware, controllers and complete bundles.", alt: "Gaming console, controller and headset", image: "/promos/console-arrivals.png" },
   { id: "retro-replay", title: "Retro gaming", headline: "Classics, replayed.", description: "Rediscover retro systems, cartridges and couch co-op favourites.", alt: "Retro gaming consoles and controllers", image: "/promos/retro-replay.png" },

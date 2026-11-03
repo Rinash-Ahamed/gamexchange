@@ -14,7 +14,8 @@ export async function saveFaqAction(data: FormData) {
   try { await saveFaq(id || undefined, fields.data); }
   catch (error) {
     if (error instanceof FaqError) redirect(`/admin/faqs?error=${error.code}`);
-    throw error;
+    console.error("[admin] FAQ change could not be confirmed.");
+    redirect("/admin/faqs?error=save");
   }
   refreshAdminData("faqs");
   redirect(`/admin/faqs?notice=saved&saved=${Date.now()}`);
@@ -27,7 +28,8 @@ export async function deleteFaqAction(data: FormData) {
   try { await deleteFaq(id.data); }
   catch (error) {
     if (error instanceof FaqError) redirect(`/admin/faqs?error=${error.code}`);
-    throw error;
+    console.error("[admin] FAQ deletion could not be confirmed.");
+    redirect("/admin/faqs?error=save");
   }
   refreshAdminData("faqs");
   redirect(`/admin/faqs?notice=deleted&saved=${Date.now()}`);

@@ -23,8 +23,8 @@ export default async function BannersPage({ searchParams }: { searchParams: Prom
         <Link href="/#promo-switch-heading" target="_blank" rel="noopener noreferrer" className={adminGhostButtonClass}>View on website</Link>
       </div>
       {!storageConfigured && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">Image uploads are unavailable. Please contact support.</p>}
-{query.notice === "deleted" && <AdminNotice key={query.saved} className="mt-6">Banner deleted.</AdminNotice>}
-      {query.error && <p role="alert" className="mt-6 rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">The banner could not be deleted. Refresh and try again.</p>}
+{query.notice === "deleted" && <AdminNotice eventKey={query}>Banner deleted.</AdminNotice>}
+      {query.error && <AdminNotice variant="error" eventKey={query}>The banner could not be deleted. Refresh and try again.</AdminNotice>}
       <aside className="metal mt-6 rounded-xl p-4 text-sm">
         <p id="banner-size-requirements"><strong>1920 × 840 px</strong><span className="text-muted"> · JPG, PNG or WebP · Max 5 MB</span></p>
         <details className="mt-2 text-muted">

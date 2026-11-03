@@ -29,11 +29,13 @@ export const repairSchema = z
     ...common,
     category: z.enum(repairCategories, { error: "Choose a device category" }),
     device: z.string({ error: "Choose your device" }).transform(oneLine).pipe(z.string().min(1, "Choose your device")),
+    deviceOther: z.string().transform(oneLine).pipe(z.string().max(120, "Keep the device model under 120 characters")).optional().default(""),
     fault: z.array(z.enum(repairFaults), { error: "Select at least one issue" }).min(1, "Select at least one issue").max(repairFaults.length).transform((faults) => [...new Set(faults)]),
     details: z.string({ error: "Tell us a little more" }).transform(multiLine).pipe(z.string().min(10, "Tell us a little more (10+ characters)").max(1000, "Keep it under 1000 characters")),
     branch,
   })
-  .refine((v) => repairDevices[v.category].includes(v.device), { path: ["device"], message: "Choose a device from the list" });
+  .refine((v) => repairDevices[v.category].includes(v.device), { path: ["device"], message: "Choose a device from the list" })
+  .refine((v) => v.device !== "Other" || v.deviceOther.length >= 2, { path: ["deviceOther"], message: "Enter your device brand and model" });
 
 export const exchangeSchema = z.object({
   kind: z.literal("exchange"),

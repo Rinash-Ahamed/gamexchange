@@ -8,8 +8,8 @@ import { imageLoading } from "@/lib/image-loading";
 import { usePageVisible } from "@/lib/use-page-visible";
 
 const slides = [
-  { src: "/franchise/presence-network-v2.webp", name: "network illustration", alt: "Concept illustration connecting GamexChange's network cities: Coimbatore, Pollachi, Perundurai and Karur. Exact locations are listed alongside." },
-  { src: "/franchise/presence-location-map-v2.webp", name: "location map", alt: "GamexChange locations in Coimbatore, Pollachi, Perundurai and Karur. The locations are also listed alongside." },
+  { src: "/franchise/presence-network-v2.webp", name: "network illustration", alt: "Concept illustration connecting GameXchange's network cities: Coimbatore, Pollachi, Perundurai and Karur. Exact locations are listed alongside." },
+  { src: "/franchise/presence-location-map-v2.webp", name: "location map", alt: "GameXchange locations in Coimbatore, Pollachi, Perundurai and Karur. The locations are also listed alongside." },
 ] as const;
 
 export function PresenceCarousel() {
@@ -31,14 +31,14 @@ export function PresenceCarousel() {
   }, [visible, pageVisible, reduce, paused, hovered, focused, loaded]);
 
   return (
-    <figure ref={container} aria-label="GamexChange presence images" aria-roledescription="carousel"
+    <figure ref={container} aria-label="GameXchange presence images" aria-roledescription="carousel"
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setFocused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}
       className="min-w-0 overflow-hidden rounded-3xl border border-line-strong bg-[#050b25]">
       <div className="relative aspect-square">
         {slides.map((slide, index) => (index === 0 || near) && (
           <a key={slide.src} href={slide.src} target="_blank" rel="noopener noreferrer"
-            aria-label={`Open the GamexChange ${slide.name} at full size in a new tab`}
+            aria-label={`Open the GameXchange ${slide.name} at full size in a new tab`}
             aria-hidden={index !== active} tabIndex={index === active ? 0 : -1}
             data-active={index === active ? "true" : "false"}
             className="presence-slide absolute inset-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-blue">

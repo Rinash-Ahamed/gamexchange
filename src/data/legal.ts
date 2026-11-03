@@ -3,7 +3,7 @@ export type LegalPolicy = { slug: string; title: string; description: string; up
 
 /** Supplied business terms, copy-edited without changing conditions or consumer protections. */
 export const businessDetails = {
-  "brand": "GamexChange",
+  "brand": "GameXchange",
   "entity": "GXC Concepts Pvt Ltd",
   "address": "No. 7, Shanmuganagar, Sungam Bypass Road, Ramanathapuram, Coimbatore - 641045, Tamil Nadu, India",
   "cin": "U52398TZ2022PTC038675",
@@ -11,7 +11,7 @@ export const businessDetails = {
   "phone": "+917708845461",
   "phoneDisplay": "+91 77088 45461",
   "about": [
-    "GamexChange is a gaming retail brand operated by GXC Concepts Pvt Ltd, offering new and pre-owned gaming consoles, video games, controllers, gaming accessories, buying and exchange services, Game Zone experiences, and gaming console repair and servicing solutions.",
+    "GameXchange is a gaming retail brand operated by GXC Concepts Pvt Ltd, offering new and pre-owned gaming consoles, video games, controllers, gaming accessories, buying and exchange services, Game Zone experiences, and gaming console repair and servicing solutions.",
     "Through our retail stores, franchise network and authorised sales channels, we aim to provide customers with reliable gaming products, gaming experiences and customer service."
   ]
 };
@@ -19,16 +19,16 @@ export const businessDetails = {
 export const terms: LegalPolicy = {
   "slug": "terms",
   "title": "Terms and conditions",
-  "description": "The terms governing your use of the GamexChange website and our products and services.",
+  "description": "The terms governing your use of the GameXchange website and our products and services.",
   "updated": "29 October 2026",
   "sections": [
     {
       "id": "acceptance",
       "title": "Acceptance of terms",
       "paragraphs": [
-        "The domain name www.gamexchange.co.in (hereinafter referred to as the “Website”) is operated by GXC Concepts Pvt Ltd, under its gaming retail brand GamexChange, having its registered office at No. 7, Shanmuganagar, Sungam Bypass Road, Ramanathapuram, Coimbatore - 641045, Tamil Nadu, India (hereinafter referred to as “GamexChange”, “GXC”, “we”, “us” or “our”).",
+        "The domain name www.gamexchange.co.in (hereinafter referred to as the “Website”) is operated by GXC Concepts Pvt Ltd, under its gaming retail brand GameXchange, having its registered office at No. 7, Shanmuganagar, Sungam Bypass Road, Ramanathapuram, Coimbatore - 641045, Tamil Nadu, India (hereinafter referred to as “GameXchange”, “GXC”, “we”, “us” or “our”).",
         "Your access to and use of this Website, including its services, features and tools, are governed by these Terms and Conditions and the applicable policies published on the Website. Any additional terms or policies relating to specific products or services shall be read together with these Terms and Conditions.",
-        "By accessing or using this Website, placing an order, purchasing a product or using any of our services, you agree to comply with these Terms and Conditions and the applicable policies of GamexChange."
+        "By accessing or using this Website, placing an order, purchasing a product or using any of our services, you agree to comply with these Terms and Conditions and the applicable policies of GameXchange."
       ]
     },
     {
@@ -42,7 +42,7 @@ export const terms: LegalPolicy = {
       "id": "updates",
       "title": "Changes to these terms",
       "paragraphs": [
-        "GamexChange reserves the right to modify, update or revise the Website, its features and these Terms and Conditions from time to time. Any changes will be published on the Website with the relevant revision date. Your continued use of the Website after such changes take effect will be subject to the revised terms, to the extent permitted by applicable law."
+        "GameXchange reserves the right to modify, update or revise the Website, its features and these Terms and Conditions from time to time. Any changes will be published on the Website with the relevant revision date. Your continued use of the Website after such changes take effect will be subject to the revised terms, to the extent permitted by applicable law."
       ]
     },
     {
@@ -56,7 +56,7 @@ export const terms: LegalPolicy = {
       "id": "orders",
       "title": "Availability and order acceptance",
       "paragraphs": [
-        "GamexChange will not be responsible for delays or interruptions caused by circumstances beyond our reasonable control, subject to applicable law. All orders are subject to product availability, payment verification and acceptance by GamexChange. We reserve the right to decline or cancel an order where reasonably necessary, including in cases of product unavailability, suspected fraudulent activity or material pricing errors, subject to applicable law and our published policies."
+        "GameXchange will not be responsible for delays or interruptions caused by circumstances beyond our reasonable control, subject to applicable law. All orders are subject to product availability, payment verification and acceptance by GameXchange. We reserve the right to decline or cancel an order where reasonably necessary, including in cases of product unavailability, suspected fraudulent activity or material pricing errors, subject to applicable law and our published policies."
       ]
     },
     {
@@ -70,7 +70,7 @@ export const terms: LegalPolicy = {
       "id": "governing-law",
       "title": "Governing law and consumer rights",
       "paragraphs": [
-        "All transactions conducted through the Website and services offered by GXC Concepts Pvt Ltd under the GamexChange brand are subject to applicable laws of India.",
+        "All transactions conducted through the Website and services offered by GXC Concepts Pvt Ltd under the GameXchange brand are subject to applicable laws of India.",
         "These Terms and Conditions shall be governed by the laws of India. Any disputes shall be handled by the competent courts or other appropriate forums having jurisdiction under applicable law. Nothing in these terms limits any statutory rights or remedies available to consumers."
       ]
     }
@@ -88,14 +88,14 @@ export const policies: LegalPolicy[] = [
         "id": "overview",
         "title": "Overview",
         "paragraphs": [
-          "This Cancellation, Return & Refund Policy applies to purchases made through the official GamexChange website and other authorised sales channels operated by GXC Concepts Pvt Ltd."
+          "This Cancellation, Return & Refund Policy applies to purchases made through the official GameXchange website and other authorised sales channels operated by GXC Concepts Pvt Ltd."
         ]
       },
       {
         "id": "order-cancellation",
         "title": "Order Cancellation",
         "paragraphs": [
-          "Customers wishing to cancel an order must contact GamexChange customer support at support@gamexchange.co.in or +91 77088 45461, quoting their order number.",
+          "Customers wishing to cancel an order must contact GameXchange customer support at support@gamexchange.co.in or +91 77088 45461, quoting their order number.",
           "Cancellation requests will be reviewed based on the order status. Orders that have already been dispatched may not be eligible for cancellation through the standard cancellation process. Any applicable remedies will be subject to our published policies and applicable consumer protection laws."
         ]
       },
@@ -121,7 +121,7 @@ export const policies: LegalPolicy[] = [
         "id": "product-inspection-and-replacement",
         "title": "Product Inspection and Replacement",
         "paragraphs": [
-          "Where a product is reported as defective or non-functional, GamexChange may arrange an inspection or request the product to be returned for testing.",
+          "Where a product is reported as defective or non-functional, GameXchange may arrange an inspection or request the product to be returned for testing.",
           "If the reported issue is verified, we will offer an appropriate remedy in accordance with the applicable policy and law. A replacement will be subject to stock availability. If a suitable replacement is unavailable, an eligible refund or other legally required remedy will be arranged.",
           "If testing does not reproduce the reported issue, we will communicate the findings to the customer. Any applicable return shipping or inspection charges must be disclosed in advance and comply with applicable law and the published policy."
         ]
@@ -141,7 +141,7 @@ export const policies: LegalPolicy[] = [
         "title": "Manufacturer Warranty on New Products",
         "paragraphs": [
           "New products may carry a manufacturer's warranty where specified in the product description or accompanying documentation.",
-          "Customers may be directed to an authorised manufacturer service centre for warranty assessment or repair, where appropriate. GamexChange will provide reasonable assistance with relevant purchase documentation and warranty information.",
+          "Customers may be directed to an authorised manufacturer service centre for warranty assessment or repair, where appropriate. GameXchange will provide reasonable assistance with relevant purchase documentation and warranty information.",
           "Manufacturer warranty terms, coverage and exclusions will be determined by the applicable manufacturer's policy, without limiting any rights the customer may have against the seller under applicable law."
         ]
       },
@@ -150,7 +150,7 @@ export const policies: LegalPolicy[] = [
         "title": "Cancellation Charges",
         "paragraphs": [
           "Any cancellation or payment-processing charges will be communicated clearly before the transaction is completed, where applicable.",
-          "No cancellation or processing fee will be charged where the cancellation results from our inability to fulfil the order, including confirmed stock unavailability or an error attributable to GamexChange, unless otherwise permitted by applicable law.",
+          "No cancellation or processing fee will be charged where the cancellation results from our inability to fulfil the order, including confirmed stock unavailability or an error attributable to GameXchange, unless otherwise permitted by applicable law.",
           "Any deduction from a refund must be lawful, disclosed and consistent with the applicable policy and payment-provider requirements."
         ]
       },
@@ -220,7 +220,7 @@ export const policies: LegalPolicy[] = [
         "title": "Contact Customer Support",
         "paragraphs": [
           "For order cancellations, returns, replacement requests, refund enquiries or warranty claims, please contact:",
-          "GamexChange, operated by GXC Concepts Pvt Ltd.",
+          "GameXchange, operated by GXC Concepts Pvt Ltd.",
           "Registered office: No. 7, Shanmuganagar, Sungam Bypass Road, Ramanathapuram, Coimbatore - 641045, Tamil Nadu, India.",
           "Email: support@gamexchange.co.in",
           "Phone: +91 77088 45461",
@@ -240,7 +240,7 @@ export const policies: LegalPolicy[] = [
         "id": "overview",
         "title": "Overview",
         "paragraphs": [
-          "Pre-owned gaming products sold by GamexChange may have been previously owned or used. Customers are advised to review the product description, condition and included accessories before completing their purchase."
+          "Pre-owned gaming products sold by GameXchange may have been previously owned or used. Customers are advised to review the product description, condition and included accessories before completing their purchase."
         ]
       },
       {
@@ -319,7 +319,7 @@ export const policies: LegalPolicy[] = [
         "id": "overview",
         "title": "Overview",
         "paragraphs": [
-          "GamexChange, operated by GXC Concepts Pvt Ltd, aims to process and deliver orders safely and efficiently throughout our serviceable delivery locations in India."
+          "GameXchange, operated by GXC Concepts Pvt Ltd, aims to process and deliver orders safely and efficiently throughout our serviceable delivery locations in India."
         ]
       },
       {
@@ -386,9 +386,9 @@ export const policies: LegalPolicy[] = [
       },
       {
         "id": "products-sent-to-gamexchange",
-        "title": "Products Sent to GamexChange",
+        "title": "Products Sent to GameXchange",
         "paragraphs": [
-          "Where GamexChange accepts gaming products from customers for purchase, exchange or another authorised transaction, the applicable shipping or collection arrangements will be communicated separately.",
+          "Where GameXchange accepts gaming products from customers for purchase, exchange or another authorised transaction, the applicable shipping or collection arrangements will be communicated separately.",
           "Any shipping reimbursement, collection charge or other applicable condition must be confirmed with the customer before the transaction is finalized."
         ]
       },
@@ -412,7 +412,7 @@ export const policies: LegalPolicy[] = [
         "id": "contact-information",
         "title": "Contact Information",
         "paragraphs": [
-          "GamexChange, operated by GXC Concepts Pvt Ltd.",
+          "GameXchange, operated by GXC Concepts Pvt Ltd.",
           "Registered office: No. 7, Shanmuganagar, Sungam Bypass Road, Ramanathapuram, Coimbatore - 641045, Tamil Nadu, India.",
           "Email: support@gamexchange.co.in",
           "Phone: +91 77088 45461",
@@ -425,14 +425,14 @@ export const policies: LegalPolicy[] = [
   {
     "slug": "trade-in",
     "title": "Trade-in policy",
-    "description": "Inspection, valuation, payment and ownership terms when selling products to GamexChange.",
+    "description": "Inspection, valuation, payment and ownership terms when selling products to GameXchange.",
     "updated": "29 October 2026",
     "sections": [
       {
         "id": "overview",
         "title": "Overview",
         "paragraphs": [
-          "Applicable to customers selling eligible gaming products to GamexChange for cash payment or store credit."
+          "Applicable to customers selling eligible gaming products to GameXchange for cash payment or store credit."
         ]
       },
       {
@@ -453,22 +453,22 @@ export const policies: LegalPolicy[] = [
         "id": "product-valuation-and-acceptance",
         "title": "Product Valuation and Acceptance",
         "paragraphs": [
-          "All products submitted for sale are subject to inspection, functionality testing and valuation by GamexChange. The final offer may depend on the product's condition, market demand, resale value, included accessories and applicable testing results.",
-          "GamexChange reserves the right to decline a product that does not meet its acceptance criteria."
+          "All products submitted for sale are subject to inspection, functionality testing and valuation by GameXchange. The final offer may depend on the product's condition, market demand, resale value, included accessories and applicable testing results.",
+          "GameXchange reserves the right to decline a product that does not meet its acceptance criteria."
         ]
       },
       {
         "id": "transfer-of-ownership",
         "title": "Transfer of Ownership",
         "paragraphs": [
-          "Once GamexChange has accepted the product, the agreed transaction has been completed, and payment or store credit has been issued in accordance with the confirmed terms, ownership of the product will transfer to GXC Concepts Pvt Ltd or its designated purchasing entity."
+          "Once GameXchange has accepted the product, the agreed transaction has been completed, and payment or store credit has been issued in accordance with the confirmed terms, ownership of the product will transfer to GXC Concepts Pvt Ltd or its designated purchasing entity."
         ]
       },
       {
         "id": "final-sale-and-transaction-completion",
         "title": "Final Sale and Transaction Completion",
         "paragraphs": [
-          "Completed sell transactions cannot ordinarily be cancelled or reversed once ownership has transferred and payment has been made, except where required by applicable law or agreed by GamexChange.",
+          "Completed sell transactions cannot ordinarily be cancelled or reversed once ownership has transferred and payment has been made, except where required by applicable law or agreed by GameXchange.",
           "Customers should review and confirm the final valuation and payment terms before completing the transaction."
         ]
       },
@@ -476,7 +476,7 @@ export const policies: LegalPolicy[] = [
         "id": "shipping-products-for-inspection",
         "title": "Shipping Products for Inspection",
         "paragraphs": [
-          "Where a sell order is accepted for remote processing, customers must dispatch the product to the address provided by GamexChange within the communicated timeframe.",
+          "Where a sell order is accepted for remote processing, customers must dispatch the product to the address provided by GameXchange within the communicated timeframe.",
           "If the product is not dispatched within the specified period, the quotation may expire and a revised valuation may be required."
         ]
       },
@@ -492,7 +492,7 @@ export const policies: LegalPolicy[] = [
         "id": "transit-damage-and-packaging",
         "title": "Transit Damage and Packaging",
         "paragraphs": [
-          "Customers are responsible for packing products securely when arranging their own shipment. GamexChange will communicate the applicable process for reporting transit damage or loss, taking into account the agreed shipping arrangement and applicable law."
+          "Customers are responsible for packing products securely when arranging their own shipment. GameXchange will communicate the applicable process for reporting transit damage or loss, taking into account the agreed shipping arrangement and applicable law."
         ]
       },
       {
@@ -524,7 +524,7 @@ export const policies: LegalPolicy[] = [
         "id": "inspection-and-testing",
         "title": "Inspection and Testing",
         "paragraphs": [
-          "GamexChange may conduct appropriate functionality tests to verify the condition of the submitted product.",
+          "GameXchange may conduct appropriate functionality tests to verify the condition of the submitted product.",
           "The inspection period and expected completion time will be communicated when the sell order is received. Processing times may vary depending on the product category, volume of submissions and technical testing requirements."
         ]
       },
@@ -532,7 +532,7 @@ export const policies: LegalPolicy[] = [
         "id": "revised-valuation",
         "title": "Revised Valuation",
         "paragraphs": [
-          "If the inspection reveals a material difference between the declared condition and the actual condition, GamexChange may provide a revised quotation explaining the relevant adjustment.",
+          "If the inspection reveals a material difference between the declared condition and the actual condition, GameXchange may provide a revised quotation explaining the relevant adjustment.",
           "The customer may accept or decline the revised quotation. If the quotation is declined, the product will be returned or otherwise handled according to the agreed return procedure and applicable law. Any return shipping charges will be disclosed before the transaction proceeds."
         ]
       },
@@ -558,14 +558,14 @@ export const policies: LegalPolicy[] = [
         "title": "Account Removal and Device Security",
         "paragraphs": [
           "Before selling a console or electronic device, customers must sign out of personal accounts, remove account locks where possible, disable applicable tracking or activation locks, and back up any personal data they wish to retain.",
-          "GamexChange is not responsible for personal data left on a device after it has been transferred, subject to applicable law and any separate agreement."
+          "GameXchange is not responsible for personal data left on a device after it has been transferred, subject to applicable law and any separate agreement."
         ]
       },
       {
         "id": "fraud-prevention-and-verification",
         "title": "Fraud Prevention and Verification",
         "paragraphs": [
-          "GamexChange may request reasonable proof of identity, ownership or purchase where necessary to verify a transaction or comply with applicable law.",
+          "GameXchange may request reasonable proof of identity, ownership or purchase where necessary to verify a transaction or comply with applicable law.",
           "We may suspend, reject or investigate a sell order where there are reasonable concerns about ownership, authenticity, fraud or compliance."
         ]
       },
@@ -573,7 +573,7 @@ export const policies: LegalPolicy[] = [
         "id": "right-to-decline-products",
         "title": "Right to Decline Products",
         "paragraphs": [
-          "GamexChange reserves the right to reject products that are counterfeit, stolen, reported lost, subject to ownership disputes, materially misrepresented or otherwise unsuitable for acceptance.",
+          "GameXchange reserves the right to reject products that are counterfeit, stolen, reported lost, subject to ownership disputes, materially misrepresented or otherwise unsuitable for acceptance.",
           "Any product already received but not accepted will be handled through the communicated return or collection process, subject to applicable law."
         ]
       },
@@ -581,7 +581,7 @@ export const policies: LegalPolicy[] = [
         "id": "policy-updates",
         "title": "Policy Updates",
         "paragraphs": [
-          "GXC Concepts Pvt Ltd may update this Trade-In Policy from time to time. The current version will be published on the official GamexChange website.",
+          "GXC Concepts Pvt Ltd may update this Trade-In Policy from time to time. The current version will be published on the official GameXchange website.",
           "Changes will not override transaction terms already agreed with a customer or rights protected under applicable law."
         ]
       },
@@ -589,7 +589,7 @@ export const policies: LegalPolicy[] = [
         "id": "contact-information",
         "title": "Contact Information",
         "paragraphs": [
-          "GamexChange, operated by GXC Concepts Pvt Ltd.",
+          "GameXchange, operated by GXC Concepts Pvt Ltd.",
           "Registered office: No. 7, Shanmuganagar, Sungam Bypass Road, Ramanathapuram, Coimbatore - 641045, Tamil Nadu, India.",
           "Email: support@gamexchange.co.in",
           "Phone: +91 77088 45461",
@@ -609,28 +609,28 @@ export const policies: LegalPolicy[] = [
         "id": "wallet-account-creation",
         "title": "Wallet Account Creation",
         "paragraphs": [
-          "A GamexChange Wallet account may be made available to registered customers for managing eligible store credit associated with their transactions."
+          "A GameXchange Wallet account may be made available to registered customers for managing eligible store credit associated with their transactions."
         ]
       },
       {
         "id": "existing-customers",
         "title": "Existing Customers",
         "paragraphs": [
-          "Eligible existing customers may access wallet or store credit features through their registered GamexChange account, where such functionality is available."
+          "Eligible existing customers may access wallet or store credit features through their registered GameXchange account, where such functionality is available."
         ]
       },
       {
         "id": "credit-for-sell-orders",
         "title": "Credit for Sell Orders",
         "paragraphs": [
-          "If a customer selects store credit as the payment option for an eligible sell order, the approved credit amount will be added to their GamexChange Wallet after the product has completed the required inspection and verification process and the transaction has been approved."
+          "If a customer selects store credit as the payment option for an eligible sell order, the approved credit amount will be added to their GameXchange Wallet after the product has completed the required inspection and verification process and the transaction has been approved."
         ]
       },
       {
         "id": "use-of-store-credit",
         "title": "Use of Store Credit",
         "paragraphs": [
-          "GamexChange Wallet credit may be used toward eligible purchases through the official GamexChange website or other authorised channels where wallet redemption is supported.",
+          "GameXchange Wallet credit may be used toward eligible purchases through the official GameXchange website or other authorised channels where wallet redemption is supported.",
           "Store credit is not redeemable for cash and is not transferable to another customer, except where required by applicable law or expressly authorised by GXC Concepts Pvt Ltd."
         ]
       },
@@ -638,21 +638,21 @@ export const policies: LegalPolicy[] = [
         "id": "store-credit-value",
         "title": "Store Credit Value",
         "paragraphs": [
-          "Unless otherwise specified, ₹1 in GamexChange Wallet credit is equivalent to ₹1 when applied toward an eligible purchase."
+          "Unless otherwise specified, ₹1 in GameXchange Wallet credit is equivalent to ₹1 when applied toward an eligible purchase."
         ]
       },
       {
         "id": "eligible-purchases",
         "title": "Eligible Purchases",
         "paragraphs": [
-          "Store credit may be used toward eligible gaming consoles, video games, controllers, accessories and other products offered by GamexChange, subject to product availability, applicable redemption conditions and any exclusions disclosed before purchase."
+          "Store credit may be used toward eligible gaming consoles, video games, controllers, accessories and other products offered by GameXchange, subject to product availability, applicable redemption conditions and any exclusions disclosed before purchase."
         ]
       },
       {
         "id": "validity-of-store-credit",
         "title": "Validity of Store Credit",
         "paragraphs": [
-          "The validity period and any applicable conditions for GamexChange Wallet credit will be communicated when the credit is issued. Any expiry or restriction will be subject to applicable law and the terms agreed with the customer."
+          "The validity period and any applicable conditions for GameXchange Wallet credit will be communicated when the credit is issued. Any expiry or restriction will be subject to applicable law and the terms agreed with the customer."
         ]
       },
       {
@@ -666,7 +666,7 @@ export const policies: LegalPolicy[] = [
         "id": "incorrect-transactions-and-support",
         "title": "Incorrect Transactions and Support",
         "paragraphs": [
-          "If a customer believes their wallet balance is incorrect or eligible store credit has not been credited, they should contact GamexChange customer support with the relevant transaction details.",
+          "If a customer believes their wallet balance is incorrect or eligible store credit has not been credited, they should contact GameXchange customer support with the relevant transaction details.",
           "We will review the issue and make any necessary correction after verification."
         ]
       },
@@ -682,14 +682,14 @@ export const policies: LegalPolicy[] = [
         "id": "policy-updates",
         "title": "Policy Updates",
         "paragraphs": [
-          "GXC Concepts Pvt Ltd may revise this policy from time to time. Updates will be published on the official GamexChange website. Changes will not override rights already accrued to customers or any mandatory rights under applicable law."
+          "GXC Concepts Pvt Ltd may revise this policy from time to time. Updates will be published on the official GameXchange website. Changes will not override rights already accrued to customers or any mandatory rights under applicable law."
         ]
       },
       {
         "id": "contact-information",
         "title": "Contact Information",
         "paragraphs": [
-          "GamexChange, operated by GXC Concepts Pvt Ltd.",
+          "GameXchange, operated by GXC Concepts Pvt Ltd.",
           "Registered office: No. 7, Shanmuganagar, Sungam Bypass Road, Ramanathapuram, Coimbatore - 641045, Tamil Nadu, India.",
           "Email: support@gamexchange.co.in",
           "Phone: +91 77088 45461",
@@ -733,7 +733,7 @@ export const policies: LegalPolicy[] = [
         "title": "Warranty Claims and Resolution",
         "paragraphs": [
           "All warranty claims are subject to product inspection and verification.",
-          "Where a claim is approved, GamexChange will generally arrange repair first. If the product cannot reasonably be repaired, an appropriate replacement or other eligible remedy may be offered according to the warranty plan, stock availability and applicable law.",
+          "Where a claim is approved, GameXchange will generally arrange repair first. If the product cannot reasonably be repaired, an appropriate replacement or other eligible remedy may be offered according to the warranty plan, stock availability and applicable law.",
           "If the original model or edition is unavailable, a comparable product with suitable specifications may be offered with the customer's agreement, subject to the applicable warranty terms and legal requirements."
         ]
       },
@@ -750,7 +750,7 @@ export const policies: LegalPolicy[] = [
         "title": "Warranty Claim Processing Time",
         "paragraphs": [
           "The time required to complete a warranty claim depends on the nature of the fault, inspection results, parts availability and repair or replacement requirements.",
-          "GamexChange will communicate the expected processing timeline after the product has been assessed. Any service commitment expressly provided in the purchased warranty plan will apply subject to its stated conditions."
+          "GameXchange will communicate the expected processing timeline after the product has been assessed. Any service commitment expressly provided in the purchased warranty plan will apply subject to its stated conditions."
         ]
       },
       {
@@ -781,7 +781,7 @@ export const policies: LegalPolicy[] = [
         "title": "Purchase Eligibility",
         "paragraphs": [
           "An extended warranty may be purchased only for eligible products and within the purchase period specified in the relevant plan.",
-          "Availability, pricing, coverage duration and eligibility conditions will be displayed during checkout or communicated by an authorised GamexChange representative."
+          "Availability, pricing, coverage duration and eligibility conditions will be displayed during checkout or communicated by an authorised GameXchange representative."
         ]
       },
       {
@@ -789,7 +789,7 @@ export const policies: LegalPolicy[] = [
         "title": "Tampering and Unauthorized Repairs",
         "paragraphs": [
           "Warranty coverage may be affected by unauthorised repairs, modifications, removal or tampering with warranty seals, or other interference with the product, where such conduct is excluded under the applicable warranty terms and permitted by law.",
-          "Customers should contact GamexChange before arranging third-party repairs for a product covered by an active extended warranty."
+          "Customers should contact GameXchange before arranging third-party repairs for a product covered by an active extended warranty."
         ]
       },
       {
@@ -805,14 +805,14 @@ export const policies: LegalPolicy[] = [
         "title": "Warranty Documentation",
         "paragraphs": [
           "Customers should retain their purchase invoice, warranty confirmation and relevant service records when requesting support.",
-          "GamexChange may request these documents to verify eligibility and process a claim."
+          "GameXchange may request these documents to verify eligibility and process a claim."
         ]
       },
       {
         "id": "policy-updates",
         "title": "Policy Updates",
         "paragraphs": [
-          "GXC Concepts Pvt Ltd may update this policy from time to time. The current version will be published on the official GamexChange website.",
+          "GXC Concepts Pvt Ltd may update this policy from time to time. The current version will be published on the official GameXchange website.",
           "Updates will not retrospectively remove coverage already purchased or override mandatory consumer rights."
         ]
       },
@@ -820,7 +820,7 @@ export const policies: LegalPolicy[] = [
         "id": "contact-information",
         "title": "Contact Information",
         "paragraphs": [
-          "GamexChange, operated by GXC Concepts Pvt Ltd.",
+          "GameXchange, operated by GXC Concepts Pvt Ltd.",
           "Registered office: No. 7, Shanmuganagar, Sungam Bypass Road, Ramanathapuram, Coimbatore - 641045, Tamil Nadu, India.",
           "Email: support@gamexchange.co.in",
           "Phone: +91 77088 45461",

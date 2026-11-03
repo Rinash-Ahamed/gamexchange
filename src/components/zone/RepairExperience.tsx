@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { repairCategories, repairDevices, repairFaults } from "@/data/repair";
-import { ContactBlock, SelectField, TextAreaField } from "@/components/forms/fields";
+import { ContactBlock, SelectField, TextAreaField, TextField } from "@/components/forms/fields";
 import { SubmitArea, SuccessPanel } from "@/components/forms/SubmitArea";
 import { formToPayload, useEnquiry } from "@/components/forms/use-enquiry";
 import { RepairDiagnostic } from "./RepairDiagnostic";
@@ -38,6 +38,7 @@ export function RepairExperience() {
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <SelectField label="Device category" name="category" errors={errors} options={repairCategories} value={category} onChange={(v) => { setCategory(v); setDevice(""); }} />
             <SelectField label="Device model" name="device" errors={errors} options={devices} value={device} onChange={setDevice} placeholder={category ? "Select…" : "Choose a category first"} />
+            {device === "Other" && <TextField label="Your device model" name="deviceOther" errors={errors} required maxLength={120} placeholder="Enter the brand and model" className="sm:col-span-2" />}
             <fieldset className="min-w-0 sm:col-span-2" aria-describedby={errors.fault ? "repair-issues-hint repair-issues-error" : "repair-issues-hint"}>
               <legend className="text-sm font-semibold">Issues with your device</legend>
               <p id="repair-issues-hint" className="mb-3 mt-1 text-xs text-muted">Select all that apply. You can choose more than one issue.</p>

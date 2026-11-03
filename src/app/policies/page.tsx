@@ -5,7 +5,7 @@ import { LegalContact } from "@/components/legal/LegalDocument";
 import { PageHero } from "@/components/ui/PageHero";
 import { businessDetails, policies, terms } from "@/data/legal";
 
-export const metadata: Metadata = { title: "Policies and support", description: "GamexChange business details, purchase terms, returns, shipping, trade-in, store credit and warranty policies.", alternates: { canonical: "/policies" } };
+export const metadata: Metadata = { title: "Policies and support", description: "GameXchange business details, purchase terms, returns, shipping, trade-in, store credit and warranty policies.", alternates: { canonical: "/policies" } };
 
 export default function PoliciesPage() {
   return (
@@ -22,7 +22,7 @@ export default function PoliciesPage() {
           </div>
         </section>
         <section aria-labelledby="business-details-heading" className="mt-10 grid gap-6 border-t border-line pt-7 lg:grid-cols-2">
-          <div><h2 id="business-details-heading" className="font-display text-2xl font-bold">About GamexChange</h2><div className="mt-3 space-y-3 text-sm leading-7 text-muted">{businessDetails.about.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div></div>
+          <div><h2 id="business-details-heading" className="font-display text-2xl font-bold">About GameXchange</h2><div className="mt-3 space-y-3 text-sm leading-7 text-muted">{businessDetails.about.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div></div>
           <div className="rounded-2xl border border-line-strong bg-surface p-5"><h3 className="mb-3 font-display text-lg font-bold">Business and support details</h3><LegalContact /></div>
         </section>
       </div>

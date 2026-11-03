@@ -10,7 +10,7 @@ export const reviews = [
   },
   {
     name: "Tamil Bharathi",
-    text: "I had a great experience buying an Xbox One S from GamexChange. The console is in excellent condition and has been running smoothly for the past two days. The service was clear and helpful. This is definitely the place to go if you're looking to buy a gaming console.",
+    text: "I had a great experience buying an Xbox One S from GameXchange. The console is in excellent condition and has been running smoothly for the past two days. The service was clear and helpful. This is definitely the place to go if you're looking to buy a gaming console.",
   },
   {
     name: "Ramji J",
@@ -18,11 +18,11 @@ export const reviews = [
   },
   {
     name: "Surya Prakash",
-    text: "I am highly satisfied with my purchase. The staff are knowledgeable, polite, and honest. I would recommend GamexChange to anyone looking for gaming consoles or accessories.",
+    text: "I am highly satisfied with my purchase. The staff are knowledgeable, polite, and honest. I would recommend GameXchange to anyone looking for gaming consoles or accessories.",
   },
   {
     name: "Saravana Saravana",
-    text: "They offer better deals when exchanging your console. Their first priority is customer satisfaction. I am happy with GamexChange.",
+    text: "They offer better deals when exchanging your console. Their first priority is customer satisfaction. I am happy with GameXchange.",
   },
   {
     name: "Mytheeswaran R",
@@ -30,7 +30,7 @@ export const reviews = [
   },
   {
     name: "Somu Reddy",
-    text: "I recently visited GamexChange and had an outstanding experience. The store offers an impressive selection of the latest gaming consoles, games, and accessories. The staff are incredibly knowledgeable and friendly, providing expert advice and recommendations that helped me make informed decisions. The prices are competitive, and I was pleased to find several great deals. The store is welcoming and well-organised, making shopping a breeze. I highly recommend it.",
+    text: "I recently visited GameXchange and had an outstanding experience. The store offers an impressive selection of the latest gaming consoles, games, and accessories. The staff are incredibly knowledgeable and friendly, providing expert advice and recommendations that helped me make informed decisions. The prices are competitive, and I was pleased to find several great deals. The store is welcoming and well-organised, making shopping a breeze. I highly recommend it.",
   },
   {
     name: "Vaishak K",
@@ -42,7 +42,7 @@ export const reviews = [
   },
   {
     name: "ragu ram",
-    text: "We regularly play arcade games and PS5 at GamexChange. The staff are very friendly, and the ambience is nice.",
+    text: "We regularly play arcade games and PS5 at GameXchange. The staff are very friendly, and the ambience is nice.",
   },
   {
     name: "marshel maxwell",

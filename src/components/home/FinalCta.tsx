@@ -27,7 +27,7 @@ export function FinalCta() {
         <h2 id="cta-h" className="mt-4 font-display text-5xl font-bold uppercase leading-[0.9] sm:text-7xl lg:text-8xl">Press <span className="text-gradient">start.</span></h2>
         <p className="mx-auto mt-6 max-w-lg text-lg text-muted">{site.tagline} Two branches in Coimbatore, open {site.hours.display}, closed {site.hours.closedDay}s.</p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <ControllerButton href={whatsappUrl("Hi GamexChange!")} external glyph="x" size="lg" magnetic>Message us</ControllerButton>
+          <ControllerButton href={whatsappUrl("Hi GameXchange!")} external glyph="x" size="lg" magnetic>Message us</ControllerButton>
           <ControllerButton href="/contact" glyph="o" size="lg" variant="ghost" magnetic>Find a branch</ControllerButton>
         </div>
       </m.div>

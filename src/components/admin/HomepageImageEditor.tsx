@@ -21,7 +21,7 @@ export function HomepageImageEditor({ id, title, image, custom }: { id: string; 
       <button type="submit" disabled={pending} className={`${adminButtonClass} w-full`}>{pending ? "Saving..." : "Publish image"}</button>
     </ConfirmSubmit>
     {custom && <ConfirmSubmit submitAction={action} title="Restore original image?" message={`Remove the uploaded artwork for ${title} and restore the original image?`} confirmLabel="Restore original" intent="danger" className="mt-3"><input type="hidden" name="id" value={id} /><input type="hidden" name="reset" value="true" /><button disabled={pending} type="submit" className={`${adminGhostButtonClass} w-full`}>Restore original</button></ConfirmSubmit>}
-    {state.error && <p role="alert" className="mt-3 text-sm text-danger">{state.error}</p>}
-    {state.message && <AdminNotice key={state.saved} clearQuery={false} className="mt-3">{state.message}</AdminNotice>}
+    {state.error && <AdminNotice variant="error" eventKey={state} clearQuery={false}>{state.error}</AdminNotice>}
+    {state.message && <AdminNotice eventKey={state} clearQuery={false}>{state.message}</AdminNotice>}
   </article>;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { AdminNotice } from "./AdminNotice";
 import { useEffect, useState, type FormEvent } from "react";
 import { FirebaseError } from "firebase/app";
 import {
@@ -58,6 +59,7 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [attempt, setAttempt] = useState(0);
   const configured = serverConfigured && firebaseClientConfigured;
   useEffect(() => {
     if (!resetCooldown) return;
@@ -95,6 +97,7 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
     if (busy || !configured) return;
     const form = event.currentTarget;
     const data = new FormData(form);
+    setAttempt((current) => current + 1);
     setError("");
     setNotice("");
     setBusy(true);
@@ -124,7 +127,7 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
         const session = await multiFactor(user).getSession();
         const nextSecret = await TotpMultiFactorGenerator.generateSecret(session);
         const QRCode = await import("qrcode");
-        const nextQr = await QRCode.toDataURL(nextSecret.generateQrCodeUrl(user.email ?? email, "GameXChange Admin"), { width: 240, margin: 2 });
+        const nextQr = await QRCode.toDataURL(nextSecret.generateQrCodeUrl(user.email ?? email, "GameXchange Admin"), { width: 240, margin: 2 });
         setSecret(nextSecret);
         setQr(nextQr);
         setStage("enroll");
@@ -167,8 +170,8 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
   return (
     <div className="mt-6 space-y-4">
       {!configured && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">Admin sign-in is unavailable. Please contact support.</p>}
-      {error && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">{error}</p>}
-      {notice && <p role="status" className="rounded-xl border border-line bg-surface p-4 text-sm text-ink">{notice}</p>}
+      {error && <AdminNotice variant="error" eventKey={`${attempt}-${error}`} clearQuery={false}>{error}</AdminNotice>}
+      {notice && <AdminNotice eventKey={`${attempt}-${notice}`} clearQuery={false}>{notice}</AdminNotice>}
       <form onSubmit={submit} className="space-y-4" aria-busy={busy}>
         <fieldset disabled={busy || !configured} className="min-w-0 space-y-4 disabled:opacity-60">
           {stage === "password" || stage === "reset" ? (

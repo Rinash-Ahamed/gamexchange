@@ -64,7 +64,7 @@ export function Nav() {
           <div className="flex items-center gap-2">
             <CartLink />
             <div className="hidden xl:block">
-              <ControllerButton href={whatsappUrl("Hi GamexChange, I have an enquiry.")} external glyph="x" size="sm">
+              <ControllerButton href={whatsappUrl("Hi GameXchange, I have an enquiry.")} external glyph="x" size="sm">
                 WhatsApp
               </ControllerButton>
             </div>

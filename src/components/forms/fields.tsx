@@ -30,11 +30,11 @@ export function Field({ label, name, errors, hint, required = true, children, cl
   );
 }
 
-export function TextField({ label, name, errors, type = "text", autoComplete, hint, required, placeholder, inputMode, className }: { label: string; name: string; errors: Errors; type?: string; autoComplete?: string; hint?: string; required?: boolean; placeholder?: string; inputMode?: "text" | "tel" | "numeric"; className?: string }) {
+export function TextField({ label, name, errors, type = "text", autoComplete, hint, required, placeholder, inputMode, className, maxLength }: { label: string; name: string; errors: Errors; type?: string; autoComplete?: string; hint?: string; required?: boolean; placeholder?: string; inputMode?: "text" | "tel" | "numeric"; className?: string; maxLength?: number }) {
   return (
     <Field label={label} name={name} errors={errors} hint={hint} required={required} className={className}>
       {({ id, describedBy, invalid }) => (
-        <input id={id} name={name} type={type} autoComplete={autoComplete} inputMode={inputMode} placeholder={placeholder} aria-invalid={invalid} aria-describedby={describedBy} className={inputClass} />
+        <input id={id} name={name} type={type} autoComplete={autoComplete} inputMode={inputMode} placeholder={placeholder} required={required} maxLength={maxLength} aria-invalid={invalid} aria-describedby={describedBy} className={inputClass} />
       )}
     </Field>
   );

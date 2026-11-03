@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useId, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Gamepad2, Headphones, Layers, Search, SlidersHorizontal, X } from "lucide-react";
 import { productSection, shopSections } from "@/data/catalog";
@@ -16,17 +16,18 @@ const icons = { games: Gamepad2, consoles: Layers, accessories: Headphones };
 
 export function ProductBrowser({ products, initialFilters = {} }: { products: readonly Product[]; initialFilters?: Partial<Filters> }) {
   const [filters, setFilters] = useState<Filters>({ ...emptyCatalogFilters, ...initialFilters });
+  const deferredFilters = useDeferredValue(filters);
   const [mobileFilters, setMobileFilters] = useState(false);
   const [page, setPage] = useState(1);
   const results = useRef<HTMLDivElement>(null);
   const panelId = useId();
   const catalog = useMemo(() => availableCatalog(products), [products]);
   const scoped = useMemo(() => catalog.filter((product) => filters.section === "all" || productSection(product) === filters.section), [catalog, filters.section]);
-  const visible = useMemo(() => filterCatalog(catalog, filters), [catalog, filters]);
-  const groups = useMemo(() => consumerCatalogFacets(catalog, filters), [catalog, filters]);
+  const visible = useMemo(() => filterCatalog(catalog, deferredFilters), [catalog, deferredFilters]);
+  const groups = useMemo(() => consumerCatalogFacets(catalog, deferredFilters), [catalog, deferredFilters]);
   const pagination = paginate(visible, page);
   const platforms = groups.find((group) => group.key === "platforms")?.options ?? [];
-  const priceCeiling = scoped.reduce((maximum, product) => Math.max(maximum, product.price), 1);
+  const priceCeiling = useMemo(() => scoped.reduce((maximum, product) => Math.max(maximum, product.price), 1), [scoped]);
   const update = (next: Partial<Filters>) => { setFilters((current) => ({ ...current, ...next })); setPage(1); };
   const clear = () => { setFilters({ ...emptyCatalogFilters }); setPage(1); };
   const goToPage = (next: number) => {
@@ -66,7 +67,7 @@ export function ProductBrowser({ products, initialFilters = {} }: { products: re
         <button type="button" aria-expanded={mobileFilters} aria-controls={panelId} onClick={() => setMobileFilters((open) => !open)} className="mb-3 inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-strong bg-surface px-4 text-sm font-semibold lg:hidden"><SlidersHorizontal className="size-4" aria-hidden />{mobileFilters ? "Hide filters" : "Filters and sorting"}</button>
         <div id={panelId} className={mobileFilters ? "block" : "hidden lg:block"}><CatalogFilters filters={filters} groups={groups} priceCeiling={priceCeiling} update={update} clear={clear} /></div>
       </aside>
-      <div ref={results} role="region" aria-label="Shop results" tabIndex={-1} className="min-w-0 scroll-mt-28 lg:order-1">
+      <div ref={results} role="region" aria-label="Shop results" aria-busy={filters !== deferredFilters} tabIndex={-1} className="min-w-0 scroll-mt-28 lg:order-1">
         <div className="flex flex-wrap items-center justify-between gap-2"><p role="status" className="text-sm text-muted">{pagination.total ? `Showing ${pagination.from} to ${pagination.to} of ${pagination.total} ${pagination.total === 1 ? "product" : "products"}` : "Showing 0 products"}</p><span className="text-xs text-muted">Available stock only</span></div>
         {(chips.length > 0 || filters.q || filters.min || filters.max || filters.sale || filters.minDiscount > 0) && <div className="mt-3 flex flex-wrap items-center gap-2">
           {chips.map(({ key, value }) => <button key={`${key}-${value}`} type="button" aria-label={`Remove ${value} filter`} onClick={() => update({ [key]: filters[key].filter((entry) => entry !== value) })} className="inline-flex min-h-9 items-center gap-2 rounded-full border border-blue/30 bg-fill/10 px-3 text-xs text-accent-text">{value}<X className="size-3" aria-hidden /></button>)}
@@ -76,8 +77,8 @@ export function ProductBrowser({ products, initialFilters = {} }: { products: re
         <ul className="mt-4 grid grid-cols-2 gap-3 min-[600px]:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {pagination.items.map((product, index) => <li key={product.id} className="min-w-0"><CatalogCard product={product} priority={index === 0} eager={index < 5} /></li>)}
         </ul>
-        {!visible.length && <div className="rounded-2xl border border-dashed border-line-strong p-6 text-center sm:p-10"><h2 className="font-display text-xl font-semibold">No matching products right now</h2><p className="mt-2 text-sm leading-relaxed text-muted">Try another search or clear your filters. We only list stock we actually have.</p><button type="button" onClick={clear} className="mt-4 min-h-11 rounded-xl bg-fill px-4 text-sm font-semibold text-accent-ink">Reset filters</button><a href={whatsappUrl("Hi GamexChange, can you help me find a game, console or accessory?")} target="_blank" rel="noopener noreferrer" className="mx-3 mt-4 inline-flex min-h-11 items-center text-sm text-accent-text underline">Ask the team</a></div>}
-        <CatalogPagination page={pagination.page} pageCount={pagination.pageCount} onPageChange={goToPage} />
+        {!visible.length && <div className="rounded-2xl border border-dashed border-line-strong p-6 text-center sm:p-10"><h2 className="font-display text-xl font-semibold">No matching products right now</h2><p className="mt-2 text-sm leading-relaxed text-muted">Try another search or clear your filters. We only list stock we actually have.</p><button type="button" onClick={clear} className="mt-4 min-h-11 rounded-xl bg-fill px-4 text-sm font-semibold text-accent-ink">Reset filters</button><a href={whatsappUrl("Hi GameXchange, can you help me find a game, console or accessory?")} target="_blank" rel="noopener noreferrer" className="mx-3 mt-4 inline-flex min-h-11 items-center text-sm text-accent-text underline">Ask the team</a></div>}
+        <CatalogPagination page={pagination.page} pageCount={pagination.pageCount} onPageChange={goToPage} pending={filters !== deferredFilters} />
       </div>
     </div>
   </div>;
