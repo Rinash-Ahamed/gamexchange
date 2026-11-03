@@ -1,3 +1,5 @@
+import { privacyPolicy } from "./privacy-policy";
+
 export type LegalSection = { id: string; title: string; paragraphs: string[] };
 export type LegalPolicy = { slug: string; title: string; description: string; updated: string; sections: LegalSection[] };
 
@@ -78,6 +80,7 @@ export const terms: LegalPolicy = {
 };
 
 export const policies: LegalPolicy[] = [
+  privacyPolicy,
   {
     "slug": "returns-and-refunds",
     "title": "Cancellation, returns and refunds",

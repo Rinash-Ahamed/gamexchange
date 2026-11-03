@@ -6,6 +6,7 @@ import { formatINR } from "@/data/products";
 import type { CartItem } from "@/lib/cart";
 import { customerClientAuth } from "@/lib/firebase/customer-client";
 import { shippingSchema } from "@/lib/payments/shipping";
+import { checkoutPrivacyConsentSchema, checkoutPrivacyNotice } from "@/lib/payments/privacy-consent";
 import { useCustomer } from "./use-customer";
 import { ShippingForm } from "./ShippingForm";
 
@@ -63,16 +64,18 @@ export function TestCheckout({ enabled, items, amount, disabled, onBusy, onSucce
     if (pending.current) { await verify(); return; }
     const form = shippingForm.current;
     if (!form?.reportValidity()) return;
+    const privacyConsent = checkoutPrivacyConsentSchema.safeParse({ accepted: form.querySelector<HTMLInputElement>('[name="privacyConsent"]')?.checked === true, version: checkoutPrivacyNotice.version });
+    if (!privacyConsent.success) { setMessage("Please read the Privacy Policy and accept the checkout consent before continuing."); return; }
     const shipping = shippingSchema.safeParse(Object.fromEntries(new FormData(form)));
     if (!shipping.success) { setMessage(shipping.error.issues[0]?.message ?? "Check your delivery details."); return; }
     setLocked(true);
     setMessage("Preparing secure test checkout...");
-    const signature = JSON.stringify({ items, amount, uid: customer.user.uid, shipping: shipping.data });
+    const signature = JSON.stringify({ items, amount, uid: customer.user.uid, shipping: shipping.data, privacyConsent: privacyConsent.data });
     if (attempt.current?.signature !== signature) attempt.current = { signature, requestId: crypto.randomUUID() };
     const requestId = attempt.current.requestId;
     const purchased = items.map((item) => ({ ...item }));
     try {
-      const order = await post("/api/checkout/order", { requestId, items: purchased, expectedAmount: amount, shipping: shipping.data });
+      const order = await post("/api/checkout/order", { requestId, items: purchased, expectedAmount: amount, shipping: shipping.data, privacyConsent: privacyConsent.data });
       if (order.mode !== "test" || !/^rzp_test_/.test(order.key) || order.amount !== amount || order.currency !== "INR") throw new Error("Checkout could not be verified. Please try again.");
       const checkout = new window.Razorpay({
         key: order.key, amount: order.amount, currency: order.currency, order_id: order.orderId,

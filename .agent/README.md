@@ -10,7 +10,7 @@
 - [Security operations](SECURITY_OPERATIONS.md): shared protection, temporary TTL setup, admin history, readiness and release checks.
 - [Cart and Razorpay test setup](RAZORPAY_SETUP.md): test keys, webhook configuration, verification and live-payment limits.
 - [Gmail notification setup](EMAIL_SETUP.md): App Password and planned server-only mail settings; sending integration is still pending.
-- [Privacy policy draft](PRIVACY_POLICY_DRAFT.md): proposed wording and business/legal checks required before publication.
+- [Privacy policy publication record](PRIVACY_POLICY.md): public policy, checkout consent behavior and remaining business/legal checks.
 
 These documents live in `.agent/`. Source paths and commands below are relative to the repository root, not this directory. The root [AGENTS.md](../AGENTS.md) directs coding agents here.
 
@@ -85,7 +85,7 @@ The default theme follows the visitor's local time: light from 6:00 AM through 5
 - Forms never claim a booking. Success means "ready to send on WhatsApp".
 - Product images load from the existing site's CDN (`framerusercontent.com`); self-host them before decommissioning the old site.
 - FAQs and legal policies now come from the supplied `GXC Concepts Website Content.docx`, with grammar/formatting edits. FAQ purchase and sell instructions match the current enquiry workflow rather than advertising unimplemented cart, checkout or PIN-code tools.
-- Public legal routes: `/terms`, `/policies` and `/policies/[slug]`. Shared content lives in `src/data/legal.ts`. The source contains no privacy policy; its separately drafted replacement is available for review at the protected `/admin/privacy-preview` route and in `.agent/PRIVACY_POLICY_DRAFT.md`, not public navigation or the sitemap.
+- Public legal routes: `/terms`, `/policies` and `/policies/[slug]`. Shared content lives in `src/data/legal.ts`; privacy content is in `src/data/privacy-policy.ts`, published at `/policies/privacy-policy` at the owner's request. It is linked in the footer, policy directory, sitemap and required checkout consent. The legacy protected `/admin/privacy-preview` redirects to the public page. Publication does not imply legal review or live-payment readiness. See `.agent/PRIVACY_POLICY.md`.
 
 ## Environment & security notes
 

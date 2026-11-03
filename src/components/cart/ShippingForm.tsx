@@ -2,6 +2,7 @@
 
 import type { Ref } from "react";
 import { TextField } from "@/components/forms/fields";
+import { checkoutPrivacyNotice } from "@/lib/payments/privacy-consent";
 
 export function ShippingForm({ formRef, disabled }: { formRef: Ref<HTMLFormElement>; disabled: boolean }) {
   return <form ref={formRef} onSubmit={(event) => event.preventDefault()} className="mt-4" aria-label="Delivery details">
@@ -18,6 +19,13 @@ export function ShippingForm({ formRef, disabled }: { formRef: Ref<HTMLFormEleme
       <TextField label="PIN code" name="postalCode" inputMode="numeric" autoComplete="shipping postal-code" required maxLength={6} errors={{}} />
       <input type="hidden" name="country" value="IN" />
       <p className="text-xs leading-5 text-muted">India only. These details are saved with your order for order support and delivery. Enter sample details during test checkout. A valid PIN code does not confirm delivery availability; shipping charges and serviceability are not yet calculated.</p>
+      <div className="rounded-xl border border-line-strong p-3">
+        <label className="flex cursor-pointer items-start gap-3 text-sm leading-6">
+          <input type="checkbox" name="privacyConsent" required value="accepted" className="mt-1 size-5 shrink-0 accent-blue" />
+          <span>{checkoutPrivacyNotice.text}</span>
+        </label>
+        <a href={checkoutPrivacyNotice.href} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-11 items-center text-sm text-accent-text underline">Read the Privacy Policy (opens in a new tab)</a>
+      </div>
     </fieldset>
   </form>;
 }

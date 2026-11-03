@@ -10,6 +10,7 @@ const legalLinks = [
   { href: "/terms", label: "Terms and conditions" },
   { href: "/policies/returns-and-refunds", label: "Cancellation & refunds" },
   { href: "/policies/shipping-and-delivery", label: "Shipping policy" },
+  { href: "/policies/privacy-policy", label: "Privacy policy" },
   { href: "/policies/trade-in", label: "Sell & exchange policy" },
   { href: "/policies", label: "All store policies" },
 ];

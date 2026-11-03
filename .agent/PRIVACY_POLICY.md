@@ -1,12 +1,16 @@
-# Privacy policy draft for review
+# Privacy policy publication and review record
 
-Status: Unapproved. Prepared 30 October 2026. Not published to the public website.
+Status: Publication requested by the business owner on 3 November 2026. Public source: src/data/privacy-policy.ts, rendered at /policies/privacy-policy. Footer, policy directory, metadata and sitemap use the public policy. Actual production deployment and legal compliance have not been verified. No lawyer approval is claimed.
 
-Implementation update for reviewers: a browser-local cart now stores product IDs and quantities. Optional Razorpay test checkout loads the provider's hosted checkout script on the configured cart page and saves product/amount snapshots plus order/payment references in Firestore. Use dummy contact/payment details for testing. The provider may process technical request and checkout/contact information under its own policies. The app does not store card numbers or security codes. The body and protected preview below predate this integration and must both be revised and approved before any live payments or privacy-policy publication. See `RAZORPAY_SETUP.md` for the implemented data flow and limits.
+Current public source additionally covers customer Google/Firebase sign-in, session authentication storage, Indian recipient/address/phone fields, checkout snapshots including abandoned/unpaid test records, Razorpay prefill and references, admin-only access, checkout consent receipt, no marketing opt-in, purpose-limited sharing, retention limitations and privacy requests. Real payments, shipping fees/serviceability, courier dispatch and Gmail notifications remain unimplemented. Use sample shipping/payment details during testing. This paragraph supersedes the historical text below; the public source is authoritative and must be maintained rather than copying the old body.
+
+Checkout consent is an unchecked native required checkbox, validated as literal true and the current notice version on the server. New order records store the acceptance receipt time from the server and notice version 2026-11-03-v1. This is checkout-specific acknowledgment, not marketing consent, age verification, a legal compliance certification or retroactive consent for earlier Google authentication. The policy link opens independently without losing form input. No IP address or extra customer identifiers are added to the consent receipt. Change the version when materially changing the notice.
+
+The public policy is now published in code at the owner's explicit request, not held behind admin review. The legacy /admin/privacy-preview route remains admin-protected and redirects to the public policy. The historical content below is retained only as drafting context; it is not the live policy body.
 
 The supplied Word document does not include a privacy policy. This draft combines verified website data flows with proposed retention and support wording that the business must approve. It is not a legal compliance certification.
 
-## Confirm before publication
+## Remaining business/legal review
 
 - Confirm the privacy contact, responsible person and complaint-handling process, including any required escalation details and response procedures.
 - Confirm the hosting provider, database and Storage regions, processors, international transfers, provider logs and retention settings. These settings have not been inspected.
@@ -17,7 +21,7 @@ The supplied Word document does not include a privacy policy. This draft combine
 
 ## Website preview
 
-Sign in to the admin portal and open `/admin/privacy-preview`. The preview reuses the themed policy layout but is protected by admin authentication, marked noindex and omitted from public navigation and sitemap.
+Open /policies/privacy-policy to read the published source in the themed legal layout. No deployed browser check was performed for this update.
 
 ## Who we are
 

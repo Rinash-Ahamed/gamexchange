@@ -1,4 +1,5 @@
 import type { TestOrder } from "@/lib/payments/orders";
+import { formatAdminDate } from "@/lib/admin/format";
 
 export function OrderDeliveryDetails({ order }: { order: TestOrder }) {
   return <>
@@ -12,5 +13,6 @@ export function OrderDeliveryDetails({ order }: { order: TestOrder }) {
       </address>
       <p className="mt-2">Mobile: {order.shipping.phone}</p>
     </section> : <p className="mt-4 text-xs text-muted">No delivery details were collected for this older test order.</p>}
+    {order.privacyConsent && <p className="mt-3 text-xs leading-5 text-muted">Checkout privacy consent recorded: {formatAdminDate(order.privacyConsent.acceptedAt)}. Notice version: {order.privacyConsent.version}.</p>}
   </>;
 }

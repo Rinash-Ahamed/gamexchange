@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, type User } from "firebase/auth";
 import { customerClientAuth } from "@/lib/firebase/customer-client";
 import { firebaseClientConfigured } from "@/lib/firebase/client";
+import { customerSignInError } from "@/lib/firebase/customer-errors";
 
 export function useCustomer() {
   const [user, setUser] = useState<User | null>(null);
@@ -20,8 +21,8 @@ export function useCustomer() {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
       await signInWithPopup(customerClientAuth(), provider);
-    } catch {
-      setError("Google sign-in could not finish. Allow popups and try again.");
+    } catch (caught) {
+      setError(customerSignInError(caught));
     } finally { setBusy(false); }
   }
   async function logout() {

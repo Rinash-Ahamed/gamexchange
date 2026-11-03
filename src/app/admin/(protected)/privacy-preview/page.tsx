@@ -1,19 +1,10 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/admin/auth";
-import { LegalDocument } from "@/components/legal/LegalDocument";
-import { privacyPolicyDraft } from "@/data/privacy-policy-draft";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Privacy policy draft preview", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Privacy policy", robots: { index: false, follow: false } };
 
 export default async function PrivacyPreviewPage() {
   await requireAdmin();
-  return (
-    <div>
-      <header className="mx-auto max-w-7xl px-5 pb-6 sm:px-8">
-        <h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Privacy policy <span className="text-gradient">preview</span></h1>
-        <p className="mt-3 rounded-xl border border-blue/30 bg-blue/10 p-4 text-sm leading-relaxed text-ink">Unpublished draft for your review. Confirm your business details and privacy practices with your adviser before approval. This draft has not received a legal review.</p>
-      </header>
-      <LegalDocument policy={privacyPolicyDraft} draft />
-    </div>
-  );
+  redirect("/policies/privacy-policy");
 }

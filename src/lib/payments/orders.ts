@@ -7,12 +7,14 @@ import { isPcComponentCategory } from "@/data/catalog";
 import type { InventoryItem } from "@/lib/admin/types";
 import { CheckoutError, gatewayOrderSchema, gatewayPaymentSchema, razorpayRequest, testCredentials, validSignature } from "./razorpay";
 import { shippingSchema, type CheckoutCustomer, type ShippingAddress } from "./shipping";
+import { checkoutPrivacyConsentSchema } from "./privacy-consent";
 
 export const checkoutSchema = z.object({
   requestId: z.uuid(),
   items: z.array(z.object({ id: z.string().regex(/^[a-zA-Z0-9-]{1,128}$/), quantity: z.number().int().min(1).max(99) })).min(1).max(30),
   expectedAmount: z.number().int().positive().max(100_000_000),
   shipping: shippingSchema,
+  privacyConsent: checkoutPrivacyConsentSchema,
 }).refine((value) => new Set(value.items.map((item) => item.id)).size === value.items.length, "Duplicate products are not allowed.");
 export const verifySchema = z.object({ requestId: z.uuid(), razorpay_order_id: z.string().regex(/^order_[a-zA-Z0-9]+$/), razorpay_payment_id: z.string().regex(/^pay_[a-zA-Z0-9]+$/), razorpay_signature: z.string().regex(/^[a-fA-F0-9]{64}$/) });
 export type TestOrder = {
@@ -20,9 +22,10 @@ export type TestOrder = {
   amount: number; currency: "INR"; items: { id: string; name: string; quantity: number; unitAmount: number }[];
   createdAt: string; updatedAt: string; razorpayOrderId?: string; paymentId?: string;
   customer?: CheckoutCustomer; shipping?: ShippingAddress;
+  privacyConsent?: { accepted: true; version: string; acceptedAt: string };
 };
 const collection = () => firebaseFirestore().collection("checkoutTestOrders");
-const fingerprint = (input: z.infer<typeof checkoutSchema>, customer: CheckoutCustomer) => createHash("sha256").update(JSON.stringify({ uid: customer.uid, shipping: input.shipping, amount: input.expectedAmount, items: [...input.items].sort((a, b) => a.id.localeCompare(b.id)) })).digest("hex");
+const fingerprint = (input: z.infer<typeof checkoutSchema>, customer: CheckoutCustomer) => createHash("sha256").update(JSON.stringify({ uid: customer.uid, shipping: input.shipping, privacyConsent: input.privacyConsent, amount: input.expectedAmount, items: [...input.items].sort((a, b) => a.id.localeCompare(b.id)) })).digest("hex");
 function checkoutResponse(order: TestOrder) {
   if (order.status === "paid") throw new CheckoutError("This test order is already paid. Check your order reference.", 409);
   if (!order.razorpayOrderId) throw new CheckoutError("This checkout is still being prepared. Please retry shortly.", 409);
@@ -57,7 +60,7 @@ export async function createTestOrder(input: z.infer<typeof checkoutSchema>, cus
     return checkoutResponse(order);
   }
   const now = new Date().toISOString();
-  const order: TestOrder = { id: input.requestId, mode: "test", keyId: credentials.key, fingerprint: hash, status: "creating", amount, currency: "INR", items, customer, shipping: input.shipping, createdAt: now, updatedAt: now };
+  const order: TestOrder = { id: input.requestId, mode: "test", keyId: credentials.key, fingerprint: hash, status: "creating", amount, currency: "INR", items, customer, shipping: input.shipping, privacyConsent: { ...input.privacyConsent, acceptedAt: now }, createdAt: now, updatedAt: now };
   const claimed = await db.runTransaction(async (transaction) => {
     if ((await transaction.get(ref)).exists) return false;
     transaction.create(ref, order);

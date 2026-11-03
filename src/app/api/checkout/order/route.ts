@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   if (denied) return denied;
   try {
     const input = checkoutSchema.safeParse(await checkoutBody(request));
-    if (!input.success) return checkoutJson({ error: "Check your cart and try again." }, 400);
+    if (!input.success) return checkoutJson({ error: input.error.issues.some((issue) => issue.path[0] === "privacyConsent") ? "Please read the Privacy Policy and accept the checkout consent before continuing." : "Check your cart and delivery details and try again." }, 400);
     const customer = await requireCheckoutCustomer(request);
     return checkoutJson(await createTestOrder(input.data, customer));
   } catch (error) { return checkoutFailure(error); }
