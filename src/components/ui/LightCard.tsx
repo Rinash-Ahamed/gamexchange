@@ -10,6 +10,7 @@ export function LightCard({ children, className = "", as: Tag = "div" }: { child
   useEffect(() => () => { if (frame.current !== undefined) cancelAnimationFrame(frame.current); }, []);
   const onMove = (e: PointerEvent<HTMLElement>) => {
     if (e.pointerType !== "mouse") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce), (hover: none), (pointer: coarse)").matches) return;
     pointer.current = { element: e.currentTarget, x: e.clientX, y: e.clientY };
     if (frame.current !== undefined) return;
     frame.current = requestAnimationFrame(() => {

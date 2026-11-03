@@ -25,11 +25,12 @@ const headingClass = "font-display text-base font-semibold text-[#a9bfff]";
 
 export function Footer() {
   return (
-    <footer className="relative isolate mt-16 overflow-hidden border-t border-white/15 bg-[#050711] pb-24 pt-9 text-white lg:pb-7">
+    <footer className="relative isolate overflow-hidden bg-[#050711] pb-24 pt-28 text-white lg:pb-7">
       <FooterVideo />
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,5,14,0.95),rgba(3,5,14,0.88),rgba(3,5,14,0.95))]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-0 h-24 bg-[linear-gradient(180deg,var(--bg),transparent)]" />
       <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="flex flex-col gap-5 border-b border-white/15 pb-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-5 pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0"><Wordmark className="footer-logo-heartbeat" /><p className="mt-3 max-w-md text-sm leading-6 text-white/65">Gaming gear, expert repairs and a place to play.</p></div>
           <nav aria-label="Social media" className="flex flex-wrap gap-2">
             {([
@@ -61,7 +62,7 @@ export function Footer() {
             <p className="mt-3 text-xs leading-6 text-white/60">{site.hours.display}<br />Closed on {site.hours.closedDay}s</p>
           </section>
         </div>
-        <p className="border-t border-white/15 pt-5 text-center text-xs leading-6 text-white/55">© {new Date().getFullYear()} GamexChange, operated by {businessDetails.entity}. All rights reserved.</p>
+        <p className="pt-5 text-center text-xs leading-6 text-white/55">© {new Date().getFullYear()} GamexChange, operated by {businessDetails.entity}. All rights reserved.</p>
       </div>
     </footer>
   );

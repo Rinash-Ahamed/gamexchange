@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { Store } from "lucide-react";
 import { Suspense } from "react";
 import { FranchiseVideo } from "@/components/franchise/FranchiseVideo";
 import { FranchiseGallery } from "@/components/franchise/FranchiseGallery";
+import { PresenceCarousel } from "@/components/franchise/PresenceCarousel";
 import { PageHero } from "@/components/ui/PageHero";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { franchiseLocations } from "@/data/franchise";
 import { whatsappUrl } from "@/data/site";
-import { imageLoading } from "@/lib/image-loading";
 
 export const metadata: Metadata = {
   title: "Franchise opportunities",
@@ -45,18 +44,13 @@ export default function FranchisePage() {
         <Suspense fallback={<div role="status" className="min-h-64 rounded-2xl border border-line bg-surface p-6 text-sm text-muted">Loading store photos...</div>}><FranchiseGallery /></Suspense>
       </section>
 
-      <section aria-labelledby="locations-heading" className="grid items-start gap-7 lg:grid-cols-2 lg:gap-12">
+      <section aria-labelledby="locations-heading" className="grid items-center gap-7 lg:grid-cols-2 lg:gap-12">
         <div className="min-w-0"><h2 id="locations-heading" className="font-display text-3xl font-bold uppercase">Our <span className="text-gradient">presence.</span></h2><p className="mt-3 leading-7 text-muted">Explore the locations in our network. Contact the team to confirm store details or discuss your preferred area.</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {franchiseLocations.map(({ city, areas }) => <section key={city} aria-label={city} className="rounded-2xl border border-line-strong bg-surface p-5"><h3 className="flex items-center gap-2 font-display text-lg font-bold"><Store className="size-4 text-accent-text" aria-hidden />{city}</h3><ul className="mt-3 space-y-2 text-sm leading-6 text-muted">{areas.map((area) => <li key={area}>{area}</li>)}</ul></section>)}
           </div>
         </div>
-        <figure className="min-w-0 overflow-hidden rounded-3xl border border-line-strong bg-[#050b25]">
-          <a href="/franchise/locations-map.webp" target="_blank" rel="noopener noreferrer" aria-label="Open the GamexChange locations map at full size in a new tab" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-blue">
-            <Image src="/franchise/locations-map.webp" alt="Illustrated GamexChange network map showing Coimbatore, Pollachi, Perundurai and Karur. Locations are also listed alongside the map." width={678} height={727} sizes="(min-width: 1280px) 580px, (min-width: 1024px) 46vw, 100vw" {...imageLoading("deferred")} className="h-auto w-full" />
-          </a>
-          <figcaption className="border-t border-white/15 px-5 py-3 text-sm text-white/75">Locations overview. Tap the map to view it full size.</figcaption>
-        </figure>
+        <PresenceCarousel />
       </section>
 
       <section aria-labelledby="franchise-enquiry" className="rounded-3xl border border-line-strong bg-surface p-6 sm:p-9">

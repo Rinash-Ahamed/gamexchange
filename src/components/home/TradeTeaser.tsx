@@ -2,6 +2,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Glyph, glyphTint, type GlyphName } from "@/components/ui/Glyph";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { Reveal } from "@/components/ui/Reveal";
+import { AnimationBoundary } from "@/components/ui/AnimationBoundary";
 
 const steps: { glyph: GlyphName; title: string; body: string }[] = [
   { glyph: "x", title: "Choose your console", body: "Tell us what you’re trading in." },
@@ -23,16 +24,18 @@ export function TradeTeaser() {
           </div>
         </div>
 
-        <ol className="grid gap-4 sm:grid-cols-2">
+        <AnimationBoundary className="min-w-0">
+        <ol className="trade-step-cards grid gap-4 sm:grid-cols-2">
           {steps.map((s, i) => (
-            <Reveal as="li" key={s.title} delay={i * 0.08} className="metal rounded-3xl p-6">
-              <span className="grid size-11 place-items-center rounded-full border border-line-strong bg-surface" style={{ color: glyphTint[s.glyph] }}><Glyph name={s.glyph} className="size-5" /></span>
+            <Reveal as="li" key={s.title} delay={i * 0.08} className="trade-step-card metal relative isolate overflow-hidden rounded-3xl p-6">
+              <span className="trade-step-icon grid size-11 place-items-center rounded-full border border-line-strong bg-surface" style={{ color: glyphTint[s.glyph] }}><Glyph name={s.glyph} className="size-5" /></span>
               <p className="mt-4 font-display text-xs font-semibold uppercase tracking-[0.25em] text-muted">Step {i + 1}</p>
               <h3 className="mt-1 font-display text-lg font-bold uppercase">{s.title}</h3>
               <p className="mt-1 text-sm text-muted">{s.body}</p>
             </Reveal>
           ))}
         </ol>
+        </AnimationBoundary>
       </div>
     </section>
   );

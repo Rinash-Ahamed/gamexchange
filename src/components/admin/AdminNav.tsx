@@ -16,7 +16,7 @@ const items = [
 ] as const;
 
 const homepageItems = [
-  { href: "/admin/franchise", label: "Franchise photos", icon: Images },
+  { href: "/admin/franchise", label: "Franchise", icon: Images },
   { href: "/admin/homepage-services", label: "Service images", icon: Images },
   { href: "/admin/homepage-gamezone", label: "Game Zone images", icon: Images },
   { href: "/admin/banners", label: "Banners", icon: Images },
