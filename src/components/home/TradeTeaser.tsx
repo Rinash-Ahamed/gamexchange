@@ -25,12 +25,12 @@ export function TradeTeaser() {
         </div>
 
         <AnimationBoundary className="min-w-0">
-        <ol className="trade-step-cards grid gap-4 sm:grid-cols-2">
+        <ol className="trade-step-cards grid grid-cols-2 gap-3 sm:gap-4">
           {steps.map((s, i) => (
-            <Reveal as="li" key={s.title} delay={i * 0.08} className="trade-step-card metal relative isolate overflow-hidden rounded-3xl p-6">
+            <Reveal as="li" key={s.title} delay={i * 0.08} className="trade-step-card metal relative isolate min-w-0 overflow-hidden rounded-3xl p-3 sm:p-6">
               <span className="trade-step-icon grid size-11 place-items-center rounded-full border border-line-strong bg-surface" style={{ color: glyphTint[s.glyph] }}><Glyph name={s.glyph} className="size-5" /></span>
               <p className="mt-4 font-display text-xs font-semibold uppercase tracking-[0.25em] text-muted">Step {i + 1}</p>
-              <h3 className="mt-1 font-display text-lg font-bold uppercase">{s.title}</h3>
+              <h3 className="mt-1 break-words font-display text-base font-bold uppercase sm:text-lg">{s.title}</h3>
               <p className="mt-1 text-sm text-muted">{s.body}</p>
             </Reveal>
           ))}

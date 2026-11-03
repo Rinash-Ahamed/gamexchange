@@ -1439,6 +1439,8 @@ html[data-tone="violet"] .amb-violet, html[data-tone="teal"] .amb-teal { opacity
   overflow: hidden;
 }
 
+.review-marquee-mobile { display: none; }
+
 .review-marquee-track {
   display: flex;
   flex-direction: column;
@@ -1492,15 +1494,28 @@ html[data-tone="violet"] .amb-violet, html[data-tone="teal"] .amb-teal { opacity
 }
 
 @media (max-width: 639px) {
-  .review-marquee-scene { height: 28rem; }
+  .review-marquee-scene { height: 24rem; perspective: none; }
+  .review-marquee-desktop { display: none; }
+  .review-marquee-mobile { display: flex; }
   .review-marquee-stage {
-    inset: -22% 0.5rem;
+    inset: -10% 0;
     gap: 0.65rem;
     /* A flat compositor layer keeps the continuous marquee reliable on mobile Safari. */
-    transform: rotate(-2deg) translateZ(0);
+    transform: translateZ(0);
   }
-  .review-float-card { min-height: 11.5rem; }
+  .review-float-card { min-height: 0; border-radius: 1rem; }
   .review-float-card > div { padding: 1rem; }
+  .review-float-card > div > div { gap: 0.625rem; }
+  .review-float-card > div > div > span:first-child { width: 2rem; height: 2rem; }
+  .review-float-card blockquote {
+    margin-top: 0.75rem;
+    min-height: 0;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    white-space: normal;
+  }
+  .review-float-card:hover,
+  .review-float-card:focus-within { transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

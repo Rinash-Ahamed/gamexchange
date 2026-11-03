@@ -44,7 +44,7 @@ export function Reviews() {
         </div>
 
         <AnimationBoundary className="review-marquee-scene" label="Customer reviews">
-          <div className="review-marquee-stage">
+          <div className="review-marquee-stage review-marquee-desktop">
             {columns.map((column, columnIndex) => {
               const timing = timings[columnIndex];
               if (!timing) return null;
@@ -70,6 +70,15 @@ export function Reviews() {
                 </div>
               );
             })}
+          </div>
+          <div className="review-marquee-stage review-marquee-mobile">
+            <div className="review-marquee-column">
+              <ul className="review-marquee-track" style={{ "--review-duration": "160s", "--review-delay": "-8s" } as CSSProperties}>
+                {[...reviews, ...reviews].map((review, index) => (
+                  <ReviewCard key={`mobile-${review.name}-${index}`} review={review} hidden={index >= reviews.length} />
+                ))}
+              </ul>
+            </div>
           </div>
         </AnimationBoundary>
       </div>

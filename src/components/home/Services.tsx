@@ -23,22 +23,22 @@ export function Services({ images = {} }: { images?: HomepageImages }) {
         One shop for buying, selling, exchanging and repairing the hardware you play on.
       </SectionHeading>
 
-      <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
         {offerings.map((s, i) => {
           const Icon = s.icon;
           const image = images[serviceImages[i]!.id] || s.image;
           return (
-            <Reveal as="li" key={s.title} delay={(i % 4) * 0.06}>
+            <Reveal as="li" key={s.title} delay={(i % 4) * 0.06} className="min-w-0">
               <LightCard className="metal h-full rounded-3xl">
-                <Link href={s.href} target={s.href.startsWith("https://") ? "_blank" : undefined} rel={s.href.startsWith("https://") ? "noopener noreferrer" : undefined} className="service-offering relative isolate flex h-full min-h-72 flex-col overflow-hidden rounded-3xl p-6 text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-blue/60">
-                  <Image src={image} alt="" fill sizes="(min-width: 1280px) 400px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" {...imageLoading(image.startsWith("/hero/") || image.startsWith("/promos/") ? "visible" : "deferred")} className="service-offering-image -z-20 object-cover" />
+                <Link href={s.href} target={s.href.startsWith("https://") ? "_blank" : undefined} rel={s.href.startsWith("https://") ? "noopener noreferrer" : undefined} className="service-offering relative isolate flex h-full min-h-60 flex-col overflow-hidden rounded-3xl p-3 text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-blue/60 sm:min-h-72 sm:p-6">
+                  <Image src={image} alt="" fill sizes="(min-width: 1280px) 400px, (min-width: 1024px) 33vw, 50vw" {...imageLoading(image.startsWith("/hero/") || image.startsWith("/promos/") ? "visible" : "deferred")} className="service-offering-image -z-20 object-cover" />
                   <span aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(4,8,18,0.28)_0%,rgba(4,8,18,0.65)_38%,rgba(4,8,18,0.97)_100%)]" />
-                  <span className="flex items-start justify-between gap-4">
+                  <span className="flex items-start justify-between gap-2 sm:gap-4">
                     <span className="grid size-11 place-items-center rounded-2xl border border-white/25 bg-black/35 text-white"><Icon className="size-5" aria-hidden /></span>
                     <ArrowUpRight className="size-5 text-white/80 transition-transform duration-200 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:translate-x-1" aria-hidden />
                   </span>
-                  <h3 className="mt-auto pt-5 font-display text-lg font-bold uppercase leading-tight tracking-wide">{s.title}</h3>
-                  <span className="mt-4 font-display text-xs font-semibold uppercase tracking-wider text-white">{s.action} <span aria-hidden>↗</span></span>
+                  <h3 className="mt-auto break-words pt-5 font-display text-sm font-bold uppercase leading-tight tracking-wide sm:text-lg">{s.title}</h3>
+                  <span className="mt-3 font-display text-xs font-semibold uppercase tracking-wide text-white sm:mt-4 sm:tracking-wider">{s.action} <span aria-hidden>↗</span></span>
                 </Link>
               </LightCard>
             </Reveal>

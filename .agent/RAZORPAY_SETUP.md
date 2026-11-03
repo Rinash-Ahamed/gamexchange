@@ -12,6 +12,25 @@
 
 ## Configuration
 
+### Webhook URL and active events
+
+Use `https://gamexchange.co.in/api/checkout/webhook` if that domain serves this deployed application. Otherwise use the actual deployed HTTPS hostname followed by `/api/checkout/webhook`. This is a POST endpoint; opening it in a browser is not a webhook test. The endpoint exists in source, but its deployment and public reachability have not been verified in this update.
+
+In Razorpay Test Mode, open Accounts & Settings > Webhooks and add this endpoint. Enable exactly these active events for the current integration:
+
+| Event | Existing handling |
+| --- | --- |
+| `payment.captured` | Re-fetch and validate the captured payment, then transactionally mark the matching test order paid. |
+| `order.paid` | Reconcile the associated captured payment if the browser callback was missed. |
+
+Set a separate strong webhook secret in the Razorpay form and put the identical value in `RAZORPAY_WEBHOOK_SECRET` on the deployment. Do not use the API key secret as the webhook secret. Redeploy after changing hosting environment values. Add an alert email in Razorpay so delivery failures are visible to the operator.
+
+Do not select all events. `payment.authorized`, `payment.failed`, refund, settlement and subscription events do not currently update stored order state. Authorization alone is not proof of capture, and failed attempts must not overwrite a successful payment. Refund/fulfilment workflows and real-money payments require a separate implementation.
+
+Validate with a sandbox purchase and inspect both Razorpay delivery logs and Admin > Test orders. Repeat delivery must not create another order or reduce stock. A successful build or a browser GET does not verify webhook delivery. This update did not create provider settings, deploy an endpoint, send a webhook or perform a payment.
+
+References checked on 2026-11-03: [Razorpay webhook signature and retry validation](https://razorpay.com/docs/webhooks/validate-test/) and [payment capture and dashboard webhook setup](https://razorpay.com/docs/payments/payments/dashboard/).
+
 Use a Razorpay account's **Test Mode** API keys. Add these to `.env.local` and the staging host environment:
 
 ```dotenv
