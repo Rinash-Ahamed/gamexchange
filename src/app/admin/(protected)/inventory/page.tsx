@@ -3,7 +3,7 @@ import { ChevronDown, PackagePlus, Pencil, Save, Trash2 } from "lucide-react";
 import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
 import { InventoryFields } from "@/components/admin/InventoryFields";
 import { InventoryFilters } from "@/components/admin/InventoryFilters";
-import { adminButtonClass, adminGhostButtonClass } from "@/components/admin/styles";
+import { adminGhostButtonClass } from "@/components/admin/styles";
 import { listInventory, listInventoryCategories } from "@/lib/admin/db";
 import { requireAdmin } from "@/lib/admin/auth";
 import { formatAdminDate, titleCaseStatus } from "@/lib/admin/format";
@@ -13,6 +13,7 @@ import { ConditionBadge } from "@/components/shop/ConditionBadge";
 import { filterInventory, groupInventory, queryValue, stockFilters, type InventoryFilters as Filters, type InventorySearchParams } from "@/lib/admin/inventory-filters";
 import { createInventoryAction, deleteInventoryAction, updateInventoryAction } from "../../actions";
 import { AdminNotice } from "@/components/admin/AdminNotice";
+import { AdminSubmitButton } from "@/components/admin/AdminSubmitButton";
 
 export const metadata: Metadata = { title: "Inventory management", robots: { index: false, follow: false } };
 
@@ -56,7 +57,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
         </summary>
         <ConfirmSubmit submitAction={createInventoryAction} title="Create inventory item?" confirmLabel="Create item" cancelLabel="Keep editing" intent="primary" message="Add this item to inventory? Active and Out of stock items appear in the public shop. Only Active items with stock can be purchased; drafts stay hidden." className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-2 xl:grid-cols-4">
           <InventoryFields categories={categories} />
-          <div className="col-span-full flex justify-end"><button type="submit" className={adminButtonClass}>Create item</button></div>
+          <div className="col-span-full flex justify-end"><AdminSubmitButton pendingLabel="Creating...">Create item</AdminSubmitButton></div>
         </ConfirmSubmit>
       </details>
 
@@ -91,7 +92,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
                       <summary className={`${adminGhostButtonClass} cursor-pointer list-none gap-2`}><Pencil className="size-4" aria-hidden /><span className="group-open:hidden">Edit item</span><span className="hidden group-open:inline">Close editor</span><ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden /></summary>
                       <ConfirmSubmit submitAction={updateInventoryAction} title="Save inventory changes?" confirmLabel="Save changes" cancelLabel="Keep editing" intent="primary" message={`Save changes to ${item.name} (${item.sku})? Changes to price, stock and visibility will update the public shop.`} className="mt-3 grid gap-3 rounded-xl border border-line bg-surface/40 p-3 sm:grid-cols-2 xl:grid-cols-4">
                         <InventoryFields item={item} categories={categories} />
-                        <div className="col-span-full flex justify-end"><button type="submit" className={adminButtonClass}><Save className="mr-2 size-4" aria-hidden />Save changes</button></div>
+                        <div className="col-span-full flex justify-end"><AdminSubmitButton pendingLabel="Saving..."><Save className="mr-2 size-4" aria-hidden />Save changes</AdminSubmitButton></div>
                       </ConfirmSubmit>
                     </details>
                   </li>
