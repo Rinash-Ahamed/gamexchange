@@ -27,11 +27,12 @@ test("WhatsApp repairs remain compatible and callbacks require consent and a sta
   for (const change of [{ callbackConsent: false }, { callbackConsent: "on" }, { callbackRequestId: undefined }, { callbackRequestId: "invalid" }]) expect(repairSchema.safeParse({ ...callback, ...change }).success).toBe(false);
 });
 
-test("Turnstile validation requires genuine success, matching action and an exact allowed host", () => {
+test("Turnstile validation requires genuine success and matching action without a second hostname list", () => {
   const good = { success: true, hostname: "gamexchange.co.in", action: "repair" };
-  expect(turnstileResultMatches(good, "repair", ["gamexchange.co.in"])).toBe(true);
-  for (const change of [{ success: false }, { success: "true" }, { hostname: "evil.example" }, { hostname: "gamexchange.co.in.evil.example" }, { action: "contact" }, { action: undefined }]) expect(turnstileResultMatches({ ...good, ...change }, "repair", ["gamexchange.co.in"])).toBe(false);
-  expect(turnstileResultMatches(good, "repair", [])).toBe(false);
+  expect(turnstileResultMatches(good, "repair")).toBe(true);
+  for (const change of [{ success: false }, { success: "true" }, { action: "contact" }, { action: undefined }]) expect(turnstileResultMatches({ ...good, ...change }, "repair")).toBe(false);
+  expect(turnstileResultMatches({ ...good, hostname: "localhost" }, "repair")).toBe(true);
+  expect(turnstileResultMatches(null, "repair")).toBe(false);
 });
 
 test("callback persistence and Turnstile stay server-side behind existing enquiry protections", () => {

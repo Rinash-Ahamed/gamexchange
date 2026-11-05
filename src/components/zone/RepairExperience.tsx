@@ -12,12 +12,13 @@ import { RepairDiagnostic } from "./RepairDiagnostic";
 
 export function RepairExperience() {
   const formRef = useRef<HTMLFormElement>(null);
-  const { state, errors, submit, reset, challengeResetKey } = useEnquiry(formRef);
+  const { state, errors, submit, reset, challengeResetKey, clearFieldError } = useEnquiry(formRef);
   const [category, setCategory] = useState("");
   const [device, setDevice] = useState("");
   const [faults, setFaults] = useState<string[]>([]);
   const [delivery, setDelivery] = useState("whatsapp");
   const toggleFault = (fault: string) => {
+    clearFieldError("fault");
     setFaults((current) => current.includes(fault) ? current.filter((item) => item !== fault) : [...current, fault]);
   };
 
@@ -80,8 +81,7 @@ export function RepairExperience() {
               {({ id, describedBy, invalid }) => <div className="flex items-start gap-3 text-sm leading-6"><input id={id} name="callbackConsent" type="checkbox" required aria-invalid={invalid} aria-describedby={describedBy} className="mt-1 size-4 shrink-0 accent-blue" /><label htmlFor={id}>I agree that GameXchange may save my repair details and call me about this request. <Link href="/policies/privacy-policy" className="text-accent-text underline">Privacy Policy</Link></label></div>}
             </Field>}
           </div>
-          {state.status !== "success" && state.status !== "callback-saved" && <TurnstileCheck key={challengeResetKey} action="repair" />}
-          <SubmitArea state={state} label={delivery === "callback" ? "Request a callback" : "Prepare enquiry"} glyph={delivery === "callback" ? "play" : "x"} />
+          <SubmitArea state={state} label={delivery === "callback" ? "Request a callback" : "Prepare enquiry"} glyph={delivery === "callback" ? "play" : "x"} securityCheck={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() && state.status !== "success" && state.status !== "callback-saved" ? <TurnstileCheck key={challengeResetKey} action="repair" /> : undefined} />
         </form>
       </div>
     </div>

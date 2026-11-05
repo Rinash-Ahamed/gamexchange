@@ -5,6 +5,7 @@ import { flushSync } from "react-dom";
 import { z } from "zod";
 import { enquirySchema } from "@/lib/validation";
 import type { Errors } from "./fields";
+import { clearEditedField } from "@/lib/form-errors";
 
 export type EnquiryState =
   | { status: "idle" }
@@ -40,6 +41,24 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
   const submitting = useRef(false);
   const callbackAttempt = useRef<{ signature: string; id: string } | null>(null);
   const [challengeResetKey, setChallengeResetKey] = useState(0);
+
+  const clearFieldError = useCallback((name: string) => {
+    if (!name || submitting.current) return;
+    setErrors((current) => clearEditedField(current, name));
+    setState((current) => current.status === "error" && current.message === "Please fix the highlighted fields." ? { status: "idle" } : current);
+  }, []);
+
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+    const edited = (event: Event) => {
+      const field = event.target;
+      if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement) clearFieldError(field.name);
+    };
+    form.addEventListener("input", edited);
+    form.addEventListener("change", edited);
+    return () => { form.removeEventListener("input", edited); form.removeEventListener("change", edited); };
+  }, [formRef, clearFieldError]);
 
   useEffect(() => {
     mounted.current = true;
@@ -146,7 +165,7 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
     setState({ status: "idle" });
   };
 
-  return { state, errors, submit, reset, challengeResetKey };
+  return { state, errors, submit, reset, challengeResetKey, clearFieldError };
 }
 
 /** Reads a form into a plain object; multi-value fields (checkboxes) become arrays. */

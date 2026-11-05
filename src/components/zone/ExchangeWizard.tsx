@@ -6,14 +6,15 @@ import { m } from "motion/react";
 import { z } from "zod";
 import { exchangeAccessories, exchangeConditions, exchangeConsoles, exchangeUpgrades } from "@/data/repair";
 import { enquirySchema } from "@/lib/validation";
-import { CheckPills, ContactBlock, PillRadio, TextAreaField, type Errors } from "@/components/forms/fields";
+import { clearEditedField } from "@/lib/form-errors";
+import { CheckPills, ContactBlock, PillRadio, TextAreaField, TextField, type Errors } from "@/components/forms/fields";
 import { SubmitArea, SuccessPanel } from "@/components/forms/SubmitArea";
 import { formToPayload, useEnquiry } from "@/components/forms/use-enquiry";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import { Glyph, glyphTint, type GlyphName } from "@/components/ui/Glyph";
 
 const allSteps: { title: string; glyph: GlyphName; fields: string[] }[] = [
-  { title: "Your console", glyph: "x", fields: ["console"] },
+  { title: "Your console", glyph: "x", fields: ["console", "consoleOther"] },
   { title: "Condition", glyph: "o", fields: ["condition"] },
   { title: "Extras", glyph: "tri", fields: [] },
   { title: "Upgrade", glyph: "sq", fields: ["upgrade"] },
@@ -32,6 +33,7 @@ export function ExchangeWizard() {
   const { state, errors: serverErrors, submit, reset } = useEnquiry(formRef);
   const [step, setStep] = useState(0);
   const [intent, setIntent] = useState<"sell" | "exchange">("exchange");
+  const [consoleChoice, setConsoleChoice] = useState("");
   const steps = allSteps.filter((item) => intent === "exchange" || item.title !== "Upgrade");
   const [stepErrors, setStepErrors] = useState<Errors>({});
   const errors: Errors = { ...serverErrors, ...stepErrors };
@@ -46,6 +48,7 @@ export function ExchangeWizard() {
     if (!form) return;
     const data = new FormData(form);
     const missing = Object.fromEntries((steps[step]?.fields ?? []).filter((f) => f in required && !data.get(f)).map((f) => [f, [required[f] ?? "Required"]]));
+    if (step === 0 && data.get("console") === "Other" && String(data.get("consoleOther") ?? "").trim().length < 2) missing.consoleOther = ["Enter your console brand and model"];
     flushSync(() => setStepErrors(missing));
     if (Object.keys(missing).length) {
       form.querySelector<HTMLElement>(`[name="${Object.keys(missing)[0]}"]`)?.focus();
@@ -71,7 +74,7 @@ export function ExchangeWizard() {
     <div>
       {state.status === "success" && <SuccessPanel whatsappUrl={state.whatsappUrl} onEdit={reset} title={intent === "sell" ? "Sell enquiry ready" : "Exchange enquiry ready"} />}
 
-      <form ref={formRef} onSubmit={onSubmit} noValidate hidden={state.status === "success"} aria-label="Sell or exchange enquiry" className="metal relative rounded-3xl p-6 sm:p-10">
+      <form ref={formRef} onSubmit={onSubmit} onChange={(event) => { const field = event.target; if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement) setStepErrors((current) => clearEditedField(current, field.name)); }} noValidate hidden={state.status === "success"} aria-label="Sell or exchange enquiry" className="metal relative rounded-3xl p-6 sm:p-10">
         <input type="hidden" name="intent" value={intent} />
         {/* HUD progress */}
         <div className="relative mb-10">
@@ -120,7 +123,8 @@ export function ExchangeWizard() {
                     </div>
                     <p className="mt-2 text-xs text-muted">Selling for cash? No upgrade is needed.</p>
                   </fieldset>
-                  <PillRadio legend="Current console" name="console" options={exchangeConsoles} errors={errors} />
+                  <PillRadio legend="Current console" name="console" options={exchangeConsoles} errors={errors} onChange={setConsoleChoice} />
+                  {consoleChoice === "Other" && <TextField label="Your console model" name="consoleOther" errors={errors} required maxLength={120} placeholder="Enter the brand and model" />}
                 </>
               )}
               {i === 1 && <PillRadio legend="Condition (your own assessment)" name="condition" options={exchangeConditions} errors={errors} />}

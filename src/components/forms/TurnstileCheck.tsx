@@ -32,10 +32,10 @@ export function TurnstileCheck({ action }: { action: "contact" | "repair" }) {
     return () => { active = false; theme.disconnect(); if (id !== undefined) api.remove(id); };
   }, [ready, siteKey, action, attempt]);
   if (!siteKey) return null;
-  return <div className="mt-6 min-w-0" aria-label="Security check">
+  return <div className="min-w-0 max-w-full sm:max-w-xs" aria-label="Security check">
     <Script id="cloudflare-turnstile" src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" strategy="afterInteractive" onReady={() => setReady(true)} onError={() => { setToken(""); setError("Security check could not load. Check your connection and refresh the page."); }} />
     <input type="hidden" name="turnstileToken" value={token} />
-    <div ref={container} className="min-h-[140px] w-full min-w-0" />
+    <div ref={container} className="min-h-[140px] w-[150px] max-w-full" />
     {error && <p role="alert" className="mt-2 text-sm text-danger">{error} {ready && <button type="button" onClick={() => { setToken(""); setError(""); setAttempt((value) => value + 1); }} className="text-accent-text underline">Retry security check</button>}</p>}
   </div>;
 }

@@ -44,12 +44,14 @@ export const exchangeSchema = z.object({
   intent: z.enum(["sell", "exchange"]).default("exchange"),
   ...common,
   console: z.enum(exchangeConsoles, { error: "Choose your console" }),
+  consoleOther: z.string().transform(oneLine).pipe(z.string().max(120, "Keep the console model under 120 characters")).optional().default(""),
   condition: z.enum(exchangeConditions, { error: "Choose its condition" }),
   accessories: z.array(z.enum(exchangeAccessories)).max(exchangeAccessories.length),
   details: z.string().transform(multiLine).pipe(z.string().max(1000, "Keep it under 1000 characters")).default(""),
   upgrade: z.enum(exchangeUpgrades, { error: "Choose what you’d like to upgrade to" }).optional(),
   branch,
-}).refine((value) => value.intent === "sell" || Boolean(value.upgrade), { path: ["upgrade"], message: "Choose what you would like to upgrade to" });
+}).refine((value) => value.intent === "sell" || Boolean(value.upgrade), { path: ["upgrade"], message: "Choose what you would like to upgrade to" })
+  .refine((value) => value.console !== "Other" || value.consoleOther.length >= 2, { path: ["consoleOther"], message: "Enter your console brand and model" });
 
 export const zoneSchema = z.object({
   kind: z.literal("gamezone"),

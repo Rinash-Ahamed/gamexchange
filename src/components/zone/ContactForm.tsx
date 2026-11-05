@@ -34,8 +34,7 @@ export function ContactForm() {
           <TextAreaField label="How can we help?" name="message" errors={errors} rows={5} />
           <ContactBlock errors={errors} />
         </div>
-        {state.status !== "success" && <TurnstileCheck key={challengeResetKey} action="contact" />}
-        <SubmitArea state={state} label="Prepare message" />
+        <SubmitArea state={state} label="Prepare message" securityCheck={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() && state.status !== "success" ? <TurnstileCheck key={challengeResetKey} action="contact" /> : undefined} />
       </form>
     </div>
   );

@@ -4,8 +4,9 @@ import { CircleCheck, LoaderCircle, TriangleAlert } from "lucide-react";
 import { ControllerButton } from "@/components/ui/ControllerButton";
 import type { GlyphName } from "@/components/ui/Glyph";
 import type { EnquiryState } from "./use-enquiry";
+import type { ReactNode } from "react";
 
-export function SubmitArea({ state, label, glyph = "x" }: { state: EnquiryState; label: string; glyph?: GlyphName }) {
+export function SubmitArea({ state, label, glyph = "x", securityCheck }: { state: EnquiryState; label: string; glyph?: GlyphName; securityCheck?: ReactNode }) {
   return (
     <div className="mt-8 space-y-4">
       {state.status === "error" && (
@@ -14,11 +15,14 @@ export function SubmitArea({ state, label, glyph = "x" }: { state: EnquiryState;
           {state.message}
         </p>
       )}
-      <ControllerButton type="submit" glyph={glyph} size="lg" disabled={state.status === "submitting"}>
+      <div className={securityCheck ? "flex flex-wrap items-end justify-between gap-4" : undefined}>
+      {securityCheck}
+      <ControllerButton type="submit" glyph={glyph} size="lg" disabled={state.status === "submitting"} className={securityCheck ? "w-full max-w-full sm:w-auto" : undefined}>
         {state.status === "submitting" ? (
           <span className="inline-flex items-center gap-2"><LoaderCircle className="size-4 animate-spin" aria-hidden />Preparing…</span>
         ) : label}
       </ControllerButton>
+      </div>
     </div>
   );
 }

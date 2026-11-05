@@ -16,25 +16,24 @@ Phone validation is shared client/server: a ten-digit Indian mobile starting 6-9
 
 ## Cloudflare Turnstile setup
 
-Create a Turnstile widget in Cloudflare using Managed mode. Authorize the actual deployed hostnames in its hostname settings. Add all three variables together:
+Create a Turnstile widget in Cloudflare using Managed mode. Authorize the actual deployed hostnames in its hostname settings. Add both keys together:
 
 ```dotenv
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=your-public-site-key
 TURNSTILE_SECRET_KEY=your-server-only-secret
-TURNSTILE_ALLOWED_HOSTNAMES=gamexchange.co.in,www.gamexchange.co.in,gamexchange-tau.vercel.app
 ```
 
-Use exact hostnames without protocol, path or port. Add localhost to both settings only when using the widget locally; use separate testing credentials/host restrictions for staging as appropriate. Never put a real secret in NEXT_PUBLIC_ variables, screenshots, chat or Git. Rebuild/redeploy for public site-key changes; restart locally. No Cloudflare account changes were made by this implementation.
+Manage allowed hostnames in Cloudflare only, without protocol, path or port. Authorize localhost there when testing locally; use separate testing credentials/host restrictions for staging as appropriate. The old TURNSTILE_ALLOWED_HOSTNAMES application variable is no longer read and may be removed from local/hosting environments. Never put a real secret in NEXT_PUBLIC_ variables, screenshots, chat or Git. Rebuild/redeploy for public site-key changes; restart locally. No Cloudflare account changes were made by this implementation.
 
-All three blank leaves existing forms operational with the existing protections, but **Turnstile is not enabled**. Once any of them is set, missing companion configuration fails closed for Contact and Repair rather than bypassing verification. Configure them together before deploying. Exchange/Game Zone flows are unchanged. When enabled, both Repair WhatsApp and callback paths require verification.
+Both keys blank leaves existing forms operational with the existing protections, but **Turnstile is not enabled**. Once either key is set, a missing companion key fails closed for Contact and Repair rather than bypassing verification. Configure them together before deploying. Exchange/Game Zone flows are unchanged. When enabled, both Repair WhatsApp and callback paths require verification.
 
-The compact widget fits narrow form layouts, follows the website's data-theme, cleans up on unmount, and loads Cloudflare's script only when either protected form is mounted. No extra package was installed. CSP allows only the exact Cloudflare challenge script/frame origin. Server verification posts only secret and challenge token to the fixed Siteverify endpoint, uses no-store with a six-second timeout and requires success, matching form action and an exact configured hostname. Challenge failures/outages do not save a callback or create a WhatsApp success. Existing rate limits and form tokens remain in place.
+The compact widget fits narrow form layouts, follows the website's data-theme, cleans up on unmount, and loads Cloudflare's script only when either protected form is mounted. No extra package was installed. CSP allows only the exact Cloudflare challenge script/frame origin. Server verification posts only secret and challenge token to the fixed Siteverify endpoint, uses no-store with a six-second timeout and requires genuine success and matching form action. Domain restrictions rely on the widget's Cloudflare settings, not a second application allowlist. Challenge failures/outages do not save a callback or create a WhatsApp success. Existing rate limits and form tokens remain in place.
 
 Challenge tokens are single-use and expire. After a completed submission attempt the widget remounts for a fresh token; an internal too-fast form-token retry happens before Turnstile verification and retains the unconsumed challenge. Expired/error widgets clear their hidden token and offer retry. Tokens and secret/provider response bodies are not stored with records or logged. The public privacy policy describes callback storage and configured Turnstile use.
 
 ## Verification limits
 
-Source/whitespace reviewed only. Build, lint, type checks, regression tests and browser/provider/Firestore/MFA flows were not run, following the explicit-run convention. Added regression source for phone normalization/rejection, callback consent/default behavior, strict Turnstile action/hostname checks, backend guard ordering and a mocked saved-reference browser flow. Mocked success is not proof of actual persistence or challenge acceptance.
+Source/whitespace reviewed only. Build, lint, type checks, regression tests and browser/provider/Firestore/MFA flows were not run, following the explicit-run convention. Added regression source for phone normalization/rejection, callback consent/default behavior, strict Turnstile success/action checks without an application hostname list, backend guard ordering and a mocked saved-reference browser flow. Mocked success is not proof of actual persistence or challenge acceptance.
 
 Before enabling: run the requested checks; verify real-widget contact/repair submissions on authorized domains, missing/forged/expired/replayed/wrong-action/wrong-host tokens, key mismatch/provider timeout and narrow/mobile light/dark layouts. Verify callback appears under an approved MFA admin, repeat unchanged UUID after a simulated lost response creates one ticket, Firebase failure never shows saved, and WhatsApp default remains unchanged. Use sample data. Do not claim Cloudflare protection is active until keys/deployment and server verification are verified.
 

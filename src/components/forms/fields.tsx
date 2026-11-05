@@ -65,7 +65,7 @@ export function TextAreaField({ label, name, errors, placeholder, hint, required
 }
 
 /** Controller-style single-choice pills (native radios underneath). */
-export function PillRadio({ legend, name, options, errors, defaultValue }: { legend: string; name: string; options: readonly string[]; errors: Errors; defaultValue?: string }) {
+export function PillRadio({ legend, name, options, errors, defaultValue, onChange }: { legend: string; name: string; options: readonly string[]; errors: Errors; defaultValue?: string; onChange?: (value: string) => void }) {
   const error = errors[name]?.[0];
   return (
     <fieldset>
@@ -73,7 +73,7 @@ export function PillRadio({ legend, name, options, errors, defaultValue }: { leg
       <div className="flex flex-wrap gap-2">
         {options.map((o) => (
           <label key={o} className="relative">
-            <input type="radio" name={name} value={o} defaultChecked={o === defaultValue} className="peer sr-only" />
+            <input type="radio" name={name} value={o} defaultChecked={o === defaultValue} onChange={onChange ? () => onChange(o) : undefined} className="peer sr-only" />
             <span className="inline-flex min-h-11 cursor-pointer items-center rounded-full border border-line-strong bg-surface px-4 text-sm font-medium transition-all duration-200 touch-manipulation hover:border-blue peer-checked:border-transparent peer-checked:bg-gradient-to-b peer-checked:from-fill peer-checked:to-fill-2 peer-checked:text-accent-ink peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ink peer-active:scale-95">
               {o}
             </span>

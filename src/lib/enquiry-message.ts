@@ -21,7 +21,7 @@ export function buildEnquiryMessage(e: Enquiry): string {
     case "exchange":
       rows.push(
         line("Request", e.intent === "sell" ? "Sell for cash" : "Exchange / upgrade"),
-        line("Current console", e.console),
+        line("Current console", e.console === "Other" ? e.consoleOther : e.console),
         line("Condition", e.condition),
         line("Accessories", e.accessories.length ? e.accessories.join(", ") : "None"),
       );
