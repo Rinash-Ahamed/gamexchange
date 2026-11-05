@@ -8,9 +8,9 @@ import { imageLoading } from "@/lib/image-loading";
 
 /** Product photo from the client's own CDN, with an on-brand fallback if it can't load. */
 export function ProductImage({ product, priority = false, eager = false, sizes, presentation = "stage" }: { product: Product; priority?: boolean; eager?: boolean; sizes: string; presentation?: "stage" | "catalog" }) {
-  const [failed, setFailed] = useState(false);
+  const [failedSource, setFailedSource] = useState<string | null>(null);
 
-  if (failed) {
+  if (failedSource === product.image.src) {
     return (
       <div role="img" aria-label={`${product.name}, photo unavailable`} className="grid size-full place-items-center text-muted">
         <span className="grid place-items-center gap-2 text-center">
@@ -29,7 +29,7 @@ export function ProductImage({ product, priority = false, eager = false, sizes, 
       height={product.image.height}
       sizes={sizes}
       {...imageLoading(priority ? "critical" : eager ? "visible" : "deferred")}
-      onError={() => setFailed(true)}
+      onError={() => setFailedSource(product.image.src)}
       quality={85}
       className={presentation === "catalog" ? "size-full object-contain" : "themed-img size-full object-contain [filter:drop-shadow(0_26px_26px_var(--prod-shadow))] transition-transform duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-[1.04]"}
     />

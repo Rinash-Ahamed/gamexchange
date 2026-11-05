@@ -11,6 +11,7 @@ import { paginate } from "@/lib/pagination";
 import { CatalogCard } from "./CatalogCard";
 import { CatalogFilters } from "./CatalogFilters";
 import { CatalogPagination } from "./CatalogPagination";
+import { AnimationBoundary } from "@/components/ui/AnimationBoundary";
 
 const icons = { games: Gamepad2, consoles: Layers, accessories: Headphones };
 
@@ -25,7 +26,7 @@ export function ProductBrowser({ products, initialFilters = {} }: { products: re
   const scoped = useMemo(() => catalog.filter((product) => filters.section === "all" || productSection(product) === filters.section), [catalog, filters.section]);
   const visible = useMemo(() => filterCatalog(catalog, deferredFilters), [catalog, deferredFilters]);
   const groups = useMemo(() => consumerCatalogFacets(catalog, deferredFilters), [catalog, deferredFilters]);
-  const pagination = paginate(visible, page);
+  const pagination = useMemo(() => paginate(visible, page), [visible, page]);
   const platforms = groups.find((group) => group.key === "platforms")?.options ?? [];
   const priceCeiling = useMemo(() => scoped.reduce((maximum, product) => Math.max(maximum, product.price), 1), [scoped]);
   const update = (next: Partial<Filters>) => { setFilters((current) => ({ ...current, ...next })); setPage(1); };
@@ -51,7 +52,7 @@ export function ProductBrowser({ products, initialFilters = {} }: { products: re
 
     <div className="mt-5 flex flex-wrap items-center gap-3">
       <label className="relative block min-w-0 flex-1 basis-72"><span className="sr-only">Search the shop</span><Search className="pointer-events-none absolute left-3 top-3 size-5 text-muted" aria-hidden /><input type="search" value={filters.q} onChange={(event) => update({ q: event.target.value })} maxLength={160} placeholder="Search games, consoles and accessories" className="min-h-11 w-full rounded-xl border border-line-strong bg-surface pl-11 pr-3 text-base text-ink sm:text-sm" /></label>
-      <Link href="/exchange" className="inline-flex min-h-11 items-center rounded-xl border border-line-strong px-4 font-display text-xs font-semibold text-accent-text hover:border-blue">Sell or exchange your products</Link>
+      <AnimationBoundary className="max-w-full"><Link href="/exchange" className="shop-trade-highlight relative isolate inline-flex min-h-11 items-center overflow-hidden rounded-xl border border-blue px-4 font-display text-xs font-semibold text-accent-text hover:border-blue"><span aria-hidden className="shop-trade-highlight-glow pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-fill/20" /><span>Sell or Exchange</span></Link></AnimationBoundary>
     </div>
 
     <div role="group" aria-label="Filter by platform" className="mt-4 flex flex-wrap gap-2 lg:justify-end">

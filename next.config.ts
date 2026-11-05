@@ -50,6 +50,15 @@ const nextConfig: NextConfig = {
     serverActions: { bodySizeLimit: "6mb" },
   },
   images: {
+    localPatterns: [
+      { pathname: "/**", search: "" },
+      // Uploaded artwork uses dynamic ?v= values; the routes validate current versions.
+      // Omit search only on these image endpoints, not across all local paths.
+      { pathname: "/api/inventory/*/image" },
+      { pathname: "/api/banners/*/image" },
+      { pathname: "/api/franchise/*/image" },
+      { pathname: "/api/homepage-images/*" },
+    ],
     formats: ["image/avif", "image/webp"],
     qualities: [75, 80, 85],
     remotePatterns: [{ protocol: "https", hostname: "framerusercontent.com", pathname: "/images/**" }],

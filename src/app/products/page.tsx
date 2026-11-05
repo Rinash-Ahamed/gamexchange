@@ -5,7 +5,9 @@ import { ProductBrowser } from "@/components/shop/ProductBrowser";
 import { site } from "@/data/site";
 import { listPublicProducts } from "@/lib/admin/db";
 import { normalizePlatform, shopSections } from "@/data/catalog";
-import { availableCatalog, type CatalogFilters } from "@/lib/catalog";
+import { availableCatalog, emptyCatalogFilters, filterCatalog, type CatalogFilters } from "@/lib/catalog";
+import { catalogSummary } from "@/lib/catalog-summary";
+import { paginate } from "@/lib/pagination";
 import { productConditionSchema, productHref } from "@/lib/product-links";
 
 export const metadata: Metadata = {
@@ -18,16 +20,19 @@ export const dynamic = "force-dynamic";
 
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const [stock, query] = await Promise.all([listPublicProducts(), searchParams]);
-  const products = availableCatalog(stock);
+  const products = availableCatalog(stock).map(catalogSummary);
   const value = (key: string) => { const entry = query[key]; return (Array.isArray(entry) ? entry[0] ?? "" : entry ?? "").trim(); };
   const section = shopSections.find((entry) => entry.id === value("section"))?.id ?? "all";
   const category = products.find((product) => product.category.toLowerCase() === value("category").toLowerCase())?.category;
   const platform = products.find((product) => normalizePlatform(product.platform) === normalizePlatform(value("platform")))?.platform;
   const initialFilters: Partial<CatalogFilters> = { section, q: value("q").slice(0, 160), categories: category ? [category] : [], platforms: platform ? [normalizePlatform(platform)] : [] };
+  const initialResults = filterCatalog(products, { ...emptyCatalogFilters, ...initialFilters });
+  const initialPage = paginate(initialResults, 1);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: products.map((p, i) => ({
+    numberOfItems: initialResults.length,
+    itemListElement: initialPage.items.map((p, i) => ({
       "@type": "ListItem",
       position: i + 1,
       item: {

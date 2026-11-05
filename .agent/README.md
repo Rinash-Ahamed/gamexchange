@@ -5,6 +5,7 @@
 - [Session context and current work](SESSION.md): read first when continuing development.
 - [Firebase setup](FIREBASE_SETUP.md): authentication, database, Storage and upload requirements.
 - [Performance audit](PERFORMANCE_AUDIT.md): applied optimizations, verification limits and follow-up measurements.
+- [Cleanup audit, 5 November 2026](CODE_CLEANUP_2026-11-05.md): dead-code removal, shared helpers, query/subscription deduplication and behavior checks.
 - [Architecture review](ARCHITECTURE_REVIEW.md): minor fixes, build health gate and major production decisions.
 - [QA and security audit, 2026-11-03](QA_SECURITY_AUDIT_2026-11-03.md): findings, local test results, priorities and live-provider verification limits.
 - [Security operations](SECURITY_OPERATIONS.md): shared protection, temporary TTL setup, admin history, readiness and release checks.

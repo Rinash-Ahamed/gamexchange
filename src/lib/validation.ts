@@ -69,7 +69,5 @@ export const contactSchema = z.object({
 
 export const enquirySchema = z.discriminatedUnion("kind", [repairSchema, exchangeSchema, zoneSchema, contactSchema]);
 
-export type EnquiryInput = z.input<typeof enquirySchema>;
 export type Enquiry = z.output<typeof enquirySchema>;
-export type EnquiryKind = Enquiry["kind"];
 export { contactMethods, branchChoices, contactTopics };

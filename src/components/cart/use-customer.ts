@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, type User } from "firebase/auth";
 import { customerClientAuth } from "@/lib/firebase/customer-client";
-import { firebaseClientConfigured } from "@/lib/firebase/client";
+import { firebaseClientConfigured } from "@/lib/firebase/browser-config";
 import { customerSignInError } from "@/lib/firebase/customer-errors";
 
 export function useCustomer() {

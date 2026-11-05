@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { formatINR, type Product } from "@/data/products";
 import { useCart } from "./use-cart";
@@ -15,7 +15,12 @@ export function CartContents({ products, checkoutEnabled }: { products: Product[
   const cart = useCart();
   const [busy, setBusy] = useState(false);
   const [receipt, setReceipt] = useState("");
-  const lines = cart.items.map((item) => ({ ...item, product: products.find((product) => product.id === item.id) }));
+  const productById = useMemo(() => {
+    const index = new Map<string, Product>();
+    for (const product of products) if (!index.has(product.id)) index.set(product.id, product);
+    return index;
+  }, [products]);
+  const lines = cart.items.map((item) => ({ ...item, product: productById.get(item.id) }));
   const invalid = lines.some((line) => !line.product || line.quantity > (line.product.stock ?? 1));
   const total = lines.reduce((sum, line) => sum + (line.product?.price ?? 0) * 100 * line.quantity, 0);
   if (!cart.ready) return <p role="status" className="min-h-60 text-muted">Loading your cart...</p>;

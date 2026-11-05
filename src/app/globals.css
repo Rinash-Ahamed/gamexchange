@@ -1390,6 +1390,16 @@ html,
 
 .hero-float { animation: float-y 7s ease-in-out 1.6s infinite; }
 
+@keyframes shop-trade-highlight {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+.shop-trade-highlight-glow { animation: shop-trade-highlight 3s ease-in-out infinite; }
+.shop-trade-highlight:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .shop-trade-highlight-glow { animation: none; opacity: 0.65; }
+}
+
 /* Pause every looping animation while the hero is off-screen. */
 [data-live="false"] *, [data-live="false"] *::before { animation-play-state: paused !important; }
 

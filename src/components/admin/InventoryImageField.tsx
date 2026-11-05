@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Trash2 } from "lucide-react";
 import { adminFileInputClass, adminLabelClass, adminGhostButtonClass } from "./styles";
 import type { InventoryItem } from "@/lib/admin/types";
 import { inventoryPhotoKey, inventoryPhotos, inventoryPhotoSource, INVENTORY_UPLOAD_BYTES, MAX_INVENTORY_PHOTOS } from "@/lib/inventory-photos";
+import { validateInventoryPhoto } from "@/lib/inventory-photo-validation";
 
 type Preview = { key: string; src: string };
 
@@ -13,6 +14,7 @@ export function InventoryImageField({ item }: { item?: InventoryItem }) {
   const [error, setError] = useState("");
   const hintId = useId();
   const urls = useRef(new Set<string>());
+  const selection = useRef(0);
   useEffect(() => { const owned = urls.current; return () => { owned.forEach((url) => URL.revokeObjectURL(url)); }; }, []);
   function move(index: number, target: number) {
     setPhotos((previous) => {
@@ -27,14 +29,24 @@ export function InventoryImageField({ item }: { item?: InventoryItem }) {
       <input type="hidden" name="imageOrder" value={JSON.stringify(photos.map((photo) => photo.key))} />
       <label><span className={adminLabelClass}>Product images ({photos.length}/{MAX_INVENTORY_PHOTOS})</span>
         <input name="image" type="file" multiple accept="image/jpeg,image/png,image/webp" required={!item && !photos.length}
-          aria-describedby={hintId} className={adminFileInputClass} onChange={(event) => {
+          aria-describedby={hintId} className={adminFileInputClass} onChange={async (event) => {
+            const input = event.currentTarget;
+            const attempt = ++selection.current;
             const files = Array.from(event.target.files ?? []);
             const retained = photos.filter((photo) => photo.key.startsWith("existing:"));
             const invalid = retained.length + files.length > MAX_INVENTORY_PHOTOS || files.reduce((sum, file) => sum + file.size, 0) > INVENTORY_UPLOAD_BYTES || files.some((file) => !["image/jpeg", "image/png", "image/webp"].includes(file.type));
-            const message = invalid ? "Keep up to 5 photos. New files must be JPG, PNG or WebP, up to 4 MB combined. Remove a photo before adding its replacement if all slots are full." : "";
-            event.target.setCustomValidity(message); setError(message);
+            let message = invalid ? "Keep up to 5 photos. New files must be JPG, PNG or WebP, up to 4 MB combined. Remove a photo before adding its replacement if all slots are full." : "";
+            input.setCustomValidity("Please wait while the selected images are checked.");
+            setError("Checking selected images...");
+            if (!invalid) {
+              try { for (const file of files) await validateInventoryPhoto(file); }
+              catch (error) { message = error instanceof Error ? error.message : "Choose a valid JPG, PNG or WebP image."; }
+            }
+            if (attempt !== selection.current || !input.isConnected) return;
+            input.setCustomValidity(message); setError(message);
+            if (message) input.value = "";
             urls.current.forEach((url) => URL.revokeObjectURL(url)); urls.current.clear();
-            const selected = invalid ? [] : files.map((file, index) => {
+            const selected = message ? [] : files.map((file, index) => {
               const src = URL.createObjectURL(file); urls.current.add(src);
               return { key: `new:${index}`, src };
             });

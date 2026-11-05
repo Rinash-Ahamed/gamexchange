@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHash, randomUUID } from "node:crypto";
 import { unstable_cache } from "next/cache";
+import { cache } from "react";
 import { PUBLIC_PRODUCTS_TAG } from "@/lib/public-cache";
 import { firebaseFirestore as database } from "@/lib/firebase/firestore";
 import {
@@ -76,10 +77,10 @@ async function ensureCategoriesInitialized() {
   await categoryCheck;
 }
 
-export async function listInventoryCategories() {
+export const listInventoryCategories = cache(async () => {
   await ensureCategoriesInitialized();
   return storedCategories((await categoryRegistry().get()).data()).toSorted((a, b) => a.name.localeCompare(b.name));
-}
+});
 
 function resolveInventoryCategory(item: InventoryItem, categories: InventoryCategory[]): InventoryItem {
   const category = categories.find((entry) => categoryMatches(entry, item));

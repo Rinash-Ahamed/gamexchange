@@ -2,9 +2,15 @@
 
 import { useSyncExternalStore } from "react";
 
+const listeners = new Set<() => void>();
+const changed = () => listeners.forEach((notify) => notify());
 const subscribe = (notify: () => void) => {
-  document.addEventListener("visibilitychange", notify);
-  return () => document.removeEventListener("visibilitychange", notify);
+  if (!listeners.size) document.addEventListener("visibilitychange", changed);
+  listeners.add(notify);
+  return () => {
+    listeners.delete(notify);
+    if (!listeners.size) document.removeEventListener("visibilitychange", changed);
+  };
 };
 const visible = () => !document.hidden;
 const serverVisible = () => true;

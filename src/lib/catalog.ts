@@ -67,6 +67,10 @@ function facetValues(product: Product, key: CatalogFacetKey): string[] {
 /** Counts respect other selections while keeping each facet's own choices visible. */
 export function catalogFacets(products: readonly Product[], filters: CatalogFilters): CatalogFacet[] {
   const scoped = products.filter((product) => filters.section === "all" || productSection(product) === filters.section);
+  return scopedCatalogFacets(scoped, filters);
+}
+
+function scopedCatalogFacets(scoped: readonly Product[], filters: CatalogFilters): CatalogFacet[] {
   const hasGames = scoped.some((product) => productSection(product) === "games");
   const defaults: Partial<Record<CatalogFacetKey, readonly string[]>> = { platforms: platformSuggestions, conditions: productConditions, genres: hasGames ? genreSuggestions : [], formats: hasGames ? gameFormats : [], playModes: hasGames ? playModeChoices : [] };
   const titles: Record<CatalogFacetKey, string> = { platforms: "Platforms", categories: "Categories", conditions: "Condition", brands: "Brand / publisher", genres: "Game genre", formats: "Game format", editions: "Edition / model", playModes: "Player modes", ageRatings: "Age rating", years: "Release year" };
@@ -87,7 +91,7 @@ export function catalogFacets(products: readonly Product[], filters: CatalogFilt
 export function consumerCatalogFacets(products: readonly Product[], filters: CatalogFilters) {
   const scoped = products.filter((product) => filters.section === "all" || productSection(product) === filters.section);
   const hasHardware = scoped.some((product) => productSection(product) !== "games");
-  return catalogFacets(products, filters).filter((facet) => {
+  return scopedCatalogFacets(scoped, filters).filter((facet) => {
     if (filters[facet.key].length) return true;
     if (facet.key === "platforms" || facet.key === "conditions") return true;
     if (facet.key === "editions") return false;

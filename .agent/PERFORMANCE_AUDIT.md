@@ -8,6 +8,12 @@ Scope: homepage rendering, public catalogue/banner data, banner image API, anima
 
 ## Changes applied
 
+### Catalogue payload follow-up, 2026-11-05
+
+Confirmed existing 20-card pagination, deferred lower-row covers, critical/eager initial row, memoized cards, deferred filter results and intent-only product prefetch. Added a non-mutating catalogue-summary projection before sending shop/cart/related-card props to clients: removes unused full descriptions and gallery arrays while keeping cover, pricing and every filter/search/sort field. Detail pages retain full product content. Shop ItemList structured data is now bounded to the initial filtered 20-product page, with the full result count retained, instead of serializing every product again. Memoized the page slice to avoid allocating it on unrelated UI updates. Image bytes, quality and photo limits are unchanged.
+
+This reduces response data but is not backend pagination: Firestore/cache reads and initial browser filter metadata still scale with the full available catalogue. Fully server-side filtering, facets and cursor pagination remain a separate larger-catalogue implementation. No arbitrary product truncation, fake counts, new indexes or live data changes. Added projection/2000-item page-limit regression source, not executed. No build/lint/tests or browser/network/FPS measurements in this update, per explicit-run convention.
+
 | Finding | Change | Expected benefit |
 | --- | --- | --- |
 | The homepage awaited all Firebase data before returning its hero. | Start catalogue and banner reads together; stream their sections behind Suspense boundaries. Reserve placeholder space. | Hero markup can render without waiting for database calls. |

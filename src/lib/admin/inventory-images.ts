@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { firebaseStorageBucket } from "@/lib/firebase/storage";
 import { createByteCache } from "@/lib/byte-cache";
 import type { InventoryPhoto } from "./types";
+import { processCardImage, supportedCardImage } from "./process-card-image";
 
 export class InventoryImageError extends Error {
   constructor(public readonly code: "image" | "storage") { super(code); }
@@ -16,19 +17,12 @@ function bucket() {
 const ownedPath = /^inventory-images\/[a-f0-9-]+\.webp$/;
 
 export async function uploadInventoryImage(file: File) {
-  if (!file.size || file.size > 5 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+  if (!supportedCardImage(file)) {
     throw new InventoryImageError("image");
   }
   let image;
   try {
-    const { default: sharp } = await import("sharp");
-    const input = sharp(Buffer.from(await file.arrayBuffer()), { limitInputPixels: 16_777_216, failOn: "warning" });
-    const metadata = await input.metadata();
-    if (!metadata.width || !metadata.height || Math.min(metadata.width, metadata.height) < 300 ||
-      Math.max(metadata.width, metadata.height) > 4096 || (metadata.pages ?? 1) !== 1 ||
-      !["jpeg", "png", "webp"].includes(metadata.format ?? "")) throw new Error("Invalid image");
-    image = await input.rotate().resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
-      .webp({ quality: 85 }).toBuffer({ resolveWithObject: true });
+    image = await processCardImage(file);
   } catch { throw new InventoryImageError("image"); }
   const imageVersion = randomUUID();
   const imageStoragePath = `inventory-images/${imageVersion}.webp`;

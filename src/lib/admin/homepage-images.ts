@@ -5,6 +5,7 @@ import { homepageImageSlots } from "@/data/homepage-images";
 import { firebaseFirestore } from "@/lib/firebase/firestore";
 import { firebaseStorageBucket } from "@/lib/firebase/storage";
 import { createByteCache } from "@/lib/byte-cache";
+import { processCardImage, supportedCardImage } from "./process-card-image";
 
 type ImageAsset = { path: string; version: string; updatedAt: string };
 const document = () => firebaseFirestore().collection("settings").doc("homepageImages");
@@ -40,14 +41,10 @@ export async function saveHomepageImage(id: string, file: File | undefined, rese
   if (!imageSlot(id)) throw new Error("Unknown image slot.");
   let uploaded: ImageAsset | undefined;
   if (!reset) {
-    if (!file?.size || file.size > 5 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) throw new Error("Choose a static JPG, PNG or WebP up to 5 MB.");
+    if (!file || !supportedCardImage(file)) throw new Error("Choose a static JPG, PNG or WebP up to 5 MB.");
     let output;
     try {
-      const { default: sharp } = await import("sharp");
-      const input = sharp(Buffer.from(await file.arrayBuffer()), { limitInputPixels: 16_777_216, failOn: "warning" });
-      const meta = await input.metadata();
-      if (!meta.width || !meta.height || Math.min(meta.width, meta.height) < 300 || Math.max(meta.width, meta.height) > 4096 || (meta.pages ?? 1) !== 1 || !["jpeg", "png", "webp"].includes(meta.format ?? "")) throw new Error();
-      output = await input.rotate().resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
+      output = (await processCardImage(file)).data;
     } catch { throw new Error("Use a static image with each side between 300 and 4096 px."); }
     const version = randomUUID();
     uploaded = { path: `homepage-images/${version}.webp`, version, updatedAt: new Date().toISOString() };
