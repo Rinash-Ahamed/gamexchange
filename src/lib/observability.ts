@@ -1,4 +1,4 @@
-export type Operation = "checkout.create" | "checkout.verify" | "checkout.webhook" | "email.worker";
+export type Operation = "checkout.create" | "checkout.verify" | "checkout.webhook" | "checkout.reservations" | "email.worker";
 export type RouteOperation = Operation | "enquiry" | "enquiry.token" | "admin.session";
 
 /** Allowlisted event fields only. Never pass headers, URLs, errors, IDs or customer content. */

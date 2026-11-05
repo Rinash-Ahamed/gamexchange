@@ -11,7 +11,7 @@ import { useCustomer } from "./use-customer";
 import { ShippingForm } from "./ShippingForm";
 
 type PaymentResult = { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string };
-type CheckoutOptions = { key: string; amount: number; currency: string; order_id: string; name: string; description: string; prefill: { name: string; email: string; contact: string }; theme: { color: string }; handler: (result: PaymentResult) => void; modal: { ondismiss: () => void } };
+type CheckoutOptions = { key: string; amount: number; currency: string; order_id: string; name: string; description: string; timeout: number; prefill: { name: string; email: string; contact: string }; theme: { color: string }; handler: (result: PaymentResult) => void; modal: { ondismiss: () => void } };
 type CheckoutInstance = { open: () => void; on: (event: "payment.failed", handler: () => void) => void };
 declare global { interface Window { Razorpay?: new (options: CheckoutOptions) => CheckoutInstance } }
 
@@ -77,9 +77,11 @@ export function TestCheckout({ enabled, items, amount, disabled, onBusy, onSucce
     try {
       const order = await post("/api/checkout/order", { requestId, items: purchased, expectedAmount: amount, shipping: shipping.data, privacyConsent: privacyConsent.data });
       if (order.mode !== "test" || !/^rzp_test_/.test(order.key) || order.amount !== amount || order.currency !== "INR") throw new Error("Checkout could not be verified. Please try again.");
+      const remaining = Math.floor((order.expiresAt - Date.now()) / 1000);
+      if (!Number.isFinite(remaining) || remaining <= 0) throw new Error("This checkout hold expired. Refresh your cart to start again.");
       const checkout = new window.Razorpay({
         key: order.key, amount: order.amount, currency: order.currency, order_id: order.orderId,
-        name: "GameXchange", description: "Test order only. No delivery or stock reservation.", theme: { color: "#3a69f5" },
+        name: "GameXchange", description: "Test order only. Real inventory is unchanged.", timeout: remaining, theme: { color: "#3a69f5" },
         prefill: { name: shipping.data.name, email: customer.user.email ?? "", contact: `+91${shipping.data.phone}` },
         handler(result) { pending.current = { requestId, result, items: purchased }; setNeedsVerification(true); void verify(); },
         modal: { ondismiss() { if (!verifying.current && !pending.current) { setLocked(false); setMessage("Checkout closed. Your cart is unchanged."); } } },

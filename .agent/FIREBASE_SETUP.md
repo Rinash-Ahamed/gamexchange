@@ -6,6 +6,7 @@ GamexChange stores inventory and customer service records in Cloud Firestore thr
 
 ## 1. Create the database
 
+
 1. Create or open a project in the Firebase console.
 2. Open **Build > Firestore Database**.
 3. Create a Firestore database in Native mode and select the region closest to the shop and hosting region.
@@ -16,6 +17,7 @@ The following collections are managed by the app:
 - `inventory`
 - `inventorySkus`
 - `serviceRecords`
+- `checkoutTestStock` and `checkoutTestPayments` for isolated sandbox stock counters and permanent payment-ID claims. Never expose these to browser writes or TTL deletion. See STOCK_RESERVATIONS.md; real inventory is not decremented by test payments.
 
 `inventorySkus` is an internal uniqueness index. Do not edit it manually.
 
@@ -198,6 +200,16 @@ Delivery fields are kept in form memory only, not cart/local storage or a public
 Payments remain sandbox-only and no shipment is created. Use sample recipient/address/phone details while testing. Existing test records may contain customer data; define retention and access procedures before accepting real delivery details. The owner requested public privacy-policy publication on 3 November 2026; it now covers customer authentication, shipping and payment data at /policies/privacy-policy. Checkout requires explicit current-version privacy consent and stores the server receipt time/version with each new order, visible in protected admin. Business/legal review remains necessary; no compliance certification is implied. Shipping fees, PIN serviceability, stock reservation, live orders, customer order-history/recovery, courier fulfilment and finance email delivery are separate pending features. No public address lookup or customer-record export endpoint is introduced.
 
 `checkoutTestOrders` stores Razorpay sandbox order snapshots and verified payment references through the Admin SDK. No client Firestore write rules or new indexes are required. Admin > Test orders is a protected, read-only list of the latest 50 records. These are simulations, not fulfilment orders: real inventory is neither reserved nor decremented. See `RAZORPAY_SETUP.md` for the required server-only test keys, signed webhook setup and live-payment prerequisites. No retention cleanup or data migration has been enabled.
+
+### Admin-only cursor pagination, 5 November 2026
+
+/admin/orders and /admin/services use a separate authenticated, uncached readAdminRecordPage helper, not the public catalogue helpers. Each page reads at most 21 matching documents: 20 displayed plus one lookahead. Queries sort by createdAt descending and document ID descending, use startAfter for older records and endBefore + limitToLast for newer records, never offsets. Existing default ascending/descending single-field indexes normally cover this shape with the default matching __name__ direction; custom index exemptions/edition settings must be checked in staging. No index, rule, credential or stored record was changed remotely.
+
+Bounded, versioned cursor values contain only scope/date/record ID, never customer contact data, payment secrets or session tokens. They do not grant access: pages and the reader enforce the existing approved MFA session before reading. Invalid, duplicated, cross-screen or oversized cursors reset to the latest page with a notice. Status saves and email retries preserve the page; creating a service ticket returns to latest records. Under concurrent inserts/deletions, cursor pages are not a frozen snapshot and can become empty; Latest records recovers without scanning the whole collection. No total-count query, arbitrary page jump or N+1 record lookup was added. Existing legacy fields and creation timestamps are not migrated.
+
+Public shop/inventory/filter/search/cart/checkout/homepage queries and rendering are unchanged. Dashboard aggregate/recent-five queries also stay unchanged. Admin inventory pagination remains deferred because its existing partial-text filters need a separate design. Source regressions cover tied timestamps, forward/back traversal past 50 records, removed anchors, malformed cursors and edit return URLs; they were added, not executed in this update. Source/whitespace reviewed and hashes confirmed all 164 public/shared source files unchanged relative to the start of this change. Build/lint/typecheck/browser and live Firestore/index/authorized interaction verification remain pending an explicit request.
+
+References: [Firestore cursors](https://firebase.google.com/docs/firestore/query-data/query-cursors), [default document-ID index ordering](https://firebase.google.com/docs/firestore/query-data/index-overview).
 
 ## 12. Homepage service and Game Zone artwork
 

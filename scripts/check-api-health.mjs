@@ -134,6 +134,11 @@ try {
     assert.equal(response.status, 401);
     noStore(response);
   });
+  await check("Stock reservation worker rejects unauthorized release attempts", async () => {
+    const response = await request("/api/internal/checkout-reservations");
+    assert.equal(response.status, 401);
+    noStore(response);
+  });
   await check("Unversioned uploaded images reject before database access", async () => {
     for (const path of ["/api/inventory/fixture/image", "/api/banners/fixture/image", "/api/franchise/fixture/image", "/api/homepage-images/zone-ps5"]) {
       const response = await request(path);

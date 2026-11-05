@@ -13,6 +13,7 @@
 - [QA and security audit, 2026-11-03](QA_SECURITY_AUDIT_2026-11-03.md): findings, local test results, priorities and live-provider verification limits.
 - [Security operations](SECURITY_OPERATIONS.md): shared protection, temporary TTL setup, admin history, readiness and release checks.
 - [Cart and Razorpay test setup](RAZORPAY_SETUP.md): test keys, webhook configuration, verification and live-payment limits.
+- [Stock reservation flow](STOCK_RESERVATIONS.md): isolated test stock holds, verified payment idempotency, expiry worker setup, late-payment review and live-launch gates.
 - [Gmail notification setup](EMAIL_SETUP.md): backend order/shipping templates, App Password settings, duplicate protection, admin tracking and required scheduled retries. Current payment flow remains test-only.
 - [Privacy policy publication record](PRIVACY_POLICY.md): public policy, checkout consent behavior and remaining business/legal checks.
 
@@ -30,6 +31,8 @@ npx playwright install chromium && npm run test:e2e
 ```
 
 ## Admin dashboard
+
+Admin pagination follow-up, 5 November 2026: /admin/orders and /admin/services now use private Firestore cursor queries showing 20 records with one lookahead. Newer/Older/Latest links preserve stable createdAt + document-ID ordering, and edits/retries retain the current page. This removes the service list's full collection read and the orders screen's latest-50 navigation ceiling. Dashboard aggregate/latest-five queries and all public inventory/shop/filter/cart/checkout paths remain unchanged. No exact collection totals or arbitrary numbered page jumps are claimed. See FIREBASE_SETUP.md for limits and verification status.
 
 Availability update, 5 November 2026: Active and Out of stock inventory is public. Only Active items with positive stock can be purchased; out-of-stock and zero-stock active items show an Out of stock label instead of Add to cart and block existing-cart checkout. Drafts and PC-component categories stay hidden. Product image routes use the same publication boundary so sold-out artwork remains visible. Shop/detail schema availability follows purchase eligibility. This supersedes older in-stock-only visibility statements below; no live inventory is rewritten.
 

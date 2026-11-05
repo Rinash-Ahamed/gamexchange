@@ -2,6 +2,8 @@
 
 ## Implemented
 
+- Stock reservation follow-up, 5 November 2026: new checkout transactions hold isolated test stock for ten minutes and captured-payment transactions consume it once with a permanent payment-ID claim. Expiry requires gateway reconciliation through the separate protected reservation worker; configure its every-minute scheduler before expecting automatic release. Very late captures without remaining capacity become payment review, not fulfilment. Actual inventory stays unchanged and live keys remain rejected. Historical pending orders without holds require review if captured. See [stock reservation details and verification limits](STOCK_RESERVATIONS.md). This supersedes statements below that a sandbox quote has no reservation; it is still not a real-stock reservation.
+
 - Customer checkout now requires server-verified Google sign-in and validated Indian delivery details. Customer UID/email and recipient name, phone and address are saved with each new sandbox order and visible under protected Admin > Test orders. Customer verification is owner-bound; webhook verification is unchanged. Enable Firebase Google Authentication and authorized domains as described in FIREBASE_SETUP.md. Use sample shipping details for sandbox tests. This is not courier integration, delivery coverage validation, shipping pricing or live payment activation.
 
 - Add to cart on the shop grid and both homepage shelf presentations. A navigation cart icon shows quantity on desktop and mobile. The themed `/cart` page supports multiple products, stock-aware quantity controls, removal, unavailable-item warnings and one combined WhatsApp enquiry.
@@ -60,7 +62,7 @@ In Razorpay Test Mode:
 - A pending verification keeps the cart and offers verification retry, not another payment. If the browser closes, webhooks can still mark the saved test record paid; the cart is not automatically cleared in that closed browser. Retain the Razorpay reference and check Test orders rather than paying again.
 - Verification retry state is memory-only; it does not survive a full refresh. There is not yet a customer order-history/status page. Webhook reconciliation and the admin screen are the recovery path for sandbox tests.
 - An uncertain gateway order creation remains `creating` for inspection rather than automatically issuing duplicate gateway orders. This status alone is never proof of payment. Manual gateway reconciliation of uncertain creates is not automated.
-- The cart itself persists independently; local price displays may be stale until refresh, but the server rejects mismatched checkout totals. The snapshot is a test quote, not a reservation. Test order success does not imply that stock is held.
+- The cart itself persists independently; local price displays may be stale until refresh, but the server rejects mismatched checkout totals. The order holds isolated test capacity, not actual inventory. Browser cart contents alone are not a hold. See STOCK_RESERVATIONS.md before testing expiry or late payments.
 - The existing limiter/replay/proxy limitations documented in `ARCHITECTURE_REVIEW.md` still apply. Abuse controls are not yet distributed. No automatic retention cleanup is installed for sandbox order records.
 
 ## Before any live-payment implementation

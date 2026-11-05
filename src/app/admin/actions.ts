@@ -1,4 +1,5 @@
 "use server";
+import { recordPageFormLocation, recordPageHref } from "@/lib/admin/record-cursor";
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -175,13 +176,14 @@ export async function createServiceAction(formData: FormData) {
 
 export async function updateServiceAction(formData: FormData) {
   const actor = await requireAdmin();
+  const location = recordPageFormLocation("services", formData);
   const parsed = serviceUpdateSchema.safeParse(formTextFields(formData, ["id", "status", "estimatedCost", "notes"]));
-  if (!parsed.success) redirect("/admin/services?error=invalid");
+  if (!parsed.success) redirect(recordPageHref("services", location, { error: "invalid" }));
   try { await updateServiceRecord(parsed.data.id, parsed.data, actor); }
   catch {
     console.error("[admin] Service update could not be confirmed.");
-    redirect("/admin/services?error=save");
+    redirect(recordPageHref("services", location, { error: "save" }));
   }
   refreshAdminData("services");
-  redirect(`/admin/services?notice=updated&saved=${Date.now()}`);
+  redirect(`${recordPageHref("services", location, { notice: "updated", saved: String(Date.now()) })}#service-list`);
 }

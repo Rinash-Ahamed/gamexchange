@@ -3,7 +3,9 @@ import { ClipboardPlus, Save } from "lucide-react";
 import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
 import { adminButtonClass, adminInputClass, adminLabelClass } from "@/components/admin/styles";
 import { formatINR } from "@/data/products";
-import { listServiceRecords } from "@/lib/admin/db";
+import { readAdminRecordPage } from "@/lib/admin/record-pages";
+import type { RecordPageInput } from "@/lib/admin/record-cursor";
+import { RecordPagination, RecordPageFields } from "@/components/admin/RecordPagination";
 import { requireAdmin } from "@/lib/admin/auth";
 import { formatAdminDate, titleCaseStatus } from "@/lib/admin/format";
 import { serviceStatuses } from "@/lib/admin/types";
@@ -12,9 +14,11 @@ import { AdminNotice } from "@/components/admin/AdminNotice";
 
 export const metadata: Metadata = { title: "Customer service records", robots: { index: false, follow: false } };
 
-export default async function ServicesPage({ searchParams }: { searchParams: Promise<{ notice?: string; error?: string; ticket?: string; saved?: string }> }) {
+export default async function ServicesPage({ searchParams }: { searchParams: Promise<RecordPageInput & { notice?: string; error?: string; ticket?: string; saved?: string }> }) {
   await requireAdmin();
-  const [records, query] = await Promise.all([listServiceRecords(), searchParams]);
+  const query = await searchParams;
+  const page = await readAdminRecordPage("services", query);
+  const records = page.items;
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -44,10 +48,11 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
         </ConfirmSubmit>
       </details>
 
-      <section className="mt-8" aria-labelledby="service-list">
+      {page.invalid && <p role="status" className="mt-3 text-sm text-muted">That page link is invalid. Showing the latest records.</p>}
+      <section className="mt-8 scroll-mt-24" aria-labelledby="service-list">
         <div className="flex items-center justify-between gap-4">
           <h2 id="service-list" className="font-display text-xl font-bold uppercase">All records</h2>
-          <p className="text-sm text-muted">{records.length} {records.length === 1 ? "record" : "records"}</p>
+          <p className="text-sm text-muted">Latest first</p>
         </div>
 
         {records.length ? (
@@ -69,6 +74,7 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
 
                 <ConfirmSubmit submitAction={updateServiceAction} title="Update service record?" confirmLabel="Update record" cancelLabel="Keep editing" intent="primary" message={`Save the new status, estimated cost and notes for ${record.ticketNumber} (${record.customerName})?`} className="mt-5 grid gap-3 border-t border-line pt-5 sm:grid-cols-2 xl:grid-cols-[12rem_10rem_minmax(0,1fr)_auto] sm:items-end">
                   <input type="hidden" name="id" value={record.id} />
+                  <RecordPageFields location={page.location} />
                   <label><span className={adminLabelClass}>Status</span><select name="status" defaultValue={record.status} className={adminInputClass}>{serviceStatuses.map((status) => <option key={status} value={status}>{titleCaseStatus(status)}</option>)}</select></label>
                   <label><span className={adminLabelClass}>Estimated cost</span><input name="estimatedCost" type="number" min="0" defaultValue={record.estimatedCost} required className={adminInputClass} /></label>
                   <label><span className={adminLabelClass}>Internal notes</span><input name="notes" maxLength={4000} defaultValue={record.notes} className={adminInputClass} /></label>
@@ -77,7 +83,8 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
               </article>
             ))}
           </div>
-        ) : <p className="mt-4 rounded-2xl border border-dashed border-line-strong p-10 text-center text-muted">No service records yet.</p>}
+        ) : <p className="mt-4 rounded-2xl border border-dashed border-line-strong p-10 text-center text-muted">{page.location.after || page.location.before ? "No records on this page. Return to the latest records." : "No service records yet."}</p>}
+        <RecordPagination scope="services" location={page.location} newer={page.newer} older={page.older} count={records.length} />
       </section>
     </div>
   );

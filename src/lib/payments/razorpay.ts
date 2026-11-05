@@ -22,7 +22,7 @@ export function validSignature(payload: string, signature: string, secret: strin
 }
 
 export const gatewayOrderSchema = z.object({ id: z.string().regex(/^order_[a-zA-Z0-9]+$/), amount: z.number().int(), currency: z.literal("INR"), receipt: z.string(), status: z.string() });
-export const gatewayPaymentSchema = z.object({ id: z.string().regex(/^pay_[a-zA-Z0-9]+$/), order_id: z.string(), amount: z.number().int(), currency: z.string(), status: z.string(), amount_refunded: z.number().int().default(0) });
+export const gatewayPaymentSchema = z.object({ id: z.string().regex(/^pay_[a-zA-Z0-9]+$/), order_id: z.string(), amount: z.number().int(), currency: z.string(), status: z.string(), amount_refunded: z.number().int().nonnegative() });
 
 /** Server-only REST calls. Provider error bodies and credentials are never sent to clients. */
 export async function razorpayRequest(path: string, body?: object): Promise<unknown> {
