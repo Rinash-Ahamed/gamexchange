@@ -28,6 +28,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" data-theme="dark" data-scroll-behavior="smooth" suppressHydrationWarning className={`${chakra.variable} ${inter.variable}`}>
+      <head>
+        <link rel="preload" as="image" href="/brand/gamexchange-logo-360.webp" fetchPriority="high" />
+      </head>
       <body>
         <a id="skip-to-content" href="#main" className="sr-only z-[60] rounded-full bg-fill px-4 py-2 text-accent-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
           Skip to content

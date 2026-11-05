@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Eye, EyeOff } from "lucide-react";
 import { AdminNotice } from "./AdminNotice";
 import { useEffect, useState, type FormEvent } from "react";
 import { FirebaseError } from "firebase/app";
@@ -50,6 +51,7 @@ function errorMessage(error: unknown) {
 
 export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boolean }) {
   const [email, setEmail] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [stage, setStage] = useState<"password" | "reset" | "enroll" | "code">("password");
   const [resetCooldown, setResetCooldown] = useState(false);
   const [resolver, setResolver] = useState<MultiFactorResolver | null>(null);
@@ -79,6 +81,7 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
       setQr("");
       setFactorUid("");
       setStage("password");
+      setShowPassword(false);
       setError("");
       setNotice("");
       setBusy(false);
@@ -97,6 +100,7 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
     if (busy || !configured) return;
     const form = event.currentTarget;
     const data = new FormData(form);
+    setShowPassword(false);
     setAttempt((current) => current + 1);
     setError("");
     setNotice("");
@@ -183,7 +187,12 @@ export function FirebaseAdminLogin({ serverConfigured }: { serverConfigured: boo
               </div>
               {stage === "password" && <div>
                 <label htmlFor="admin-password" className={adminLabelClass}>Password</label>
-                <input id="admin-password" name="password" type="password" autoComplete="current-password" required className={adminInputClass} />
+                <div className="relative">
+                  <input id="admin-password" name="password" type={showPassword ? "text" : "password"} autoComplete="current-password" required className={`${adminInputClass} pr-12`} />
+                  <button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? "Hide password" : "Show password"} aria-controls="admin-password" aria-pressed={showPassword} className="absolute inset-y-0 right-0 grid w-11 place-items-center rounded-r-lg text-muted hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue">
+                    {showPassword ? <EyeOff className="size-4" aria-hidden /> : <Eye className="size-4" aria-hidden />}
+                  </button>
+                </div>
               </div>}
             </>
           ) : (

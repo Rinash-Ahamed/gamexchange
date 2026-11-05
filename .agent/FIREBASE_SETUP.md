@@ -163,6 +163,8 @@ The first admin visit copies the current five FAQs from `src/data/faq.ts` to `se
 
 ## 10. Shop browsing and inventory details
 
+Availability update on 5 November 2026: the public inventory query now includes Active and Out of stock statuses. Sold-out listings/photos/details remain visible; Active with stock >0 is required to purchase. The cart blocks sold-out lines, the server retains direct active/stock validation, and Draft/PC-component listings stay private. Public image endpoints use the same visibility predicate without requiring stock. No record migration, new rules, new index or live data change was performed. The public-product cache key changed to pick up the new boundary. Older in-stock-only descriptions in this guide are superseded by this behavior.
+
 Public product details are available at `/products/[id]` from shop cards, homepage product links and cart names. They use the same cached active, in-stock, non-PC catalogue as the shop, never private inventory lookups. Supply accurate product details in the inventory description, including package contents and condition; absent descriptions/optional fields are not invented. Inventory/category saves invalidate detail pages too. Existing image uploads and saved discount prices work without new configuration, collections or indexes.
 
 The shop has Games, Consoles and Accessories departments in GamexChange's own theme. In inventory, select **Shop section**, a category, platform and condition, then upload your product image. Existing products without an explicit section are classified from their category when displayed, without rewriting stored data. The admin platform suggestions normalise common PS4/PS5 aliases; custom platform names remain supported.

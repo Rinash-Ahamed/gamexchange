@@ -3,6 +3,7 @@ import { getAdminSession } from "@/lib/admin/auth";
 import { getInventoryItem } from "@/lib/admin/db";
 import { readInventoryImage } from "@/lib/admin/inventory-images";
 import { inventoryPhotos } from "@/lib/inventory-photos";
+import { isPublicInventory } from "@/lib/product-availability";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   if (!item) return notFound();
   const photo = inventoryPhotos(item).find((entry) => entry.imageStoragePath && request.nextUrl.searchParams.get("v") === entry.imageVersion);
   if (!photo) return notFound();
-  const published = item.status === "active" && item.stock > 0;
+  const published = isPublicInventory(item);
   if (!published && !await getAdminSession()) return notFound();
   try {
     const data = await readInventoryImage(photo);

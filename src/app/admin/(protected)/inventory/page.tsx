@@ -45,7 +45,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
   return (
     <div className="mx-auto max-w-7xl">
       <h1 className="font-display text-2xl font-bold uppercase sm:text-3xl">Inventory</h1>
-      <p className="mt-2 text-muted">Browse by category. Open Edit only when you need to make a change. Active products with stock appear in the public shop.</p>
+      <p className="mt-2 text-muted">Browse by category. Active products with stock can be purchased. Out-of-stock products stay visible without a purchase option; drafts stay hidden.</p>
 {notice && notices[notice] && <AdminNotice eventKey={query}>{notices[notice]}</AdminNotice>}
       {error && <AdminNotice variant="error" eventKey={query}>{errors[error] ?? "Could not save this change. Please try again."}</AdminNotice>}
 
@@ -54,7 +54,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
           <span className="flex items-center gap-3"><PackagePlus className="size-5 text-accent-text" aria-hidden />Add inventory item</span>
           <ChevronDown className="size-5 shrink-0 transition-transform group-open:rotate-180" aria-hidden />
         </summary>
-        <ConfirmSubmit submitAction={createInventoryAction} title="Create inventory item?" confirmLabel="Create item" cancelLabel="Keep editing" intent="primary" message="Add this item to inventory? If its status is Active and stock is above zero, it will also appear in the public shop." className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-2 xl:grid-cols-4">
+        <ConfirmSubmit submitAction={createInventoryAction} title="Create inventory item?" confirmLabel="Create item" cancelLabel="Keep editing" intent="primary" message="Add this item to inventory? Active and Out of stock items appear in the public shop. Only Active items with stock can be purchased; drafts stay hidden." className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-2 xl:grid-cols-4">
           <InventoryFields categories={categories} />
           <div className="col-span-full flex justify-end"><button type="submit" className={adminButtonClass}>Create item</button></div>
         </ConfirmSubmit>
@@ -71,17 +71,17 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
               <ul className="metal divide-y divide-line overflow-hidden rounded-2xl">
                 {group.items.map((item) => (
                   <li key={`${item.id}:${item.updatedAt}`} className="min-w-0 p-3 sm:p-4">
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div className="min-w-0 flex-1 basis-56">
+                    <div className="grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_37rem]">
+                      <div className="min-w-0">
                         <p className="break-all text-xs font-semibold uppercase tracking-wider text-accent-text">{item.sku}</p>
                         <h4 className="mt-1 break-words font-display text-lg font-bold uppercase">{item.name}</h4>
                         <p className="mt-1 text-xs text-muted">{item.platform} · {item.condition} · Updated {formatAdminDate(item.updatedAt)}</p>
                       </div>
-                      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                        <ProductPrice product={item} className="text-lg" />
-                        <ConditionBadge condition={item.condition} />
-                        <p className="text-sm text-muted">Stock: <strong className="text-ink">{item.stock}</strong></p>
-                        <span className="rounded-full border border-line-strong bg-surface px-3 py-1 text-xs font-semibold">{titleCaseStatus(item.status)}</span>
+                      <div className="grid min-w-0 grid-cols-2 items-start gap-3 sm:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_5rem_7rem_6rem]">
+                        <div className="min-w-0"><ProductPrice product={item} className="text-lg" /></div>
+                        <div className="min-w-0"><ConditionBadge condition={item.condition} /></div>
+                        <p className="min-w-0 text-sm tabular-nums text-muted">Stock: <strong className="text-ink">{item.stock}</strong></p>
+                        <div className="min-w-0"><span className="inline-flex max-w-full rounded-full border border-line-strong bg-surface px-3 py-1 text-xs font-semibold">{titleCaseStatus(item.status)}</span></div>
                         <ConfirmSubmit submitAction={deleteInventoryAction} title="Delete inventory item?" message={`Delete ${item.name} (${item.sku}) from inventory and the public shop? This cannot be undone.`}>
                           <input type="hidden" name="id" value={item.id} /><button type="submit" aria-label={`Delete ${item.name} (${item.sku})`} className={`${adminGhostButtonClass} text-danger hover:border-danger`}><Trash2 className="mr-2 size-4" aria-hidden />Delete</button>
                         </ConfirmSubmit>

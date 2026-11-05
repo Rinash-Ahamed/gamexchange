@@ -16,6 +16,7 @@ import { isPcComponentCategory, normalizeCondition, normalizePlatform } from "@/
 import { inventoryCategories, type InventoryCategory, type DashboardStats, type InventoryItem, type ServiceRecord, type ServiceStatus } from "./types";
 import { appendAudit, type AuditActor } from "./audit";
 import { inventoryPhotos, inventoryPhotoSource } from "@/lib/inventory-photos";
+import { isPublicInventory } from "@/lib/product-availability";
 
 const INVENTORY_COLLECTION = "inventory";
 const INVENTORY_SKUS_COLLECTION = "inventorySkus";
@@ -164,12 +165,12 @@ export async function getInventoryItem(id: string): Promise<InventoryItem | null
 
 export async function listPublicInventory() {
   const [snapshot, categories] = await Promise.all([
-    database().collection(INVENTORY_COLLECTION).where("status", "==", "active").get(),
+    database().collection(INVENTORY_COLLECTION).where("status", "in", ["active", "out-of-stock"]).get(),
     categoryRegistry().get().then((document) => storedCategories(document.data())),
   ]);
   return snapshot.docs
     .map((doc) => resolveInventoryCategory(inventoryFromDocument(doc), categories))
-    .filter((item) => item.status === "active" && item.stock > 0 && !isPcComponentCategory(item.category))
+    .filter(isPublicInventory)
     .toSorted((a, b) => Number(b.featured) - Number(a.featured) || b.updatedAt.localeCompare(a.updatedAt));
 }
 
@@ -203,6 +204,7 @@ async function readPublicProducts(): Promise<Product[]> {
     createdAt: item.createdAt,
     price: item.price,
     stock: item.stock,
+    status: item.status,
     tradeInVoucher: item.tradeInVoucher,
     tradeInCash: item.tradeInCash,
     image: { src: item.imageSrc, width: item.imageWidth, height: item.imageHeight },
@@ -212,7 +214,7 @@ async function readPublicProducts(): Promise<Product[]> {
 }
 
 export const listPublicProducts = unstable_cache(readPublicProducts,
-  ["public-products-v6", process.env.FIREBASE_PROJECT_ID ?? "demo", process.env.FIREBASE_DATABASE_ID ?? "(default)"],
+  ["public-products-v7", process.env.FIREBASE_PROJECT_ID ?? "demo", process.env.FIREBASE_DATABASE_ID ?? "(default)"],
   { revalidate: 60, tags: [PUBLIC_PRODUCTS_TAG] });
 
 export async function createInventoryItem(input: InventoryInput, actor: AuditActor) {

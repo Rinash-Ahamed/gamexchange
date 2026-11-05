@@ -8,6 +8,7 @@ import { normalizePlatform, shopSections } from "@/data/catalog";
 import { availableCatalog, emptyCatalogFilters, filterCatalog, type CatalogFilters } from "@/lib/catalog";
 import { catalogSummary } from "@/lib/catalog-summary";
 import { paginate } from "@/lib/pagination";
+import { canPurchaseProduct } from "@/lib/product-availability";
 import { productConditionSchema, productHref } from "@/lib/product-links";
 
 export const metadata: Metadata = {
@@ -41,7 +42,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         url: new URL(productHref(p.id), site.url).href,
         image: p.image.src,
         itemCondition: productConditionSchema(p.condition),
-        offers: { "@type": "Offer", priceCurrency: "INR", price: p.price, seller: { "@type": "Organization", name: site.name } },
+        offers: { "@type": "Offer", priceCurrency: "INR", price: p.price, availability: canPurchaseProduct(p) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock", seller: { "@type": "Organization", name: site.name } },
       },
     })),
   };

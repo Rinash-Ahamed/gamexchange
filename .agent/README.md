@@ -28,6 +28,8 @@ npx playwright install chromium && npm run test:e2e
 
 ## Admin dashboard
 
+Availability update, 5 November 2026: Active and Out of stock inventory is public. Only Active items with positive stock can be purchased; out-of-stock and zero-stock active items show an Out of stock label instead of Add to cart and block existing-cart checkout. Drafts and PC-component categories stay hidden. Product image routes use the same publication boundary so sold-out artwork remains visible. Shop/detail schema availability follows purchase eligibility. This supersedes older in-stock-only visibility statements below; no live inventory is rewritten.
+
 The protected admin area is available at `/admin/login`. It manages live storefront inventory and private customer service records in Cloud Firestore through the server-only Firebase Admin SDK.
 
 Use `/admin/categories` to add or rename shop categories and delete unused ones. Inventory uses a required category dropdown. Existing category names are imported automatically; renames follow linked products. Categories with products cannot be deleted until those products are reassigned. Public shop filters include only categories with active, in-stock products.

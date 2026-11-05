@@ -54,6 +54,7 @@ export function InventoryImageField({ item }: { item?: InventoryItem }) {
           }} />
       </label>
       <p id={hintId} className="mt-2 text-xs leading-5 text-muted">Up to 5 photos. JPG, PNG or WebP, 300 to 4096 px per side; new files up to 4 MB combined per save. First image is the cover. Choose multiple files together; choosing again replaces unsaved selections. Changes apply when you save the item.</p>
+      <p className="mt-1 text-xs leading-5 text-muted">Portrait, square and landscape photos fit inside the same shop-card frame without cropping. Keep the product centred with minimal empty space around it.</p>
       {error && <p role="alert" className="mt-2 text-xs text-danger">{error}</p>}
       <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
         {photos.map((photo, index) => <li key={photo.key} className="min-w-0 rounded-xl border border-line-strong bg-surface p-2">

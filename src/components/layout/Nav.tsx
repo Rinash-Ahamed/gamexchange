@@ -42,7 +42,7 @@ export function Nav() {
       {/* Top bar: floating glass pill on desktop, slim brand bar on mobile */}
       <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 sm:px-5 sm:pt-4">
         <div className={`glass-nav pointer-events-auto flex w-full items-center justify-between gap-3 rounded-full py-1.5 pl-5 pr-1.5 transition-[max-width,box-shadow] duration-500 ease-out [box-shadow:var(--shadow-card)] ${compact ? "max-w-[62rem]" : "max-w-6xl"}`}>
-          <Wordmark />
+          <Wordmark primary />
 
           <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
             {navItems.map((item) => {

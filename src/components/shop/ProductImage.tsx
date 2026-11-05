@@ -31,7 +31,7 @@ export function ProductImage({ product, priority = false, eager = false, sizes, 
       {...imageLoading(priority ? "critical" : eager ? "visible" : "deferred")}
       onError={() => setFailedSource(product.image.src)}
       quality={85}
-      className={presentation === "catalog" ? "size-full object-contain" : "themed-img size-full object-contain [filter:drop-shadow(0_26px_26px_var(--prod-shadow))] transition-transform duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-[1.04]"}
+      className={presentation === "catalog" ? "block size-full min-h-0 min-w-0 max-h-full max-w-full shrink-0 object-contain object-center" : "themed-img size-full object-contain [filter:drop-shadow(0_26px_26px_var(--prod-shadow))] transition-transform duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-[1.04]"}
     />
   );
 }

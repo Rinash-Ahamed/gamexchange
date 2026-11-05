@@ -508,7 +508,7 @@ html,
   height: auto;
   margin-top: 0.75rem;
   opacity: 0;
-  animation: boot-wordmark-in 500ms var(--ease-out-expo) 420ms both;
+  /* Branding is visible immediately; reserve animated entrances for decoration. */
 }
 
 .boot-progress {

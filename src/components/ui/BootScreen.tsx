@@ -122,11 +122,12 @@ export function BootScreen() {
           <Image src="/brand/gamexchange-mark.png" alt="" width={256} height={256} {...imageLoading("visible")} className="boot-mark" />
         </div>
         <Image
-          src="/brand/gamexchange-logo-900.png"
+          src="/brand/gamexchange-logo-360.webp"
           alt="GameXchange"
-          width={900}
-          height={368}
+          width={360}
+          height={147}
           {...imageLoading("visible")}
+          unoptimized
           className="boot-wordmark"
         />
 

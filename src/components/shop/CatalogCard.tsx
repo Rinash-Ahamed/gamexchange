@@ -11,7 +11,7 @@ export const CatalogCard = memo(function CatalogCard({ product, priority = false
   return <article className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-line-strong bg-surface transition-colors hover:border-blue" aria-labelledby={`catalog-${product.id}`}>
     <Link href={productHref(product.id)} prefetch={false} aria-label={`View ${product.name} details`} className="absolute inset-0 z-10 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[var(--focus-ring)]" />
     <div className="flex flex-wrap items-center gap-1.5 px-2.5 pt-2.5"><ConditionBadge condition={product.condition} /><DiscountBadge product={product} /></div>
-    <div className="relative mx-2 mt-2 flex h-36 items-center justify-center overflow-hidden rounded-xl bg-surface-2 p-2 sm:h-40 2xl:h-44">
+    <div className="relative mx-2 mt-2 flex h-36 min-w-0 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-2 p-2 sm:h-40 2xl:h-44">
       <ProductImage product={product} priority={priority} eager={eager} presentation="catalog" sizes="(min-width: 1280px) 220px, (min-width: 1024px) 24vw, (min-width: 600px) 30vw, 45vw" />
     </div>
     <div className="flex flex-1 flex-col gap-1.5 px-2.5 pb-2.5 pt-2">

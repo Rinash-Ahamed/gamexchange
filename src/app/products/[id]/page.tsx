@@ -12,6 +12,7 @@ import { ProductPrice, DiscountBadge } from "@/components/shop/ProductPrice";
 import { ConditionBadge } from "@/components/shop/ConditionBadge";
 import { CatalogCard } from "@/components/shop/CatalogCard";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { canPurchaseProduct } from "@/lib/product-availability";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ id: string }> };
@@ -42,7 +43,7 @@ export default async function ProductDetailsPage({ params }: Props) {
     description: product.description || `${product.name} for ${product.platform}. Condition: ${product.condition}.`,
     category: product.category, itemCondition: productConditionSchema(product.condition),
     ...(product.brand ? { brand: { "@type": "Brand", name: product.brand } } : {}),
-    offers: { "@type": "Offer", url: new URL(productHref(product.id), site.url).href, price: product.price, priceCurrency: "INR", availability: "https://schema.org/InStock", itemCondition: productConditionSchema(product.condition), seller: { "@type": "Organization", name: site.name } },
+    offers: { "@type": "Offer", url: new URL(productHref(product.id), site.url).href, price: product.price, priceCurrency: "INR", availability: canPurchaseProduct(product) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock", itemCondition: productConditionSchema(product.condition), seller: { "@type": "Organization", name: site.name } },
   };
 
   return <main className="mx-auto max-w-7xl px-5 pb-14 pt-28 sm:px-8 sm:pt-32">
@@ -55,8 +56,8 @@ export default async function ProductDetailsPage({ params }: Props) {
         <h1 id="product-title" className="mt-2 break-words font-display text-3xl font-bold leading-tight sm:text-4xl">{product.name}</h1>
         {product.edition && <p className="mt-2 text-sm text-muted">{product.edition}</p>}
         <div className="mt-5"><ProductPrice product={product} className="text-3xl sm:text-4xl" /></div>
-        <p className="mt-3 text-sm text-ok">Available in the shop</p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2"><AddToCartButton product={product} /><Link href="/cart" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-line-strong px-4 font-display text-xs font-semibold text-accent-text hover:border-blue">View cart</Link></div>
+        <p className={`mt-3 text-sm ${canPurchaseProduct(product) ? "text-ok" : "text-muted"}`}>{canPurchaseProduct(product) ? "Available in the shop" : "Out of stock. Not available to purchase."}</p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2"><AddToCartButton product={product} />{canPurchaseProduct(product) && <Link href="/cart" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-line-strong px-4 font-display text-xs font-semibold text-accent-text hover:border-blue">View cart</Link>}</div>
         <a href={whatsappUrl(message)} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent-text hover:underline"><MessageCircle className="size-4" aria-hidden />Ask about this product<span className="sr-only"> on WhatsApp, opens in a new tab</span></a>
         <p className="mt-2 text-xs leading-5 text-muted">Confirm package contents, condition and collection or delivery with the team. Adding to cart does not reserve stock. Online checkout is currently test-only.</p>
         <div className="mt-7 border-t border-line pt-5"><h2 className="font-display text-lg font-bold">Product description</h2><p className="mt-3 whitespace-pre-line break-words text-sm leading-7 text-muted">{product.description || "The team has not added a detailed description for this item yet. Ask us about its condition, included accessories and compatibility before ordering."}</p></div>

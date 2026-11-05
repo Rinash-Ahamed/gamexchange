@@ -9,6 +9,7 @@ export type Product = {
   /** Price in INR as listed on the live site. */
   price: number;
   stock?: number;
+  status?: "active" | "draft" | "out-of-stock";
   /** Trade-in figures as listed on the live site. Indicative only; confirmed in store. */
   tradeInVoucher: number;
   tradeInCash: number;
