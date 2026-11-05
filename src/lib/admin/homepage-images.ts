@@ -62,8 +62,9 @@ export async function saveHomepageImage(id: string, file: File | undefined, rese
       transaction.set(document(), { images, updatedAt: new Date().toISOString() });
     });
   } catch {
-    await removeAsset(uploaded?.path);
-    throw new Error("Could not save the image. Please try again.");
+    // Firestore may have committed before a connection failure. Preserve the new object.
+    if (uploaded) console.warn("Homepage image save unconfirmed; uploaded image retained for review.");
+    throw new Error("Could not confirm the image save. Refresh and check before trying again.");
   }
   await removeAsset(previous?.path);
 }

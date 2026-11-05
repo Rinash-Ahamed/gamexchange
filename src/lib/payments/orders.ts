@@ -1,6 +1,9 @@
 import "server-only";
 
 import { createHash } from "node:crypto";
+import { after } from "next/server";
+import { enqueueOrderEmail, dispatchOrderEmails } from "@/lib/orders/outbox";
+import type { OrderTracking } from "@/lib/orders/tracking";
 import { z } from "zod";
 import { firebaseFirestore } from "@/lib/firebase/firestore";
 import { isPcComponentCategory } from "@/data/catalog";
@@ -17,7 +20,7 @@ export const checkoutSchema = z.object({
   privacyConsent: checkoutPrivacyConsentSchema,
 }).refine((value) => new Set(value.items.map((item) => item.id)).size === value.items.length, "Duplicate products are not allowed.");
 export const verifySchema = z.object({ requestId: z.uuid(), razorpay_order_id: z.string().regex(/^order_[a-zA-Z0-9]+$/), razorpay_payment_id: z.string().regex(/^pay_[a-zA-Z0-9]+$/), razorpay_signature: z.string().regex(/^[a-fA-F0-9]{64}$/) });
-export type TestOrder = {
+export type TestOrder = OrderTracking & {
   id: string; mode: "test"; keyId: string; fingerprint: string; status: "creating" | "created" | "paid";
   amount: number; currency: "INR"; items: { id: string; name: string; quantity: number; unitAmount: number }[];
   createdAt: string; updatedAt: string; razorpayOrderId?: string; paymentId?: string;
@@ -88,9 +91,14 @@ async function confirmCaptured(order: TestOrder, paymentId: string) {
       if (current.paymentId !== paymentId) throw new CheckoutError("This order has a different payment.", 409);
       return;
     }
-    transaction.update(ref, { status: "paid", paymentId, updatedAt: new Date().toISOString() });
+    const now = new Date().toISOString();
+    transaction.update(ref, { status: "paid", paymentId, paidAt: now, fulfillmentStatus: "Order Placed", history: [{ status: "Order Placed", at: now, actor: "payment-verification" }], updatedAt: now });
+    const paid: TestOrder = { ...current, status: "paid", paymentId, paidAt: now };
+    enqueueOrderEmail(transaction, paid, "confirmation");
+    enqueueOrderEmail(transaction, paid, "admin");
     // Sandbox orders deliberately do not reserve or decrement real inventory.
   });
+  after(() => dispatchOrderEmails(order.id));
   return { ok: true, mode: "test", reference: order.id };
 }
 

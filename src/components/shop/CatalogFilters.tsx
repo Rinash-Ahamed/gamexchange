@@ -9,6 +9,7 @@ export function CatalogFilters({ filters, groups, priceCeiling, update, clear }:
     <div className="flex items-center justify-between border-b border-line p-4"><h2 className="font-display text-lg font-bold">Filters</h2><button type="button" onClick={clear} className="min-h-11 px-1 text-xs font-semibold text-accent-text hover:underline">Reset</button></div>
     <div className="space-y-5 p-4">
       <label className="block"><span className="mb-2 block text-sm font-semibold">Sort results</span><select value={filters.sort} onChange={(event) => update({ sort: event.target.value as Filters["sort"] })} className={inputClass}>{Object.entries(catalogSorts).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
+      <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm"><input type="checkbox" checked={filters.hideOutOfStock} onChange={(event) => update({ hideOutOfStock: event.target.checked })} className="size-4 shrink-0 accent-[var(--fill)]" />Hide out-of-stock products</label>
       <fieldset className="border-t border-line pt-4"><legend className="pr-2 text-sm font-semibold">Price range</legend><div className="grid grid-cols-2 gap-2">
         <label><span className="mb-1 block text-xs text-muted">Minimum (₹)</span><input type="number" min="0" max="10000000" value={filters.min} onChange={(event) => update({ min: event.target.value })} placeholder="0" className={inputClass} /></label>
         <label><span className="mb-1 block text-xs text-muted">Maximum (₹)</span><input type="number" min="0" max="10000000" value={filters.max} onChange={(event) => update({ max: event.target.value })} placeholder="Any" className={inputClass} /></label>
@@ -22,7 +23,7 @@ export function CatalogFilters({ filters, groups, priceCeiling, update, clear }:
         }) : <p className="pb-3 text-xs leading-5 text-muted">{group.emptyMessage}</p>}
       </div></details>)}
       <label className="flex min-h-11 cursor-pointer items-center gap-2.5 border-t border-line pt-4 text-sm"><input type="checkbox" checked={filters.sale} onChange={(event) => update({ sale: event.target.checked })} className="size-4 accent-[var(--fill)]" />Discounted items only</label>
-      <p className="text-xs leading-5 text-muted">Counts reflect your other filters. Zero-count choices are unavailable. Only active, in-stock products are listed.</p>
+      <p className="text-xs leading-5 text-muted">Counts reflect your other filters. In-stock products appear first; out-of-stock products appear last and cannot be purchased.</p>
     </div>
   </div>;
 }

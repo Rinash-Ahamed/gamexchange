@@ -2,6 +2,9 @@
 
 ## Project documentation
 
+- [Production readiness audit, 5 November 2026](PRODUCTION_READINESS_2026-11-05.md): ranked findings, safe fixes, measured local results, release gates and unverified infrastructure.
+- [Isolated load-test runbook](LOAD_TESTING.md): guarded k6 profiles for 10/50/100/500/1000 VUs and separate authenticated sandbox checkout.
+
 - [Session context and current work](SESSION.md): read first when continuing development.
 - [Firebase setup](FIREBASE_SETUP.md): authentication, database, Storage and upload requirements.
 - [Performance audit](PERFORMANCE_AUDIT.md): applied optimizations, verification limits and follow-up measurements.
@@ -10,7 +13,7 @@
 - [QA and security audit, 2026-11-03](QA_SECURITY_AUDIT_2026-11-03.md): findings, local test results, priorities and live-provider verification limits.
 - [Security operations](SECURITY_OPERATIONS.md): shared protection, temporary TTL setup, admin history, readiness and release checks.
 - [Cart and Razorpay test setup](RAZORPAY_SETUP.md): test keys, webhook configuration, verification and live-payment limits.
-- [Gmail notification setup](EMAIL_SETUP.md): App Password and planned server-only mail settings; sending integration is still pending.
+- [Gmail notification setup](EMAIL_SETUP.md): backend order/shipping templates, App Password settings, duplicate protection, admin tracking and required scheduled retries. Current payment flow remains test-only.
 - [Privacy policy publication record](PRIVACY_POLICY.md): public policy, checkout consent behavior and remaining business/legal checks.
 
 These documents live in `.agent/`. Source paths and commands below are relative to the repository root, not this directory. The root [AGENTS.md](../AGENTS.md) directs coding agents here.
@@ -46,7 +49,7 @@ Inventory supports up to five ordered photos, with cover selection, preview, ear
 
 The consumer sidebar keeps sort, price inputs/sliders, condition, platforms and discounted-only choices. Categories appear when there are multiple subcategories, hardware brand when supplied, and game genre/format/player modes/age rating/release year only when stocked products provide the data. Edition/model remains searchable and visible on cards but is not a separate default filter. The minimum-discount dropdown was removed as redundant clutter; biggest-discount sorting remains. Optional inventory metadata is preserved. Selected facets remain removable even with no matching products. No fake stock, gameplay-hour guesses, preorder or PC-component offerings are added.
 
-Visitors can collect multiple products at `/cart`, change quantities, sign in with Google and enter Indian delivery details before Razorpay checkout. Cart checkout no longer links to WhatsApp. Enable the Firebase Google provider and authorized domains as described in FIREBASE_SETUP.md. Razorpay checkout is test-only and needs the three server environment values in `RAZORPAY_SETUP.md`. Admin > Test orders shows sandbox records with customer email and delivery details. Live keys are blocked; simulated orders do not change stock or create deliveries. Shipping rates, courier serviceability and finance email delivery are not implemented.
+Visitors can collect multiple products at `/cart`, change quantities, sign in with Google and enter Indian delivery details before Razorpay checkout. Cart checkout no longer links to WhatsApp. Enable the Firebase Google provider and authorized domains as described in FIREBASE_SETUP.md. Razorpay checkout is test-only and needs the three server environment values in `RAZORPAY_SETUP.md`. Admin > Test orders shows sandbox records, customer/delivery details, the four-stage internal tracking flow, history and email delivery records/retries. Backend customer/business confirmations and one shipping notification per order use Gmail SMTP; configure credentials and the scheduled worker in EMAIL_SETUP.md. Live keys are blocked; simulated orders do not change stock or create real deliveries. Shipping rates and courier serviceability are not implemented.
 
 Homepage promotions are managed at `/admin/banners`. Set `FIREBASE_STORAGE_BUCKET` for image uploads. Admins can preview, reorder, save drafts, publish up to five slides and replace or delete images. Upload requirements are shown in the editor. See the banner upload section of `FIREBASE_SETUP.md` for Storage setup and artwork sizes.
 
@@ -78,7 +81,7 @@ Admin login requires Firebase Authentication with Identity Platform, a verified 
 | Repair devices/faults, exchange options | `src/data/repair.ts` |
 | Reviews, FAQ | `src/data/reviews.ts`, `src/data/faq.ts` |
 | Enquiry delivery (currently pre-filled WhatsApp message) | `src/app/api/enquiry/route.ts` |
-| Rate limiting (in-memory; swap for Redis/Upstash when multi-instance) | `src/lib/rate-limit.ts` |
+| Rate limiting (shared Firestore in configured deployments, bounded memory for fixtures) | `src/lib/rate-limit.ts`, `src/lib/security-store.ts` |
 | Theme tokens (dark + light) | `src/app/globals.css` |
 
 The default theme follows the visitor's local time: light from 6:00 AM through 5:59 PM and dark from 6:00 PM through 5:59 AM. The navigation toggle stores an explicit light or dark preference that overrides the schedule.
@@ -106,7 +109,7 @@ Shared implementation helpers:
 - `src/lib/byte-cache.ts`: bounded immutable-byte LRU with concurrent-download coalescing. It must never cache admin authorization or image visibility.
 
 - Admin sessions are Firebase-issued, HTTP-only, same-site cookies with an eight-hour maximum and a server-enforced 15-minute idle timeout. The admin UI warns one minute before expiry, offers Stay signed in and synchronizes activity across tabs. Background requests do not extend the deadline. Firestore adminSessions stores per-cookie hashed session IDs, UID and timing metadata, not bearer tokens. Existing sessions without tracking records must sign in again. Server checks still enforce the UID allowlist, verified email, TOTP authentication and enrollment, account status, and revocation. Legacy environment passwords are no longer accepted.
-- Set `ENQUIRY_SECRET` (long random string) in production; it signs the single-use enquiry tokens. Without it a per-process fallback is used, so tokens won't survive restarts or multiple instances.
+- Set `ENQUIRY_SECRET` (at least 32 random characters) in production; it signs single-use enquiry tokens. Configured Firebase deployments fail closed without it. Only unconfigured fixtures use a per-process fallback.
 - Configured Firebase deployments use atomic Firestore rate limits and nonce consumption. Strong ENQUIRY_SECRET is required; shared-store failures fail closed. Unconfigured fixtures use bounded memory. Configure expiresAt TTL only for securityRateLimits/securityTokenUses; see SECURITY_OPERATIONS.md for costs, limits and staging checks.
 - The CSP still allows `script-src 'unsafe-inline'` (theme boot script, JSON-LD, Next inline scripts). Development also allows `unsafe-eval` for React and Turbopack debugging; production does not. Moving inline scripts to nonces is a known follow-up.
 - Enquiries are not stored: they end as a pre-filled WhatsApp message the customer sends.
@@ -119,7 +122,7 @@ Shared implementation helpers:
 
 Image loading is explicit through `src/lib/image-loading.ts`: critical = eager/high fetch priority, visible = eager, deferred = lazy. Choose by layout role, not client-only viewport branches during hydration. ESLint requires this policy on imported Next Image elements and disallows competing loading/priority/preload overrides. The primary hero and first shop product are critical, likely above-fold rows are eager, and lower content remains deferred. Banner slides are eager whenever mounted: the first is present in server HTML; remaining slides mount near the banner. Do not eagerly mount every below-fold image just to silence a warning. Existing page regression checks now include LCP/priority-loading console warnings; `tests/e2e/image-loading.spec.ts` covers the policy and banner transitions. Browser checks are still needed after layout or artwork changes because the actual LCP candidate depends on the viewport and content.
 
-Use `npm run build` in CI/hosting. Its postbuild step starts an isolated loopback production server with live Firebase/payments disabled and runs 14 fixture API/import checks, including checkout and anonymous readiness guards. A health-check failure fails the command. `/api/health` reports process liveness only; protected `/admin/health` and `/api/admin/readiness` add on-demand read-only dependency checks. Neither proves live payment readiness. Direct `next build` does not run npm lifecycle hooks. See `SECURITY_OPERATIONS.md` and `RAZORPAY_SETUP.md` for scope and limits.
+Use `npm run build` in CI/hosting. Its postbuild step starts an isolated loopback production server with live Firebase/payments disabled and runs 16 fixture API/import checks, including checkout, anonymous readiness, email-worker authorization and cheap image-version guards. A health-check failure fails the command. `/api/health` reports process liveness only; protected `/admin/health` and `/api/admin/readiness` add on-demand read-only dependency checks. Neither proves live payment readiness. Direct `next build` does not run npm lifecycle hooks. See `SECURITY_OPERATIONS.md` and `RAZORPAY_SETUP.md` for scope and limits.
 
 Node is pinned to 24.x. Deploy both package.json and package-lock.json. A scoped Firebase Admin > jwks-rsa > jose 5.10.0 override avoids the upstream CommonJS require of ESM-only jose 6 during server startup; do not edit node_modules manually. Postbuild includes a credential-free Firebase Admin import check with require(ESM) disabled. This import gate does not verify remote credentials, MFA or Firestore/Storage access. Revisit the compatibility override when upstream resolves the module-loading issue.
 

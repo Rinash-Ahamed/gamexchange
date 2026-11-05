@@ -8,6 +8,12 @@ Scope: homepage rendering, public catalogue/banner data, banner image API, anima
 
 ## Changes applied
 
+### Production-readiness audit, 5 November 2026
+
+See PRODUCTION_READINESS_2026-11-05.md for ranked findings and bounded local measurements, and LOAD_TESTING.md for unexecuted staging-only k6 profiles. Added allowlisted backend Server-Timing/request results, safe server error events, cheap pre-database image-version rejection, direct admin-dashboard authorization and reliable worker failure reporting. Ambiguous image commits now retain possibly referenced files rather than deleting them. No visual quality, motion, business rules or hosting/CPU configuration was changed.
+
+The isolated sequential diagnostic measured warm homepage full-response p95 95.1 ms and shop 31.4 ms, but first homepage request took 3299.5 ms. These exclude live Firebase/provider, image/browser and concurrency costs; they are not production latency/FPS guarantees. All-route JS/CSS chunk raw bytes stayed unchanged at 1,350,498. No before-change latency result exists. Global rate-limit contention, full-catalogue/admin collection reads, metadata read costs and real-image/cold-start behavior remain staging follow-ups.
+
 ### Catalogue payload follow-up, 2026-11-05
 
 Confirmed existing 20-card pagination, deferred lower-row covers, critical/eager initial row, memoized cards, deferred filter results and intent-only product prefetch. Added a non-mutating catalogue-summary projection before sending shop/cart/related-card props to clients: removes unused full descriptions and gallery arrays while keeping cover, pricing and every filter/search/sort field. Detail pages retain full product content. Shop ItemList structured data is now bounded to the initial filtered 20-product page, with the full result count retained, instead of serializing every product again. Memoized the page slice to avoid allocating it on unrelated UI updates. Image bytes, quality and photo limits are unchanged.

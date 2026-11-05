@@ -161,7 +161,10 @@ export async function saveBanner(id: string | undefined, fields: BannerFields, f
     if (oldPath) await removeImage(oldPath);
     return bannerId;
   } catch (error) {
-    if (uploaded) await removeImage(uploaded.storagePath);
+    // Only our explicit precondition errors prove the transaction did not commit.
+    // A timeout/disconnect can be reported after commit; deleting then breaks the saved image.
+    if (uploaded && error instanceof BannerError) await removeImage(uploaded.storagePath);
+    else if (uploaded) console.warn("Banner save unconfirmed; uploaded image retained for review.");
     throw error;
   }
 }

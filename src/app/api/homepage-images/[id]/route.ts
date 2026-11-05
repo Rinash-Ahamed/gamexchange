@@ -1,9 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { imageSlot, readHomepageImageAssets, readHomepageAsset } from "@/lib/admin/homepage-images";
+import { hasImageVersion } from "@/lib/image-request";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const missing = () => NextResponse.json({ error: "Image not found." }, { status: 404, headers: { "Cache-Control": "no-store" } });
+  if (!hasImageVersion(request.nextUrl)) return missing();
   const { id } = await params;
   if (!imageSlot(id)) return missing();
   try {

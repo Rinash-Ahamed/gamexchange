@@ -19,7 +19,10 @@ test.describe("responsive layout", () => {
         await expect(page.getByRole("navigation", { name: "Primary" }).filter({ visible: true })).toHaveCount(1);
       }
       await page.goto("/");
-      const stage = await page.locator(".hero-stage").boundingBox();
+      // Next may retain hidden streamed markup briefly alongside the active page.
+      const artwork = page.locator(".hero-stage").filter({ visible: true });
+      await expect(artwork).toHaveCount(1);
+      const stage = await artwork.boundingBox();
       expect(stage).not.toBeNull();
       // The hero art may bleed into page padding on wide screens, never past the viewport edge by more than the glow.
       expect(stage!.x + stage!.width).toBeLessThanOrEqual(w + 1);

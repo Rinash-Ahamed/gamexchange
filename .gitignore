@@ -4,6 +4,8 @@ next-env.d.ts
 *.tsbuildinfo
 playwright-report
 test-results
+tests/load/*.local.json
+tests/load/results/
 .env*.local
 data/*.sqlite
 data/*.sqlite-shm

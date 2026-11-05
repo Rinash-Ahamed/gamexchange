@@ -1,14 +1,15 @@
 import type { Product } from "@/data/products";
 import { gameFormats, genreSuggestions, isPcComponentCategory, normalizeCondition, normalizePlatform, platformSuggestions, playModeChoices, productConditions, productSection, type ShopSection } from "@/data/catalog";
 import { productDiscount } from "@/lib/pricing";
+import { canPurchaseProduct } from "@/lib/product-availability";
 
 export const catalogSorts = { featured: "Recommended", latest: "Newest arrivals", "price-asc": "Price: low to high", "price-desc": "Price: high to low", name: "Name: A to Z", "name-desc": "Name: Z to A", discount: "Biggest discount" } as const;
 export type CatalogSort = keyof typeof catalogSorts;
 export const catalogFacetKeys = ["platforms", "categories", "conditions", "brands", "genres", "formats", "editions", "playModes", "ageRatings", "years"] as const;
 export type CatalogFacetKey = typeof catalogFacetKeys[number];
-export type CatalogFilters = Record<CatalogFacetKey, string[]> & { section: ShopSection | "all"; q: string; min: string; max: string; sale: boolean; minDiscount: number; sort: CatalogSort };
+export type CatalogFilters = Record<CatalogFacetKey, string[]> & { section: ShopSection | "all"; q: string; min: string; max: string; sale: boolean; hideOutOfStock: boolean; minDiscount: number; sort: CatalogSort };
 export type CatalogFacet = { key: CatalogFacetKey; title: string; options: { value: string; count: number }[]; emptyMessage: string };
-export const emptyCatalogFilters: CatalogFilters = { section: "all", q: "", platforms: [], categories: [], conditions: [], brands: [], genres: [], formats: [], editions: [], playModes: [], ageRatings: [], years: [], min: "", max: "", sale: false, minDiscount: 0, sort: "featured" };
+export const emptyCatalogFilters: CatalogFilters = { section: "all", q: "", platforms: [], categories: [], conditions: [], brands: [], genres: [], formats: [], editions: [], playModes: [], ageRatings: [], years: [], min: "", max: "", sale: false, hideOutOfStock: false, minDiscount: 0, sort: "featured" };
 export function hasDiscount(product: Product) { return productDiscount(product) !== null; }
 export function availableCatalog(products: readonly Product[]) { return products.filter((product) => !isPcComponentCategory(product.category)); }
 function catalogMatcher(filters: CatalogFilters) {
@@ -16,6 +17,7 @@ function catalogMatcher(filters: CatalogFilters) {
   const min = filters.min.trim() === "" ? 0 : Math.max(0, Number(filters.min) || 0);
   const max = filters.max.trim() === "" ? Infinity : Math.max(0, Number(filters.max) || 0);
   return (product: Product) => {
+    if (filters.hideOutOfStock && !canPurchaseProduct(product)) return false;
     if (filters.section !== "all" && productSection(product) !== filters.section) return false;
     if (filters.platforms.length && !filters.platforms.includes(normalizePlatform(product.platform))) return false;
     if (filters.categories.length && !filters.categories.includes(product.category)) return false;
@@ -37,6 +39,8 @@ function catalogMatcher(filters: CatalogFilters) {
 export function filterCatalog(products: readonly Product[], filters: CatalogFilters) {
   const visible = products.filter(catalogMatcher(filters));
   return visible.toSorted((a, b) => {
+    const availability = Number(canPurchaseProduct(b)) - Number(canPurchaseProduct(a));
+    if (availability) return availability;
     switch (filters.sort) {
       case "latest": return (b.createdAt ?? "").localeCompare(a.createdAt ?? "");
       case "price-asc": return a.price - b.price;

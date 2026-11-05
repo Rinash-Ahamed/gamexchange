@@ -1,5 +1,13 @@
 # Security operations and release checks
 
+## 5 November 2026 audit update
+
+Current ranked findings and verification results are in PRODUCTION_READINESS_2026-11-05.md. The postbuild gate now runs 16 fixture checks. The latest npm scan reports 14 moderate affected-package entries overall, six in production, with zero high/critical entries reported. This supersedes older dependency counts below; no forced dependency upgrades/downgrades were made.
+
+Root firestore.rules and storage.rules now contain deny-all browser rules matching this app's backend-only data access. They have not been deployed or emulator-verified. Review the currently deployed policies and other apps using the same project before applying these templates. Firebase Authentication still works without client Firestore/Storage access. Server Admin SDK access bypasses these rules and must be restricted through IAM plus application authorization. Never treat adding a local rules file as proof that the remote database/bucket is secure.
+
+src/instrumentation.ts records sanitized unhandled-request event categories, not exception/request content. Critical API routes add Server-Timing and optional allowlisted operation/status/duration logs with PERFORMANCE_LOGGING=true. Default 5xx/queue-processing errors are logged without secrets or customer details. The email worker now returns 503 on query/processor persistence failure; SMTP rejection/uncertainty is still stored per job. Configure alerts/retention and inspect platform logs separately. These hooks do not install an external monitoring account or prove browser Web Vitals.
+
 ## Shared API protection
 
 With FIREBASE_PROJECT_ID configured, enquiry token issuance/submission, admin-session creation and checkout guards use atomic Firestore transactions in securityRateLimits. Valid signed enquiry nonces are consumed atomically in securityTokenUses, preventing replay across instances. Origin/content/body guards remain. ENQUIRY_SECRET must be a server-only random value of at least 32 characters and identical across instances. Invalid/missing signing configuration or failed shared storage returns a temporary failure, never silently switches to per-process enforcement.

@@ -3,10 +3,13 @@ import Link from "next/link";
 import { Boxes, CircleAlert, PackageCheck, Wrench, BadgeCheck } from "lucide-react";
 import { dashboardStats, listServiceRecords } from "@/lib/admin/db";
 import { formatAdminDate, titleCaseStatus } from "@/lib/admin/format";
+import { requireAdmin } from "@/lib/admin/auth";
 
 export const metadata: Metadata = { title: "Admin dashboard", robots: { index: false, follow: false } };
 
 export default async function AdminDashboardPage() {
+  // Layouts and pages can render concurrently; authorize before reading private records here too.
+  await requireAdmin();
   const [stats, recent] = await Promise.all([dashboardStats(), listServiceRecords(5)]);
   const cards = [
     { label: "Inventory items", value: stats.inventoryItems, icon: Boxes, tone: "text-accent-text" },

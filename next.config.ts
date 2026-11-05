@@ -45,7 +45,12 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  serverExternalPackages: ["firebase-admin"],
+  serverExternalPackages: ["firebase-admin", "nodemailer"],
+  outputFileTracingIncludes: {
+    "/api/checkout/*": ["./public/brand/gamexchange-logo-900.png"],
+    "/api/internal/order-emails": ["./public/brand/gamexchange-logo-900.png"],
+    "/admin/orders": ["./public/brand/gamexchange-logo-900.png"],
+  },
   experimental: {
     serverActions: { bodySizeLimit: "6mb" },
   },

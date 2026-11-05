@@ -8,7 +8,10 @@ test("Explore our spaces scrolls to the gallery, including repeated clicks", asy
   for (let attempt = 0; attempt < 2; attempt++) {
     await link.click();
     await expect(page).toHaveURL(/\/franchise#our-spaces$/);
-    await expect.poll(async () => page.locator("#our-spaces").evaluate((element) => Math.abs(element.getBoundingClientRect().top - parseFloat(getComputedStyle(element).scrollMarginTop)))).toBeLessThan(5);
+    await expect.poll(async () => page.locator("#our-spaces").evaluate((element) => {
+      const offset = parseFloat(getComputedStyle(element).scrollMarginTop) + parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop);
+      return Math.abs(element.getBoundingClientRect().top - offset);
+    })).toBeLessThan(5);
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   }
 });

@@ -1,11 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin/auth";
 import { getStoredBanner, readBannerImage } from "@/lib/admin/banners";
+import { hasImageVersion } from "@/lib/image-request";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!hasImageVersion(request.nextUrl)) return NextResponse.json({ error: "Image not found." }, { status: 404, headers: { "Cache-Control": "no-store" } });
   const { id } = await params;
   const banner = await getStoredBanner(id);
   const notFound = () => NextResponse.json({ error: "Image not found." }, { status: 404, headers: { "Cache-Control": "no-store" } });

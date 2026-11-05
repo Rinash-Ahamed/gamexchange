@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { stubImages } from "./helpers";
 
 const ROUTES = ["/", "/products", "/exchange", "/repair-service", "/game-zone", "/contact"];
-const EXTERNAL_HOSTS = ["wa.me", "www.instagram.com", "instagram.com", "maps.google.com", "www.google.com", "goo.gl", "maps.app.goo.gl", "www.facebook.com", "gamexchange.co.in", "docs.google.com", "g.co"];
+const EXTERNAL_HOSTS = ["wa.me", "www.instagram.com", "instagram.com", "maps.google.com", "www.google.com", "share.google", "goo.gl", "maps.app.goo.gl", "www.facebook.com", "gamexchange.co.in", "docs.google.com", "g.co"];
 
 test("every internal link resolves; external links use allowed hosts", async ({ page, request }) => {
   await stubImages(page);

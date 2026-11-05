@@ -20,6 +20,7 @@ const collection = () => db().collection("franchisePhotos");
 const marker = () => db().collection("settings").doc("franchisePhotos");
 const owned = /^franchise-images\/[a-f0-9-]+\.webp$/;
 const bytes = createByteCache(8 * 1024 * 1024);
+class FranchiseSaveRejected extends Error {}
 const defaults: FranchisePhoto[] = franchisePhotos.map((photo, index) => ({
   ...photo, id: `original-${index + 1}`, city: "", state: "", location: "", position: index + 1,
   status: "published", storagePath: "", version: `original-${index + 1}`,
@@ -63,20 +64,24 @@ export async function saveFranchisePhoto(id: string | undefined, fields: Fields,
     await db().runTransaction(async (transaction) => {
       const ref = collection().doc(id ?? randomUUID());
       const previous = id ? await transaction.get(ref) : undefined;
-      if (id && !previous?.exists) throw new Error("This photo no longer exists. Refresh the page.");
+      if (id && !previous?.exists) throw new FranchiseSaveRejected("This photo no longer exists. Refresh the page.");
       if (!id) {
         const existing = await transaction.get(collection());
-        if (existing.size >= 50) throw new Error("Keep up to 50 franchise photos. Remove an unused photo first.");
+        if (existing.size >= 50) throw new FranchiseSaveRejected("Keep up to 50 franchise photos. Remove an unused photo first.");
       }
       const prior = previous?.data();
-      if (!prior && !image) throw new Error("Choose an image for this new location.");
+      if (!prior && !image) throw new FranchiseSaveRejected("Choose an image for this new location.");
       oldPath = image ? prior?.storagePath : undefined;
       transaction.set(ref, {
         ...(prior ?? {}), ...fields, title: `${fields.location}, ${fields.city}`,
         ...(image ?? {}), src: image ? "" : prior?.src ?? "",
       });
     });
-  } catch (error) { await cleanup(image?.storagePath); throw error; }
+  } catch (error) {
+    if (error instanceof FranchiseSaveRejected) await cleanup(image?.storagePath);
+    else if (image) console.warn("Franchise image save unconfirmed; uploaded image retained for review.");
+    throw error;
+  }
   await cleanup(oldPath);
 }
 export async function deleteFranchisePhoto(id: string) {

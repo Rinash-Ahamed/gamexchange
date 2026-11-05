@@ -14,7 +14,8 @@ test("shop supports a multi-product cart and removal on small and large screens"
   await page.getByRole("link", { name: "Cart, 2 items", exact: true }).click();
   await expect(page).toHaveURL("/cart");
   await expect(page.locator("fieldset article")).toHaveCount(2);
-  await expect(page.getByRole("link", { name: "Send cart on WhatsApp" })).toHaveAttribute("href", /wa\.me/);
+  await expect(page.getByRole("link", { name: "Send cart on WhatsApp" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Account & delivery" })).toBeVisible();
   await page.getByRole("button", { name: /Remove .+ from cart/ }).first().click();
   await expect(page.locator("fieldset article")).toHaveCount(1);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
