@@ -106,8 +106,8 @@ export function paymentStockHarness() {
     const absolute = resolve(path);
     const cached = modules.get(absolute);
     if (cached) return cached.exports;
-    const module = { exports: {} as unknown };
-    modules.set(absolute, module);
+    const loadedModule = { exports: {} as unknown };
+    modules.set(absolute, loadedModule);
     const source = transpileModule(readFileSync(absolute, "utf8"), { compilerOptions: { module: ModuleKind.CommonJS, target: ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
     const injected = (id: string): unknown => {
       if (id === "server-only") return {};
@@ -119,8 +119,8 @@ export function paymentStockHarness() {
       if (id.startsWith("./")) return load(resolve(dirname(absolute), `${id}.ts`));
       return require(id);
     };
-    runInNewContext(source, { module, exports: module.exports, require: injected, Buffer, AbortSignal, fetch: fakeFetch, process: { env: { RAZORPAY_KEY_ID: "rzp_test_fixture", RAZORPAY_KEY_SECRET: "fixture-secret", RAZORPAY_WEBHOOK_SECRET: "fixture-webhook", FIREBASE_PROJECT_ID: "fixture-project" } } }, { filename: absolute });
-    return module.exports;
+    runInNewContext(source, { module: loadedModule, exports: loadedModule.exports, require: injected, Buffer, AbortSignal, fetch: fakeFetch, process: { env: { RAZORPAY_KEY_ID: "rzp_test_fixture", RAZORPAY_KEY_SECRET: "fixture-secret", RAZORPAY_WEBHOOK_SECRET: "fixture-webhook", FIREBASE_PROJECT_ID: "fixture-project" } } }, { filename: absolute });
+    return loadedModule.exports;
   }
   const orders = load("src/lib/payments/orders.ts") as typeof Orders;
   const stock = () => [...records].filter(([path]) => path.startsWith("checkoutTestStock/")).map(([, value]) => value);
