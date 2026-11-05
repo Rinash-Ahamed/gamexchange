@@ -1,14 +1,19 @@
 "use client";
 
 import { AlertTriangle, Check, Trash2, X } from "lucide-react";
-import { useFormStatus } from "react-dom";
-import { useEffect, useId, useRef, type FormEvent, type MouseEvent, type ReactNode, type RefObject } from "react";
+import { useEffect, useId, useRef, useState, useTransition, type FormEvent, type MouseEvent, type ReactNode, type RefObject } from "react";
+import { useRouter } from "next/navigation";
+import { AdminPendingContext, useAdminFormPending } from "./admin-form-status";
+import { AdminNotice } from "./AdminNotice";
+import type { AdminSaveResult } from "@/lib/admin/save-result";
 import { adminButtonClass, adminGhostButtonClass } from "./styles";
 
 type ConfirmSubmitProps = {
   children: ReactNode;
   message: string;
-  submitAction: (formData: FormData) => void | Promise<void>;
+  submitAction: (formData: FormData) => void | AdminSaveResult | Promise<void | AdminSaveResult>;
+  /** Retain native fields/files when a save returns an error. */
+  preserveOnError?: boolean;
   title?: string;
   confirmLabel?: string;
   cancelLabel?: string;
@@ -19,11 +24,15 @@ type ConfirmSubmitProps = {
 };
 
 function PendingFields({ children, className = "" }: { children: ReactNode; className?: string }) {
-  const { pending } = useFormStatus();
+  const pending = useAdminFormPending();
   return <fieldset disabled={pending} className={`min-w-0 ${className}`}>{children}{pending && <p role="status" className="col-span-full text-sm text-muted">Please wait...</p>}</fieldset>;
 }
 
-export function ConfirmSubmit({ children, message, submitAction, title = "Delete this item?", confirmLabel = "Delete permanently", cancelLabel = "Keep item", intent = "danger", className, formRef }: ConfirmSubmitProps) {
+export function ConfirmSubmit({ children, message, submitAction, preserveOnError = false, title = "Delete this item?", confirmLabel = "Delete permanently", cancelLabel = "Keep item", intent = "danger", className, formRef }: ConfirmSubmitProps) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [failure, setFailure] = useState<{ message: string } | null>(null);
+  const saving = useRef(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const ownForm = useRef<HTMLFormElement>(null);
   const form = formRef ?? ownForm;
@@ -54,8 +63,27 @@ export function ConfirmSubmit({ children, message, submitAction, title = "Delete
   };
 
   const interceptSubmit = (event: FormEvent<HTMLFormElement>) => {
+    if (saving.current) { event.preventDefault(); return; }
     if (confirmed.current) {
       confirmed.current = false;
+      if (preserveOnError) {
+        event.preventDefault();
+        // Capture before pending disables fields. Explicit invocation avoids
+        // React's uncontrolled-input reset after an action returns an error.
+        const data = new FormData(event.currentTarget);
+        saving.current = true;
+        setFailure(null);
+        startTransition(async () => {
+          try {
+            const result = await submitAction(data);
+            if (result && result.error) setFailure({ message: result.error });
+            else if (result && result.redirectTo) router.push(result.redirectTo);
+            else setFailure({ message: "Could not confirm the save. Your entries are still here. Check inventory before retrying." });
+          } catch {
+            setFailure({ message: "Could not confirm the save. Your entries are still here. Check inventory before retrying." });
+          } finally { saving.current = false; }
+        });
+      }
       return;
     }
     event.preventDefault();
@@ -82,7 +110,9 @@ export function ConfirmSubmit({ children, message, submitAction, title = "Delete
   }, []);
 
   return (
-    <form ref={form} action={submitAction} onSubmit={interceptSubmit} className="min-w-0">
+    <AdminPendingContext.Provider value={pending}>
+    <form ref={form} action={submitAction as (data: FormData) => void | Promise<void>} onSubmit={interceptSubmit} className="min-w-0" aria-busy={pending || undefined}>
+      {failure && <AdminNotice variant="error" clearQuery={false} eventKey={failure}>{failure.message}</AdminNotice>}
       <PendingFields className={className}>{children}</PendingFields>
 
       <dialog
@@ -133,5 +163,6 @@ export function ConfirmSubmit({ children, message, submitAction, title = "Delete
         </div>
       </dialog>
     </form>
+    </AdminPendingContext.Provider>
   );
 }

@@ -55,7 +55,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
           <span className="flex items-center gap-3"><PackagePlus className="size-5 text-accent-text" aria-hidden />Add inventory item</span>
           <ChevronDown className="size-5 shrink-0 transition-transform group-open:rotate-180" aria-hidden />
         </summary>
-        <ConfirmSubmit submitAction={createInventoryAction} title="Create inventory item?" confirmLabel="Create item" cancelLabel="Keep editing" intent="primary" message="Add this item to inventory? Active and Out of stock items appear in the public shop. Only Active items with stock can be purchased; drafts stay hidden." className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-2 xl:grid-cols-4">
+        <ConfirmSubmit preserveOnError submitAction={createInventoryAction} title="Create inventory item?" confirmLabel="Create item" cancelLabel="Keep editing" intent="primary" message="Add this item to inventory? Active and Out of stock items appear in the public shop. Only Active items with stock can be purchased; drafts stay hidden." className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-2 xl:grid-cols-4">
           <InventoryFields categories={categories} />
           <div className="col-span-full flex justify-end"><AdminSubmitButton pendingLabel="Creating...">Create item</AdminSubmitButton></div>
         </ConfirmSubmit>
@@ -90,7 +90,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
                     </div>
                     <details name="inventory-edit" className="group mt-3">
                       <summary className={`${adminGhostButtonClass} cursor-pointer list-none gap-2`}><Pencil className="size-4" aria-hidden /><span className="group-open:hidden">Edit item</span><span className="hidden group-open:inline">Close editor</span><ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden /></summary>
-                      <ConfirmSubmit submitAction={updateInventoryAction} title="Save inventory changes?" confirmLabel="Save changes" cancelLabel="Keep editing" intent="primary" message={`Save changes to ${item.name} (${item.sku})? Changes to price, stock and visibility will update the public shop.`} className="mt-3 grid gap-3 rounded-xl border border-line bg-surface/40 p-3 sm:grid-cols-2 xl:grid-cols-4">
+                      <ConfirmSubmit preserveOnError submitAction={updateInventoryAction} title="Save inventory changes?" confirmLabel="Save changes" cancelLabel="Keep editing" intent="primary" message={`Save changes to ${item.name} (${item.sku})? Changes to price, stock and visibility will update the public shop.`} className="mt-3 grid gap-3 rounded-xl border border-line bg-surface/40 p-3 sm:grid-cols-2 xl:grid-cols-4">
                         <InventoryFields item={item} categories={categories} />
                         <div className="col-span-full flex justify-end"><AdminSubmitButton pendingLabel="Saving..."><Save className="mr-2 size-4" aria-hidden />Save changes</AdminSubmitButton></div>
                       </ConfirmSubmit>

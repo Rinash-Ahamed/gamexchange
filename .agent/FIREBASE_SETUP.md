@@ -145,6 +145,8 @@ Public catalogue and banner data use a 60-second server cache. Admin saves immed
 
 ## 7. Inventory image uploads
 
+Failed-save retention update, 5 November 2026: inventory Create/Save returns errors in place rather than redirecting and clearing the form. The confirmed editor retains native input values, selected files and photo order on validation/upload/server failure, and keeps its loading/duplicate-submit protection. Success still refreshes the list and resets/closes the successful editor. This does not persist drafts across a manual refresh, logout or page navigation. Existing admin authorization, stale-editor/SKU checks and uncertain-upload cleanup protections remain. Authenticated failure/success browser verification is pending.
+
 Inventory uses the same `FIREBASE_STORAGE_BUCKET` and server service account as banners. No additional environment variables or public upload rules are required. Restart the development server after changing environment variables.
 
 In `/admin/inventory`, choose a product image when adding stock. Editing a product lets you replace its image; leaving the file picker empty keeps the current image. Recommended artwork is 1200 x 1200 px. Static JPG, PNG and WebP are accepted up to 5 MB, with each side between 300 and 4096 px. Portrait and landscape images are supported without cropping. The server checks the decoded file, corrects orientation, strips metadata and converts it to WebP, fitting within 1600 x 1600 px without enlargement.

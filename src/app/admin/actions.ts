@@ -3,7 +3,8 @@ import { recordPageFormLocation, recordPageHref } from "@/lib/admin/record-curso
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { requireAdmin, clearAdminSession } from "@/lib/admin/auth";
+import { requireAdmin, clearAdminSession, getAdminSession } from "@/lib/admin/auth";
+import { inventoryErrors, type AdminSaveResult } from "@/lib/admin/save-result";
 import {
   createInventoryItem,
   getInventoryItem,
@@ -83,13 +84,17 @@ function inventoryFields(formData: FormData) {
   };
 }
 
-function handleInventoryError(error: unknown): never {
-  if (error instanceof InventoryConflictError) redirect("/admin/inventory?error=conflict");
-  if (error instanceof CategoryError) redirect("/admin/inventory?error=category");
-  if (error instanceof InventoryImageError) redirect(`/admin/inventory?error=${error.code}`);
-  if (isDuplicateSkuError(error)) redirect("/admin/inventory?error=duplicate");
+function inventoryErrorCode(error: unknown) {
+  if (error instanceof InventoryConflictError) return "conflict";
+  if (error instanceof CategoryError) return "category";
+  if (error instanceof InventoryImageError) return error.code;
+  if (isDuplicateSkuError(error)) return "duplicate";
   console.error("[admin] Inventory change could not be confirmed.");
-  redirect("/admin/inventory?error=save");
+  return "save";
+}
+
+function handleInventoryError(error: unknown): never {
+  redirect(`/admin/inventory?error=${inventoryErrorCode(error)}`);
 }
 
 export async function logoutAction() {
@@ -97,10 +102,11 @@ export async function logoutAction() {
   redirect("/admin/login");
 }
 
-export async function createInventoryAction(formData: FormData) {
-  const actor = await requireAdmin();
+export async function createInventoryAction(formData: FormData): Promise<AdminSaveResult> {
+  const actor = await getAdminSession();
+  if (!actor) return { error: "Your admin session expired. Your entries are still here, but you must sign in again before saving." };
   const parsed = inventoryCreateSchema.safeParse(inventoryFields(formData));
-  if (!parsed.success) redirect("/admin/inventory?error=invalid");
+  if (!parsed.success) return { error: inventoryErrors.invalid! };
 
   let uploaded: InventoryPhoto[] = [];
   try {
@@ -109,20 +115,21 @@ export async function createInventoryAction(formData: FormData) {
     await createInventoryItem({ ...parsed.data, ...gallery.fields, tradeInVoucher: 0, tradeInCash: 0 }, actor);
   } catch (error) {
     await cleanRejectedUploads(error, uploaded);
-    handleInventoryError(error);
+    return { error: inventoryErrors[inventoryErrorCode(error)]! };
   }
   refreshAdminData("inventory");
-  redirect(`/admin/inventory?notice=created&saved=${Date.now()}#inventory-list`);
+  return { redirectTo: `/admin/inventory?notice=created&saved=${Date.now()}#inventory-list` };
 }
 
-export async function updateInventoryAction(formData: FormData) {
-  const actor = await requireAdmin();
+export async function updateInventoryAction(formData: FormData): Promise<AdminSaveResult> {
+  const actor = await getAdminSession();
+  if (!actor) return { error: "Your admin session expired. Your entries are still here, but you must sign in again before saving." };
   const parsed = inventoryUpdateSchema.safeParse({
     ...inventoryFields(formData),
     id: formText(formData, "id"),
     expectedUpdatedAt: formText(formData, "expectedUpdatedAt"),
   });
-  if (!parsed.success) redirect("/admin/inventory?error=invalid");
+  if (!parsed.success) return { error: inventoryErrors.invalid! };
   let uploaded: InventoryPhoto[] = [];
   try {
     const { id, expectedUpdatedAt, ...fields } = parsed.data;
@@ -134,10 +141,10 @@ export async function updateInventoryAction(formData: FormData) {
     await Promise.all(previousPaths.map((path) => removeInventoryImage(path)));
   } catch (error) {
     await cleanRejectedUploads(error, uploaded);
-    handleInventoryError(error);
+    return { error: inventoryErrors[inventoryErrorCode(error)]! };
   }
   refreshAdminData("inventory");
-  redirect(`/admin/inventory?notice=updated&saved=${Date.now()}#inventory-list`);
+  return { redirectTo: `/admin/inventory?notice=updated&saved=${Date.now()}#inventory-list` };
 }
 
 export async function deleteInventoryAction(formData: FormData) {
