@@ -76,6 +76,11 @@ export type ServiceRecord = {
   status: ServiceStatus;
   estimatedCost: number;
   notes: string;
+  source?: "website-callback";
+  branch?: string;
+  contactMethod?: "Phone call";
+  callbackFingerprint?: string;
+  callbackConsent?: { accepted: true; at: string };
   createdAt: string;
   updatedAt: string;
 };

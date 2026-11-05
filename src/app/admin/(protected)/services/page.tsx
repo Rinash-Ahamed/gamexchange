@@ -64,10 +64,12 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-display text-xs font-semibold uppercase tracking-[0.16em] text-accent-text">{record.ticketNumber}</p>
                       <span className="rounded-full border border-line-strong bg-surface px-3 py-1 text-xs font-semibold">{titleCaseStatus(record.status)}</span>
+                      {record.source === "website-callback" && <span className="rounded-full border border-blue/40 bg-blue/10 px-3 py-1 text-xs font-semibold text-accent-text">Callback requested</span>}
                     </div>
                     <h3 className="mt-3 font-display text-xl font-bold uppercase">{record.customerName}</h3>
                     <p className="text-sm text-muted">{record.phone} · {record.device} · Received {formatAdminDate(record.createdAt)}</p>
                     <p className="mt-4"><span className="text-sm font-semibold text-muted">Issue:</span> {record.issue}</p>
+                    {record.source === "website-callback" && <p className="mt-2 text-sm text-muted">Preferred branch: {record.branch ?? "No preference"} · <a href={`tel:+91${record.phone}`} className="text-accent-text underline">Call customer</a></p>}
                   </div>
                   <p className="font-display text-2xl font-bold tabular-nums">{formatINR(record.estimatedCost)}</p>
                 </div>

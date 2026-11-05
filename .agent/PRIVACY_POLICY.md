@@ -1,5 +1,7 @@
 # Privacy policy publication and review record
 
+5 November 2026 follow-up: public policy now describes explicit repair callback consent and private service-record storage plus configured Cloudflare Turnstile security processing. Names, phones and repair text are not posted to Siteverify; only the challenge token and server secret are posted. Policy date updated to 5 November. Source changes only, not a deployment or legal compliance certification. Callback and provider/browser persistence verification remain pending. See ENQUIRY_SETUP.md.
+
 Status: Publication requested by the business owner on 3 November 2026. Public source: src/data/privacy-policy.ts, rendered at /policies/privacy-policy. Footer, policy directory, metadata and sitemap use the public policy. Actual production deployment and legal compliance have not been verified. No lawyer approval is claimed.
 
 Current public source additionally covers customer Google/Firebase sign-in, session authentication storage, Indian recipient/address/phone fields, checkout snapshots including abandoned/unpaid test records, Razorpay prefill and references, admin-only access, checkout consent receipt, no marketing opt-in, purpose-limited sharing, retention limitations and privacy requests. Real payments, shipping fees/serviceability, courier dispatch and Gmail notifications remain unimplemented. Use sample shipping/payment details during testing. This paragraph supersedes the historical text below; the public source is authoritative and must be maintained rather than copying the old body.

@@ -7,7 +7,7 @@ import type { NextConfig } from "next";
  * debugging, but it is deliberately excluded from production.
  */
 const scriptSrc = [
-  "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdn.razorpay.com https://apis.google.com",
+  "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdn.razorpay.com https://apis.google.com https://challenges.cloudflare.com",
   process.env.NODE_ENV === "development" ? "'unsafe-eval'" : "",
 ]
   .filter(Boolean)
@@ -23,7 +23,7 @@ const csp = [
   "img-src 'self' data: blob: https://framerusercontent.com",
   "font-src 'self' data:",
   `connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.razorpay.com https://checkout.razorpay.com ${authOrigin}`,
-  `frame-src https://api.razorpay.com https://checkout.razorpay.com ${authOrigin}`,
+  `frame-src https://api.razorpay.com https://checkout.razorpay.com https://challenges.cloudflare.com ${authOrigin}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

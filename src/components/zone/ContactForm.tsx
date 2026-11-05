@@ -5,10 +5,11 @@ import { ContactBlock, SelectField, TextAreaField } from "@/components/forms/fie
 import { SubmitArea, SuccessPanel } from "@/components/forms/SubmitArea";
 import { formToPayload, useEnquiry } from "@/components/forms/use-enquiry";
 import { contactTopics } from "@/lib/validation";
+import { TurnstileCheck } from "@/components/forms/TurnstileCheck";
 
 export function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
-  const { state, errors, submit, reset } = useEnquiry(formRef);
+  const { state, errors, submit, reset, challengeResetKey } = useEnquiry(formRef);
 
   return (
     <div>
@@ -33,6 +34,7 @@ export function ContactForm() {
           <TextAreaField label="How can we help?" name="message" errors={errors} rows={5} />
           <ContactBlock errors={errors} />
         </div>
+        {state.status !== "success" && <TurnstileCheck key={challengeResetKey} action="contact" />}
         <SubmitArea state={state} label="Prepare message" />
       </form>
     </div>

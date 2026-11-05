@@ -1,7 +1,8 @@
 "use client";
 
-import { useId, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { branchChoices, contactMethods } from "@/lib/validation";
+import { indianMobileSchema } from "@/lib/phone";
 
 export const inputClass =
   "min-h-12 w-full rounded-2xl border border-line-strong bg-surface px-4 text-base text-ink placeholder:text-muted/70 transition-[border-color,box-shadow] duration-200 focus:border-blue focus:outline-none focus:ring-4 focus:ring-blue/25 aria-[invalid=true]:border-danger aria-[invalid=true]:ring-danger/20";
@@ -84,13 +85,22 @@ export function PillRadio({ legend, name, options, errors, defaultValue }: { leg
   );
 }
 
-export function ContactBlock({ errors }: { errors: Errors }) {
+export function PhoneField({ errors }: { errors: Errors }) {
+  const [error, setError] = useState<string>();
+  return <Field label="Mobile number" name="phone" errors={{ ...errors, ...(error ? { phone: [error] } : {}) }} hint="10-digit Indian mobile number. +91 is optional.">
+    {({ id, describedBy, invalid }) => <input id={id} name="phone" type="tel" inputMode="tel" autoComplete="tel" required maxLength={24} placeholder="98765 43210" aria-invalid={invalid} aria-describedby={describedBy} className={inputClass}
+      onChange={() => setError(undefined)}
+      onBlur={(event) => { const parsed = indianMobileSchema.safeParse(event.currentTarget.value); setError(parsed.success ? undefined : parsed.error.issues[0]?.message); }} />}
+  </Field>;
+}
+
+export function ContactBlock({ errors, phoneCall = false }: { errors: Errors; phoneCall?: boolean }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2">
       <TextField label="Your name" name="name" errors={errors} autoComplete="name" />
-      <TextField label="Mobile number" name="phone" errors={errors} type="tel" inputMode="tel" autoComplete="tel" placeholder="98765 43210" />
+      <PhoneField errors={errors} />
       <div className="sm:col-span-2">
-        <PillRadio legend="Preferred contact method" name="contactMethod" options={contactMethods} errors={errors} defaultValue="WhatsApp" />
+        {phoneCall ? <><input type="hidden" name="contactMethod" value="Phone call" /><p className="text-sm text-muted">Our team will call the mobile number above.</p></> : <PillRadio legend="Preferred contact method" name="contactMethod" options={contactMethods} errors={errors} defaultValue="WhatsApp" />}
       </div>
       <SelectField label="Preferred branch" name="branch" errors={errors} options={branchChoices} placeholder="No preference" className="sm:col-span-2" required={false} />
       <Honeypot />

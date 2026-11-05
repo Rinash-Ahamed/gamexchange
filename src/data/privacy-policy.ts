@@ -5,7 +5,7 @@ export const privacyPolicy: LegalPolicy = {
   "slug": "privacy-policy",
   "title": "Privacy policy",
   "description": "How GameXchange handles account, delivery, payment, enquiry and customer service information, and how to contact us about your privacy.",
-  "updated": "3 November 2026",
+  "updated": "5 November 2026",
   "sections": [
     {
       "id": "who-we-are",
@@ -48,6 +48,7 @@ export const privacyPolicy: LegalPolicy = {
       "title": "Technical information and website preferences",
       "paragraphs": [
         "The website processes technical request information, such as an IP address or available request identifiers, to operate forms and help prevent abuse. Hosting and infrastructure providers may also process request and security logs as part of delivering the service.",
+        "When configured on the Contact and Repair forms, Cloudflare Turnstile processes browser and security information to help detect automated submissions. We verify its short-lived challenge result on our server before processing the enquiry. We do not send your name, phone number or repair message to Turnstile's verification endpoint, and do not save challenge tokens with your service record.",
         "Your browser can store a theme preference and cart product identifiers and quantities. Browser session storage is used for the introductory loading screen and may retain customer authentication state for the browser session, with an in-memory fallback if storage is unavailable. We do not save your delivery address in cart storage. Authorised administrators receive a secure session cookie after multi-factor sign-in, subject to a 15-minute inactivity timeout and an eight-hour maximum."
       ]
     },
@@ -63,7 +64,7 @@ export const privacyPolicy: LegalPolicy = {
       "id": "enquiries-and-whatsapp",
       "title": "Enquiries and WhatsApp",
       "paragraphs": [
-        "Submitting a website enquiry sends its information to our server for validation and preparation of a WhatsApp message. The current enquiry endpoint does not save the full enquiry to Firestore; it returns a prepared message link. Temporary anti-abuse records are processed separately.",
+        "Submitting a WhatsApp enquiry sends its information to our server for validation and preparation of a message link. You must send the prepared message for it to reach the team. If you choose Request a callback on the repair form and agree to the callback notice, we save your name, mobile number, device and issue details, preferred branch, request reference and consent receipt in our private customer service records so authorised staff can contact you. A saved callback request is not a confirmed repair booking. Temporary anti-abuse records are processed separately.",
         "Opening the prepared link passes the message content to WhatsApp. You must review and send the message for it to reach our team through WhatsApp. WhatsApp processes information under its own terms and privacy policy.",
         "Information you share directly with the team, including through WhatsApp, telephone or email, may be retained in those communication systems and recorded where needed to handle your request."
       ]

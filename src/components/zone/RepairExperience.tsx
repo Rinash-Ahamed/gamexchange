@@ -2,17 +2,21 @@
 
 import { useRef, useState } from "react";
 import { repairCategories, repairDevices, repairFaults } from "@/data/repair";
-import { ContactBlock, SelectField, TextAreaField, TextField } from "@/components/forms/fields";
+import { ContactBlock, Field, inputClass, SelectField, TextAreaField, TextField } from "@/components/forms/fields";
+import { TurnstileCheck } from "@/components/forms/TurnstileCheck";
+import { ControllerButton } from "@/components/ui/ControllerButton";
+import Link from "next/link";
 import { SubmitArea, SuccessPanel } from "@/components/forms/SubmitArea";
 import { formToPayload, useEnquiry } from "@/components/forms/use-enquiry";
 import { RepairDiagnostic } from "./RepairDiagnostic";
 
 export function RepairExperience() {
   const formRef = useRef<HTMLFormElement>(null);
-  const { state, errors, submit, reset } = useEnquiry(formRef);
+  const { state, errors, submit, reset, challengeResetKey } = useEnquiry(formRef);
   const [category, setCategory] = useState("");
   const [device, setDevice] = useState("");
   const [faults, setFaults] = useState<string[]>([]);
+  const [delivery, setDelivery] = useState("whatsapp");
   const toggleFault = (fault: string) => {
     setFaults((current) => current.includes(fault) ? current.filter((item) => item !== fault) : [...current, fault]);
   };
@@ -21,7 +25,9 @@ export function RepairExperience() {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    void submit(formToPayload(e.currentTarget, "repair", ["fault"]));
+    const payload = formToPayload(e.currentTarget, "repair", ["fault"]);
+    if (delivery === "callback") payload.callbackConsent = payload.callbackConsent === "on";
+    void submit(payload);
   };
 
   return (
@@ -30,8 +36,14 @@ export function RepairExperience() {
 
       <div>
         {state.status === "success" && <SuccessPanel whatsappUrl={state.whatsappUrl} onEdit={reset} title="Repair enquiry ready" />}
+        {state.status === "callback-saved" && <div role="status" tabIndex={-1} ref={(element) => element?.focus()} className="metal rounded-3xl p-7 text-center outline-none sm:p-10">
+          <h2 className="font-display text-3xl font-bold uppercase">Callback requested</h2>
+          <p className="mt-3 text-muted">Your request has been saved. The GameXchange team can call you to discuss your repair. A repair is not booked yet.</p>
+          <p className="mt-3 break-all font-semibold">Reference: {state.ticketNumber}</p>
+          <div className="mt-6"><ControllerButton onClick={reset} glyph="o" variant="ghost">New enquiry</ControllerButton></div>
+        </div>}
 
-        <form ref={formRef} onSubmit={onSubmit} noValidate hidden={state.status === "success"} className="metal relative rounded-3xl p-6 sm:p-8" aria-label="Repair enquiry">
+        <form ref={formRef} onSubmit={onSubmit} noValidate hidden={state.status === "success" || state.status === "callback-saved"} className="metal relative rounded-3xl p-6 sm:p-8" aria-label="Repair enquiry">
           <h2 className="font-display text-2xl font-bold uppercase">Request a repair</h2>
           <p className="mt-1 text-sm text-muted">Tell us what’s wrong. The shop will review it and reply. Nothing is booked until they confirm.</p>
 
@@ -57,8 +69,19 @@ export function RepairExperience() {
             </div>
           </div>
 
-          <div className="mt-5"><ContactBlock errors={errors} /></div>
-          <SubmitArea state={state} label="Prepare enquiry" />
+          <div className="mt-5 space-y-5">
+            <Field label="How would you like to contact us?" name="delivery" errors={errors}>
+              {({ id, describedBy, invalid }) => <select id={id} name="delivery" value={delivery} onChange={(event) => setDelivery(event.target.value)} aria-invalid={invalid} aria-describedby={describedBy} className={inputClass}>
+                <option value="whatsapp">Send on WhatsApp</option><option value="callback">Request a callback</option>
+              </select>}
+            </Field>
+            <ContactBlock errors={errors} phoneCall={delivery === "callback"} />
+            {delivery === "callback" && <Field label="Callback consent" name="callbackConsent" errors={errors}>
+              {({ id, describedBy, invalid }) => <div className="flex items-start gap-3 text-sm leading-6"><input id={id} name="callbackConsent" type="checkbox" required aria-invalid={invalid} aria-describedby={describedBy} className="mt-1 size-4 shrink-0 accent-blue" /><label htmlFor={id}>I agree that GameXchange may save my repair details and call me about this request. <Link href="/policies/privacy-policy" className="text-accent-text underline">Privacy Policy</Link></label></div>}
+            </Field>}
+          </div>
+          {state.status !== "success" && state.status !== "callback-saved" && <TurnstileCheck key={challengeResetKey} action="repair" />}
+          <SubmitArea state={state} label={delivery === "callback" ? "Request a callback" : "Prepare enquiry"} glyph={delivery === "callback" ? "play" : "x"} />
         </form>
       </div>
     </div>

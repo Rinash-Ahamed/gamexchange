@@ -21,6 +21,8 @@ The following collections are managed by the app:
 
 `inventorySkus` is an internal uniqueness index. Do not edit it manually.
 
+Repair callback update, 5 November 2026: the explicit callback option creates a received ticket in serviceRecords using the server Admin SDK, with customer/device/issues/phone/branch and a save-and-call consent receipt. Stable UUID plus a transaction/HMAC fingerprint protects unchanged in-form retries. Existing same-origin, signed token, rate limits and configured Turnstile run before storage. Admin services displays the callback label and Call customer action; no browser database permission or public read endpoint is added. Firebase must be configured; no local-memory success fallback exists. Ordinary WhatsApp enquiries remain message links. See ENQUIRY_SETUP.md for setup, keys and verification limits.
+
 ## 2. Create server credentials
 
 In Firebase, open **Project settings > Service accounts**, then generate a new private key. Copy these values from the downloaded JSON file:

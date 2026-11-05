@@ -7,6 +7,8 @@ import { rateLimit } from "@/lib/rate-limit";
 import { clientKey, isSameOrigin, verifyToken } from "@/lib/security";
 import { whatsappUrl } from "@/data/site";
 import { readLimitedText, RequestBodyError } from "@/lib/request-body";
+import { saveRepairCallback } from "@/lib/repair-callback";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 
@@ -54,6 +56,12 @@ export async function POST(req: NextRequest) {
     // Honeypot: people never see this field. Answer like success so bots learn nothing.
     if (parsed.data.website) return NextResponse.json({ ok: true, whatsappUrl: whatsappUrl() }, { headers: { "Cache-Control": "no-store" } });
 
+    if (parsed.data.kind === "contact" || parsed.data.kind === "repair") {
+      const challenge = await verifyTurnstile(body.turnstileToken, parsed.data.kind);
+      if (challenge === "unavailable") return fail("Security verification is temporarily unavailable. Please try again shortly.", 503);
+      if (challenge !== "ok") return fail("Please complete the security check again before sending.", 400, { fieldErrors: { turnstileToken: ["Complete the security check"] } });
+    }
+
     // One phone number can't flood the shop even from many IPs.
     const phoneLimit = await rateLimit(`phone:${parsed.data.phone}`, 3, 60 * 60 * 1000);
     if (phoneLimit.unavailable) return fail("Enquiries are temporarily unavailable. Please try again shortly.", 503);
@@ -61,7 +69,16 @@ export async function POST(req: NextRequest) {
       return fail("We already have several enquiries from this number. Please message the shop on WhatsApp directly.", 429);
     }
 
-    // No booking backend exists yet: the enquiry is delivered when the customer sends this message.
+    if (parsed.data.kind === "repair" && parsed.data.delivery === "callback") {
+      try {
+        const ticketNumber = await saveRepairCallback(parsed.data);
+        return NextResponse.json({ ok: true, callback: true, ticketNumber }, { headers: { "Cache-Control": "no-store" } });
+      } catch {
+        return fail("We could not confirm your callback request. Please retry with the same details or contact the team directly.", 503);
+      }
+    }
+
+    // Other enquiries retain the existing customer-sent WhatsApp flow.
     return NextResponse.json({ ok: true, whatsappUrl: whatsappUrl(buildEnquiryMessage(parsed.data)) }, { headers: { "Cache-Control": "no-store" } });
   });
 }

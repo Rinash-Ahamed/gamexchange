@@ -10,9 +10,10 @@ export type EnquiryState =
   | { status: "idle" }
   | { status: "submitting" }
   | { status: "success"; whatsappUrl: string }
+  | { status: "callback-saved"; ticketNumber: string }
   | { status: "error"; message: string };
 
-type EnquiryResponse = { ok: boolean; token?: string; error?: string; fieldErrors?: Errors; whatsappUrl?: string; retry?: boolean };
+type EnquiryResponse = { ok: boolean; token?: string; error?: string; fieldErrors?: Errors; whatsappUrl?: string; retry?: boolean; callback?: boolean; ticketNumber?: string };
 
 async function requestEnquiry(url: string, init: RequestInit, requests: Set<AbortController>) {
   const controller = new AbortController();
@@ -37,6 +38,8 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
   const requests = useRef(new Set<AbortController>());
   const mounted = useRef(true);
   const submitting = useRef(false);
+  const callbackAttempt = useRef<{ signature: string; id: string } | null>(null);
+  const [challengeResetKey, setChallengeResetKey] = useState(0);
 
   useEffect(() => {
     mounted.current = true;
@@ -84,9 +87,18 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
 
   async function submit(payload: Record<string, unknown>) {
     if (submitting.current) return;
+    if (payload.kind === "repair" && payload.delivery === "callback") {
+      const signature = JSON.stringify({ ...payload, turnstileToken: undefined });
+      if (callbackAttempt.current?.signature !== signature) callbackAttempt.current = { signature, id: crypto.randomUUID() };
+      payload = { ...payload, callbackRequestId: callbackAttempt.current.id };
+    }
     const parsed = enquirySchema.safeParse(payload);
     if (!parsed.success) {
       fail(z.flattenError(parsed.error).fieldErrors, "Please fix the highlighted fields.");
+      return;
+    }
+    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() && ["contact", "repair"].includes(String(payload.kind)) && !payload.turnstileToken) {
+      fail({ turnstileToken: ["Complete the security check"] }, "Please complete the security check before sending.");
       return;
     }
 
@@ -106,6 +118,10 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
         token.current = null; // Single use; a fresh one is fetched before any retry.
         if (!mounted.current) return;
 
+        if (ok && data.ok && payload.kind === "repair" && payload.delivery === "callback" && data.callback === true && typeof data.ticketNumber === "string") {
+          setState({ status: "callback-saved", ticketNumber: data.ticketNumber });
+          return;
+        }
         if (ok && data.ok && data.whatsappUrl) {
           setState({ status: "success", whatsappUrl: data.whatsappUrl });
           return;
@@ -120,15 +136,17 @@ export function useEnquiry(formRef: React.RefObject<HTMLFormElement | null>) {
       fail({}, "We couldn’t reach the server. Check your connection and try again.");
     } finally {
       submitting.current = false;
+      if (mounted.current) setChallengeResetKey((value) => value + 1);
     }
   }
 
   const reset = () => {
+    callbackAttempt.current = null;
     setErrors({});
     setState({ status: "idle" });
   };
 
-  return { state, errors, submit, reset };
+  return { state, errors, submit, reset, challengeResetKey };
 }
 
 /** Reads a form into a plain object; multi-value fields (checkboxes) become arrays. */

@@ -7,6 +7,7 @@
 
 - [Session context and current work](SESSION.md): read first when continuing development.
 - [Firebase setup](FIREBASE_SETUP.md): authentication, database, Storage and upload requirements.
+- [Enquiry setup](ENQUIRY_SETUP.md): repair callbacks saved in Admin service records, mobile validation and Contact/Repair Turnstile keys.
 - [Performance audit](PERFORMANCE_AUDIT.md): applied optimizations, verification limits and follow-up measurements.
 - [Cleanup audit, 5 November 2026](CODE_CLEANUP_2026-11-05.md): dead-code removal, shared helpers, query/subscription deduplication and behavior checks.
 - [Architecture review](ARCHITECTURE_REVIEW.md): minor fixes, build health gate and major production decisions.
@@ -93,7 +94,7 @@ The default theme follows the visitor's local time: light from 6:00 AM through 5
 
 - `/franchise` has a top-section click-to-play video and a streamed managed photo gallery. Admin > Homepage > Franchise photos manages photos with city, state, locality, description, order and draft/published status using the existing Firebase bucket. Defaults remain under `public/franchise/` and `src/data/franchise.ts`; the supplied illustrated map/location list stays separate and static. Enquiry opens a WhatsApp draft. See FIREBASE_SETUP.md for initialization, upload and caching limits. Contact branches, financial terms and map coordinates are not inferred from photo entries.
 
-- Forms never claim a booking. Success means "ready to send on WhatsApp".
+- Forms never claim a booking. WhatsApp success means ready to send; the explicit repair callback path saves a private service ticket and shows its reference. See ENQUIRY_SETUP.md for callback consent, admin intake and optional Turnstile setup.
 - Product images load from the existing site's CDN (`framerusercontent.com`); self-host them before decommissioning the old site.
 - FAQs and legal policies now come from the supplied `GXC Concepts Website Content.docx`, with grammar/formatting edits. FAQ purchase and sell instructions match the current enquiry workflow rather than advertising unimplemented cart, checkout or PIN-code tools.
 - Public legal routes: `/terms`, `/policies` and `/policies/[slug]`. Shared content lives in `src/data/legal.ts`; privacy content is in `src/data/privacy-policy.ts`, published at `/policies/privacy-policy` at the owner's request. It is linked in the footer, policy directory, sitemap and required checkout consent. The legacy protected `/admin/privacy-preview` redirects to the public page. Publication does not imply legal review or live-payment readiness. See `.agent/PRIVACY_POLICY.md`.

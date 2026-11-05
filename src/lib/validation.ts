@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { zoneStationNames } from "@/data/gamezone";
+import { indianMobileSchema } from "./phone";
 import { repairCategories, repairFaults, repairDevices, exchangeConsoles, exchangeConditions, exchangeAccessories, exchangeUpgrades } from "@/data/repair";
 
 /** Single-line text: control characters (incl. CR/LF) become spaces, runs collapse. */
@@ -12,11 +13,7 @@ const contactTopics = ["General enquiry", "Franchise opportunity"] as const;
 const branchChoices = ["No preference", "Sungam Bypass Rd", "Karumbukkadai", "Pollachi"] as const;
 
 const name = z.string({ error: "Enter your name" }).transform(oneLine).pipe(z.string().min(2, "Enter your name").max(80, "Name is too long"));
-const phone = z
-  .string({ error: "Enter your mobile number" })
-  .transform((v) => v.replace(/[\s-]/g, ""))
-  .pipe(z.string().regex(/^(\+?91)?[6-9]\d{9}$/, "Enter a valid 10-digit Indian mobile number"))
-  .transform((value) => value.slice(-10));
+const phone = indianMobileSchema;
 const contactMethod = z.enum(contactMethods, { error: "Choose how we should reach you" });
 const branch = z.enum(branchChoices).default("No preference");
 const honeypot = z.string().max(200).optional();
@@ -27,6 +24,9 @@ export const repairSchema = z
   .object({
     kind: z.literal("repair"),
     ...common,
+    delivery: z.enum(["whatsapp", "callback"]).default("whatsapp"),
+    callbackRequestId: z.uuid().optional(),
+    callbackConsent: z.boolean().optional(),
     category: z.enum(repairCategories, { error: "Choose a device category" }),
     device: z.string({ error: "Choose your device" }).transform(oneLine).pipe(z.string().min(1, "Choose your device")),
     deviceOther: z.string().transform(oneLine).pipe(z.string().max(120, "Keep the device model under 120 characters")).optional().default(""),
@@ -35,7 +35,9 @@ export const repairSchema = z
     branch,
   })
   .refine((v) => repairDevices[v.category].includes(v.device), { path: ["device"], message: "Choose a device from the list" })
-  .refine((v) => v.device !== "Other" || v.deviceOther.length >= 2, { path: ["deviceOther"], message: "Enter your device brand and model" });
+  .refine((v) => v.device !== "Other" || v.deviceOther.length >= 2, { path: ["deviceOther"], message: "Enter your device brand and model" })
+  .refine((v) => v.delivery !== "callback" || Boolean(v.callbackRequestId), { path: ["callbackRequestId"], message: "Refresh the form and try again" })
+  .refine((v) => v.delivery !== "callback" || v.callbackConsent === true, { path: ["callbackConsent"], message: "Please agree so the team can save your request and call you" });
 
 export const exchangeSchema = z.object({
   kind: z.literal("exchange"),
