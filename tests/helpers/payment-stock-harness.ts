@@ -91,8 +91,9 @@ export function paymentStockHarness() {
     if (unavailable || path === "orders" && uncertainCreate) throw new Error("Fixture connection lost");
     let data: Data | undefined;
     if (path === "orders" && options.body) {
-      data = { ...JSON.parse(options.body), id: `order_fixture${++sequence}`, status: "created" };
-      gatewayOrders.set(String(data.id), data);
+      const created: Data = { ...JSON.parse(options.body), id: `order_fixture${++sequence}`, status: "created" };
+      data = created;
+      gatewayOrders.set(String(created.id), created);
     } else if (path.startsWith("payments/")) data = payments.get(path.split("/")[1]!);
     else if (path.endsWith("/payments")) {
       const items = [...payments.values()].filter((payment) => payment.order_id === path.split("/")[1]);
